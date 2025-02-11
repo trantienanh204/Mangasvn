@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Voucher</title>
+    <script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <a th:href="@{/panda/nhanvien/duyetdon/hienthi}">
+                <i class="fa-solid fa-arrow-right fa-flip-horizontal" style="color: #000000;"></i>
+            </a>
+            <h2 style="padding-left: 470px">
+                Thông tin đơn hàng
+            </h2>
+        </div>
+        <div class="card-body p-4">
+            <form th:object="${DonHang}">
+
+                <input type="text" th:field="*{id}" class="form-control" hidden>
+                <div class="modal-header">
+                    <div class="row mb-3">
+                        <label class="col-sm-4 col-form-label">Hóa đơn:</label>
+                        <div class="col-sm-7">
+                            <input type="text" th:field="*{hoaDon.mahoadon}" class="form-control" readonly
+                                   style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                        </div>
+                    </div>
+                    <div class="row mb-3" style="padding-right: 625px">
+                        <label class="col-sm-4 col-form-label">Nhân viên:</label>
+                        <div class="col-sm-7">
+                            <input type="text" th:field="*{hoaDon.nhanVien.tennhanvien}" class="form-control" readonly
+                                   style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Tên khách hàng</label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{hoaDon.khachHang.tenkhachhang}" class="form-control" readonly
+                                       style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{hoaDon.khachHang.sdt}" class="form-control" readonly
+                                       style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ghi chú</label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{hoaDon.ghiChu}" class="form-control" readonly
+                                       style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Lý do nếu đơn hủy</label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{lydohuy}" class="form-control" readonly
+                                       style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Ngày đặt</label>
+                            <div class="input-group">
+                                <input type="date"
+                                       th:field="*{ngaytao}"
+                                       class="form-control" readonly
+                                       style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">Địa chỉ</label>
+                            <input type="text" th:field="*{hoaDon.khachHang.diachi}" class="form-control" readonly
+                                   style="background-color: white; color: black; pointer-events: none; border: 1px solid #ced4da;;">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Mã spct</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Màu sắc</th>
+                                    <th>Kích thước</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="dd,i: ${listhdct}">
+                                    <td th:text="${dd.sanPhamChiTiet.maspct}"></td>
+                                    <td th:text="${dd.sanPhamChiTiet.sanPham.tensp}"></td>
+                                    <td th:text="${dd.sanPhamChiTiet.mauSac.ten}"></td>
+                                    <td th:text="${dd.sanPhamChiTiet.kichThuoc.ten}"></td>
+                                    <td th:text="${dd.soluong}"></td>
+                                    <td th:text="${#numbers.formatDecimal(dd.dongia, 1, 'POINT',0, 'COMMA')}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" style="margin-top: 10px">Thành tiền</label>
+                            <input type="text" th:value="${DonHang.hoaDon?.thanhtien != null ? #numbers.formatDecimal(DonHang.hoaDon?.thanhtien, 1, 'POINT', 0, 'COMMA') + ' VNĐ' : '0'}" class="form-control" readonly
+                                   style="background-color: white; color: black;">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" style="margin-top: 10px">Giảm giá</label>
+                            <input type="text" th:value="${DonHang?.hoaDon?.giagiam  != null ? DonHang?.hoaDon?.giagiam  : '0'}" class="form-control" readonly
+                                   style="background-color: white; color: black;">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

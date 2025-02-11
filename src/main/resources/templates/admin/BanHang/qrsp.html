@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách mã sản phẩm</title>
+
+</head>
+<body th:fragment="qrcode">
+
+
+
+
+<!--<div id="qrScanContainer" style="display: none; margin-top: 20px;">-->
+<!--    <video id="video" width="300" height="200" autoplay></video>-->
+<!--    <canvas id="canvas" width="300" height="200" style="display: none;"></canvas>-->
+<!--    <p id="message"></p>-->
+<!--</div>-->
+
+<h2>Danh sách sản phẩm</h2>
+<div class="table-container">
+
+
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Mã spct</th>
+            <th>Tên sản phẩm</th>
+            <th>Màu</th>
+            <th>Kích thước</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="spct, i : ${spct}">
+            <td th:text="${i.index + 1}"></td>
+            <td th:text="${spct.maspct}"></td>
+            <td th:text="${spct.sanPham.tensp}"></td>
+            <td th:text="${spct.mauSac.ten}"></td>
+            <td th:text="${spct.kichThuoc.ten}"></td>
+            <td>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                        th:data-id="${spct.maspct}"
+                        onclick="generateQRCode(this)">Tạo mã QR
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script th:src="@{/Javascrip/quetmaqr.js}"></script>
+
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Mã sản phẩm</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center">
+                    <div id="qrCodeContainer" style="display: none;">
+                        <p id="maspct"></p>
+                        <h3>Mã QR:</h3>
+                        <img id="qrCodeImage" class="img-fluid" alt="QR Code" style="width: 300px; height: auto;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    button {
+        background-color: #d9534f;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #c9302c;
+    }
+
+    img {
+        margin-top: 10px;
+    }
+</style>
+
+</body>
+</html>

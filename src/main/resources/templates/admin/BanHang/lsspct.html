@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+</head>
+<body>
+<h2>spct</h2>
+
+
+<div class="filter-container">
+        <div>
+
+            <label class="form-lable">Tên sp</label>
+            <p th:text="${lsspct.sanPham.tensp}"></p>
+
+            <label class="form-lable">Mã spct</label>
+            <p th:text="${lsspct.maspct}"></p>
+
+            <label class="form-lable">size</label>
+            <p th:text="${lsspct.kichThuoc.ten}"></p>
+
+            <label class="form-lable">Màu</label>
+            <p th:text="${lsspct.mauSac.ten}"></p>
+            <br>
+            <button type="submit" class="btn btn-danger">Sửa</button>
+            <a th:href="@{/panda/nsx}"type="submit" class="btn btn-danger">Quay lại</a>
+        </div>
+</div>
+
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+
+</style>
+</body>
+
+</html>

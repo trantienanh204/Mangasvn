@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả thanh toán</title>
+</head>
+<body>
+<h1>Kết quả thanh toán</h1>
+<div>
+    <p>Mã giao dịch: <span th:text="${params.vnp_TxnRef}"></span></p>
+    <p>Số tiền: <span th:text="${params.vnp_Amount}"></span></p>
+    <p>Trạng thái: <span th:text="${params.vnp_ResponseCode} == '00' ? 'Thành công' : 'Thất bại'"></span></p>
+</div>
+</body>
+</html>
+

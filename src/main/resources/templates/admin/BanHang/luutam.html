@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table class="table" style="text-align: center;">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Mã sản phẩm</th>
+        <th>Tên sản phẩm</th>
+        <th>Size</th>
+        <th>Màu sắc</th>
+        <th>Số lượng</th>
+        <th>Đơn giá</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="spct,i: ${lsspct}" >
+        <td onclick="chonVoucher(this)" th:text="${i.index + 1}"></td>
+        <td onclick="chonVoucher(this)" th:text="${spct.sanPham.masp}"></td>
+        <td  onclick="chonVoucher(this)" th:text="${spct.sanPham.tensp}"></td>
+        <td onclick="chonVoucher(this)" th:text="${spct.kichThuoc.ten}"></td>
+        <td  onclick="chonVoucher(this)" th:text="${spct.mauSac.ten}"></td>
+        <td  onclick="chonVoucher(this)" th:text="${spct.dongia}"></td>
+        <td><input type="number" style="width: 70px; border-radius: 10px; text-align: center"></td>
+        <td style="font-size: 25px">
+            <a href="javascript:void(0);" onclick="chonVoucher(this)">
+                <i class="fa-solid fa-circle-check"></i>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Cổ áo</title>
+</head>
+<body th:fragment="tknhanvien">
+<h2>Tài Khoản Nhân Viên</h2>
+<form th:action="@{/panda/tknhanvien}" method="get">
+<div class="filter-container">
+    <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
+    <hr>
+    <div class="filter-inputs">
+        <div class="filter-input">
+            <label >Mã nhân viên</label>
+            <input type="text" name="manv" th:value="${manv}" placeholder="Mã nhân viên">
+        </div>
+        <div class="filter-input">
+            <label >Tên nhân viên</label>
+            <input type="text" name="tennv" th:value="${tennv}" placeholder="Tên nhân viên">
+        </div>
+        <div class="filter-input">
+            <label for="period">Trạng thái</label>
+            <select id="period" name="trangThai">
+                <option value="">-- Chọn trạng thái --</option>
+                <option th:value="1" th:selected="${trangthai == 1}">Hoạt động</option>
+                <option th:value="0" th:selected="${trangthai == 0}">Ngừng hoạt động</option>
+            </select>
+        </div>
+    </div>
+    <div class="filter-buttons">
+        <button type="submit" class="btn btn-dark">
+            <i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i> Tìm kiếm
+        </button>
+        <a class="btn btn-dark" th:href="@{/panda/tknhanvien}">
+            <i class="fa-solid fa-rotate-right" style="color: #ffffff;padding-top: 10px"></i> Làm mới
+        </a>
+    </div>
+</div>
+</form>
+
+<!-- Thông báo -->
+<div class="custom-alert success" id="statusMessage" th:text="${saveMassage}" th:if="${saveMassage != null}">
+    <i class="fa-solid fa-circle-check"></i> Thêm thành công !
+</div>
+<div class="custom-alert success" id="statusMessage" th:text="${UpdateMassage}" th:if="${UpdateMassage != null}">
+    <i class="fa-solid fa-circle-check"></i> Thêm thành công !
+</div>
+<div class="custom-alert success" id="statusMessage" th:text="${ChangesStatusMessage}" th:if="${ChangesStatusMessage != null}">
+    <i class="fa-solid fa-circle-check"></i> Thêm thành công !
+</div>
+<!-- Danh sách bài viết -->
+<div style="text-align: right">
+    <button type="button" class="btn btn-success " data-bs-toggle="modal" data-bs-target="#add">
+        <a th:href="@{/panda/tknhanvien/create}"><i class="fa-solid fa-plus" style="color: #fcfcfc; top: 20px"></i></a>
+    </button>
+</div>
+<div class="table-container">
+    <h3><i class="fa-solid fa-list" style="color: #000000;"></i> Danh sách nhân viên</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Ảnh đại diện</th>
+            <th>Mã nhân viên</th>
+            <th>Họ tên</th>
+            <th>Giới tính</th>
+            <th>Ngày tạo</th>
+            <th>Ngày sửa</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${list.empty}">
+            <td colspan="10" style="text-align: center; color: red;">Không có dữ liệu</td>
+        </tr>
+        <tr th:each="taikhoannv,i : ${list}">
+            <td th:text="${(currentPage * pageSize) + i.index + 1}"></td>
+            <td>
+                <img th:if="${taikhoannv.image != null}"
+                     th:src="@{'/panda/hinh-anh/' + ${taikhoannv.id}}"
+                     alt="Hình ảnh"
+                     style="width: 50px; height: auto;"/>
+                <img th:if="${taikhoannv.image == null}"
+                     src="@{/images/default-avatar.png}"
+                     alt="Hình ảnh mặc định"
+                     style="width: 100px; height: auto;"/>
+            </td>
+            <td th:text="${taikhoannv.manhanvien}"></td>
+            <td th:text="${taikhoannv.tennhanvien}"></td>
+            <td th:text="${taikhoannv.gioitinh == 1 ? 'Nam' : 'Nữ'}"></td>
+            <td th:text="${taikhoannv.ngaytao != null? #temporals.format(taikhoannv.ngaytao, 'dd/MM/yyyy'): 'chưa có'}"></td>
+            <td th:text="${taikhoannv.ngaysua != null? #temporals.format(taikhoannv.ngaysua, 'dd/MM/yyyy'): 'chưa có'}"></td>
+            <td th:if="${taikhoannv.trangthai} == 1">
+                <span class="status-label status-green"
+                      th:text="${taikhoannv.trangthai == 1 ? 'Hoạt động':'Không hoạt động'}">
+                </span>
+            </td>
+            <td th:if="${taikhoannv.trangthai} == 0 ">
+                <span class="status-label status-orange"
+                      th:text="${taikhoannv.trangthai == 0 ? 'Không hoạt động':'Hoạt động'}">
+                </span>
+            </td>
+            <td>
+                <a style="margin-right: 10px" th:href="@{/panda/tknhanvien/update(id=${taikhoannv.id})}">
+                    <i class="fa-regular fa-pen-to-square" style="color: #000000;font-size: 25px"></i>
+                </a>
+
+                <a th:if="${taikhoannv.chucvu == 'Nhân viên'}">
+                    <a th:href="@{/panda/tknhanvien/change(id=${taikhoannv.id})}">
+                        <i th:if="${taikhoannv.trangthai == 1}">
+                            <i class="fa-solid fa-toggle-on"  style="color: #00040a; font-size: 25px">
+                            </i>
+
+                        </i>
+                        <i th:if="${taikhoannv.trangthai == 0}">
+                            <i class="fa-solid fa-toggle-off" style="color: #00040a; font-size: 25px">
+                            </i>
+                        </i>
+                    </a>
+                </a>
+              <!-- Icon-->
+                <a th:if="${taikhoannv.chucvu != 'Nhân viên'}">
+                    <i class="fa-solid fa-circle-xmark" style="color: #00040a; font-size: 25px"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!--Phân trang-->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <!-- Nút Previous -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/panda/tknhanvien(page=${currentPage == 0 ? 0 : currentPage - 1}, manv=${manv},tennv=${tennv}, trangThai=${trangthai})}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Hiển thị danh sách trang -->
+            <li class="page-item">
+                <a class="page-link"
+                   th:text="${currentPage +1 }" disabled></a>
+            </li>
+
+            <!-- Nút Next -->
+            <li class="page-item" th:classappend="${list.size() < pageSize} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/panda/tknhanvien(page=${currentPage + 1},manv=${manv},tennv=${tennv}, trangThai=${trangthai})}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-inputs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+        padding-top: 10px;
+        font-weight: bold;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-buttons {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .filter-buttons button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #555;
+    }
+
+    .table-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container h3 {
+        margin-bottom: 20px;
+        font-size: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+        background-color: #f4f4f9;
+    }
+
+    table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .status-label {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+    }
+
+    .status-green {
+        background-color: #4CAF50;
+    }
+
+    .status-orange {
+        background-color: #ff9800;
+    }
+
+    .action-icons {
+        display: flex;
+        justify-content: center;
+    }
+
+    .action-icons i {
+        font-size: 18px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    .custom-alert {
+        position: fixed;
+        top: 20px;  /* Cách từ đỉnh */
+        right: 20px;  /* Cách từ bên phải */
+        background-color: #4CAF50;  /* Màu nền thông báo thành công */
+        color: white;  /* Màu chữ */
+        padding: 15px;  /* Padding xung quanh */
+        border-radius: 5px;  /* Bo góc */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Đổ bóng */
+        z-index: 9999;  /* Đảm bảo thông báo luôn nằm trên cùng */
+        opacity: 0;  /* Ban đầu ẩn */
+        visibility: hidden;  /* Không hiển thị */
+        transition: opacity 0.5s ease-in-out, visibility 0.5s;  /* Hiệu ứng chuyển đổi */
+    }
+
+    .custom-alert.show {
+        opacity: 1;  /* Hiển thị thông báo */
+        visibility: visible;  /* Đặt thông báo là có thể nhìn thấy */
+    }
+</style>
+<script>
+    window.onload = function () {
+        var statusMessage = document.querySelector('.custom-alert');
+        if (statusMessage) {
+            statusMessage.classList.add('show');
+            setTimeout(function () {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+    };
+</script>
+</body>
+</html>

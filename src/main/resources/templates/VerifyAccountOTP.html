@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda-Shirt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<!--Thông báo-->
+<div class="custom-alert success" id="statusMessage" th:text="${OtpError}" th:if="${OtpError != null}">
+</div>
+<div class="custom-alert success" id="statusMessage" th:text="${OtpEmpty}" th:if="${OtpEmpty != null}">
+</div>
+<div class="container-fluid login-container">
+    <img th:src="@{/Image/panda.jpg}" class="background-image" alt="Background Image">
+    <div class="login-box">
+        <h4 class="login-header">
+            <img th:src="@{/Image/panda_logo.png}" width="50px" height="50px">Đăng Ký</h4>
+        <form method="post" th:action="@{/panda/verifyOtp}">
+            <!-- Nhập Email -->
+            <div class="mb-3">
+                <input type="text" name="otp"
+                       class="form-control" placeholder="Nhập otp xác nhận">
+
+<!--                <div th:if="${emailErrors != null}">-->
+<!--                    <div th:each="error : ${emailErrors}" th:text="${error}"></div>-->
+<!--                </div>-->
+<!--               &lt;!&ndash;valition email&ndash;&gt;-->
+<!--                <div th:if="${emailExists != null}">-->
+<!--                    <div th:each="error : ${emailExists}" th:text="${error}"></div>-->
+<!--                </div>-->
+<!--                &lt;!&ndash;email empty&ndash;&gt;-->
+<!--                <div th:if="${emailEmpty != null}">-->
+<!--                    <div th:each="error : ${emailEmpty}" th:text="${error}"></div>-->
+<!--                </div>-->
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Xác nhận</button>
+        </form>
+    </div>
+</div>
+<style>
+    .login-container {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Đảm bảo ảnh phủ kín */
+        z-index: -1; /* Đặt ảnh ở phía dưới */
+    }
+
+    .login-box {
+        background: #FE5621; /* Thêm độ trong suốt cho nền */
+        padding: 30px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-form {
+        display: grid;
+        gap: 20px;
+    }
+
+    .login-header {
+        text-align: center;
+        color: #ffffff;
+        margin-bottom: 20px;
+    }
+    .custom-alert {
+        position: fixed;
+        top: 20px;  /* Cách từ đỉnh */
+        right: 20px;  /* Cách từ bên phải */
+        background-color: red;  /* Màu nền thông báo thành công */
+        color: white;  /* Màu chữ */
+        padding: 15px;  /* Padding xung quanh */
+        border-radius: 5px;  /* Bo góc */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Đổ bóng */
+        z-index: 9999;  /* Đảm bảo thông báo luôn nằm trên cùng */
+        opacity: 0;  /* Ban đầu ẩn */
+        visibility: hidden;  /* Không hiển thị */
+        transition: opacity 0.5s ease-in-out, visibility 0.5s;  /* Hiệu ứng chuyển đổi */
+    }
+
+    .custom-alert.show {
+        opacity: 1;  /* Hiển thị thông báo */
+        visibility: visible;  /* Đặt thông báo là có thể nhìn thấy */
+    }
+</style>
+<!-- Bootstrap Bundle with Popper -->
+<script>
+    window.onload = function () {
+        var statusMessage = document.querySelector('.custom-alert');
+        if (statusMessage) {
+            statusMessage.classList.add('show');
+            setTimeout(function () {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+    };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

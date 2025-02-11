@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Màu Sắc</title>
+    <script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .form-check-label {
+            margin-left: 10px;
+        }
+        .action-icons i {
+            font-size: 18px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .custom-alert {
+            position: fixed;
+            top: 20px;  /* Cách từ đỉnh */
+            right: 20px;  /* Cách từ bên phải */
+            background-color: #4CAF50;  /* Màu nền thông báo thành công */
+            color: white;  /* Màu chữ */
+            padding: 15px;  /* Padding xung quanh */
+            border-radius: 5px;  /* Bo góc */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Đổ bóng */
+            z-index: 9999;  /* Đảm bảo thông báo luôn nằm trên cùng */
+            opacity: 0;  /* Ban đầu ẩn */
+            visibility: hidden;  /* Không hiển thị */
+            transition: opacity 0.5s ease-in-out, visibility 0.5s;  /* Hiệu ứng chuyển đổi */
+        }
+
+        .custom-alert.show {
+            opacity: 1;  /* Hiển thị thông báo */
+            visibility: visible;  /* Đặt thông báo là có thể nhìn thấy */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <a th:href="@{/panda/mausac/hienthi}">
+                <i class="fa-solid fa-arrow-right fa-flip-horizontal" style="color: #000000;"></i>
+            </a>
+            <h2 style="padding-left: 520px">
+                Sửa Màu Sắc
+            </h2>
+        </div>
+        <div class="card-body p-4">
+            <form th:action="@{/panda/mausac/update}" th:object="${MauSac}" th:method="post">
+                <input type="text" th:field="*{id}" class="form-control" hidden>
+                <!-- Mã màu -->
+                <label>Chọn màu</label>
+                <input class="form-control" type="color" id="color" style="width: 50px; height: 30px;">
+                <form th:action="@{/panda/mausac/add}" th:object="${MauSac}" th:method="post">
+                    <!-- Mã màu -->
+                    <div class="form-group">
+                        <label><b style="color: red">*</b> Mã màu</label>
+                        <input type="text" id="colorCodeInput" th:field="*{ma}" class="form-control"
+                               placeholder="Chọn mã màu sắc" readonly>
+                        <div th:if="${errorma}" th:text="${errorma}" style="color: red;"></div>
+                    </div>
+
+                <!-- Tên màu -->
+                <div class="form-group">
+                    <label for="colorName"><b style="color: red">*</b> Tên màu</label>
+                    <input type="text" th:field="*{ten}" class="form-control" id="colorName"
+                           placeholder="Nhập tên màu sắc">
+                    <div th:if="${errorten}" th:text="${errorten}" style="color: red;"></div>
+                </div>
+
+                <!-- Trạng thái màu sắc -->
+                <div class="form-group">
+                    <label class="form-label"><b style="color: red">*</b> Trạng thái màu sắc</label><br>
+                    <input type="radio" th:field="*{trangthai}" th:value="0">
+                    Hoạt động
+                    <input type="radio" th:field="*{trangthai}" th:value="1">
+                    Ngừng hoạt động
+                </div>
+
+                <!-- Nút thêm màu sắc -->
+                <button type="submit" class="btn btn-primary btn-block mt-4">Sửa Màu Sắc</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const colorPicker = document.getElementById('color');
+    const colorCodeInput = document.getElementById('colorCodeInput');
+
+    colorPicker.addEventListener('input', function () {
+        colorCodeInput.value = colorPicker.value;
+    });
+</script>
+<script>
+    // Sau khi trang load xong
+    window.onload = function() {
+        var statusMessage = document.getElementById('statusMessage');
+        if (statusMessage) {
+            statusMessage.classList.add('show');
+            // Tự động ẩn sau 5 giây (5000ms)
+            setTimeout(function() {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+    };
+</script>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

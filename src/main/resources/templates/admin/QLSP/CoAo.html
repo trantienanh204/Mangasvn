@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Cổ áo</title>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body th:fragment="coao">
+<h2>Cổ Áo</h2>
+<!-- Thông báo -->
+<div class="custom-alert success" id="statusMessage" th:text="${AddStatusMessage}" th:if="${AddStatusMessage != null}">
+    <i class="fa-solid fa-circle-check"></i> Thêm thành công !
+</div>
+<div class="custom-alert success" id="statusMessage" th:text="${UpdateStatusMessage}" th:if="${UpdateStatusMessage != null}">
+    <i class="fa-solid fa-circle-check"></i> Cập nhật thành công !
+</div>
+<div class="custom-alert error" id="statusMessage" th:text="${ErrorStatusMessage}"
+     th:if="${ErrorStatusMessage != null}">
+    <i class="fa-solid fa-exclamation-circle"></i> Thêm không thành công!
+</div>
+<div class="custom-alert error" id="statusMessage" th:text="${ChangesStatusMessage}"
+     th:if="${ChangesStatusMessage!= null}">
+    <i class="fa-solid fa-exclamation-circle"></i> Chuyển trạng thái thành công !
+</div>
+
+<form th:action="@{/panda/coao/hienthi}" method="get">
+    <div class="filter-container">
+        <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
+        <hr>
+        <div class="filter-inputs">
+            <div class="filter-input">
+                <label for="title-author">Tên cổ áo</label>
+                <input type="text" id="title-author" name="tenca" placeholder="Tên cổ áo"
+                       th:value="${tenca}">
+            </div>
+            <div class="filter-input">
+                <label for="period">Trạng thái</label>
+                <select id="period" name="trangthai">
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option th:value="0" th:selected="${trangthai == 0}">Hoạt động</option>
+                    <option th:value="1" th:selected="${trangthai == 1}">Ngừng hoạt động</option>
+                </select>
+            </div>
+
+            <div class="filter-buttons">
+                <button type="submit" class="btn btn-dark"><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i> Tìm kiếm</button>
+                <a class="btn btn-dark" th:href="@{/panda/coao/hienthi}"><i class="fa-solid fa-rotate-right" style="color: #ffffff;"></i> Làm mới</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Danh sách cổ áo -->
+    <div style="text-align: right">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add">
+            <a th:href="@{/panda/coao/add}"><i class="fa-solid fa-plus" style="color: #fcfcfc;"></i></a>
+        </button>
+    </div>
+
+<div class="table-container">
+    <h3><i class="fa-solid fa-list" style="color: #000000;"></i> Danh sách cổ áo</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Mã cổ áo</th>
+            <th>Tên cổ áo</th>
+            <th>Ngày tạo</th>
+            <th>Ngày sửa</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${list.empty}">
+            <td colspan="7" style="text-align: center; color: red;">Không có dữ liệu</td>
+        </tr>
+        <tr th:each="coAo,i : ${list}">
+            <td th:text="${(currentPage * pageSize) + i.index + 1}"></td>
+            <td th:text="${coAo.ma}"></td>
+            <td th:text="${coAo.ten}"></td>
+            <td th:text="${coAo.ngayTao != null? #temporals.format(coAo.ngayTao, 'dd/MM/yyyy'): 'chưa có'}"></td>
+            <td th:text="${coAo.ngaySua != null? #temporals.format(coAo.ngaySua, 'dd/MM/yyyy'): 'chưa có'}"></td>
+            <td th:if="${coAo.trangThai} == 0">
+                <span class="status-label status-green"
+                      th:text="${coAo.trangThai == 0 ? 'Hoạt động':'Ngừng hoạt động'}">
+                </span>
+            </td>
+            <td th:if="${coAo.trangThai} == 1 ">
+                <span class="status-label status-orange"
+                      th:text="${coAo.trangThai == 0 ? 'Hoạt động':'Ngừng hoạt động'}">
+                </span>
+            </td>
+            <td>
+                <a style="margin-right: 10px" th:href="@{/panda/coao/update(id=${coAo.id})}"><i class="fa-regular fa-pen-to-square" style="color: #000000;font-size: 25px"></i></a>
+                <a th:href="@{/panda/coao/change(id=${coAo.id})}">
+                    <i th:if="${coAo.trangThai == 0}">
+                        <i class="fa-solid fa-toggle-on"  style="color: #00040a;font-size: 25px">
+                        </i>
+                    </i>
+                    <i th:if="${coAo.trangThai == 1}">
+                        <i class="fa-solid fa-toggle-off" style="color: #00040a;font-size: 25px">
+                        </i>
+                    </i>
+                </a>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <!-- Nút Previous -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/panda/coao/hienthi(page=${currentPage == 0 ? 0 : currentPage - 1}, tenca=${tenca}, trangthai=${trangthai})}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Hiển thị danh sách trang -->
+            <li class="page-item">
+                <a class="page-link"
+                   th:text="${currentPage +1 }" disabled></a>
+            </li>
+
+            <!-- Nút Next -->
+            <li class="page-item" th:classappend="${list.size() < pageSize} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/panda/chatlieu/hienthi(page=${currentPage + 1}, tenca=${tenca}, trangthai=${trangthai})}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<style>
+
+    .action-icons i {
+        font-size: 18px;
+        cursor: pointer;
+        margin: 0 10px; /* Khoảng cách giữa các icon */
+    }
+    .custom-alert {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s;
+    }
+
+    .custom-alert.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+
+
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-inputs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+
+        font-weight: bold;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        padding-top: 25px;
+    }
+
+    .filter-buttons button {
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #555;
+    }
+
+    .table-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container h3 {
+        margin-bottom: 20px;
+        font-size: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+        background-color: #f4f4f9;
+    }
+
+    table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .status-label {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+    }
+
+    .status-green {
+        background-color: #4CAF50;
+    }
+
+    .status-orange {
+        background-color: #ff9800;
+    }
+
+    .action-icons {
+        display: flex;
+        justify-content: center;
+    }
+
+    .action-icons i {
+        font-size: 18px;
+
+
+        cursor: pointer;
+        margin: 0 10px; /* Khoảng cách giữa các icon */
+    }
+
+    .custom-alert i {
+        margin-right: 8px; /* Khoảng cách giữa icon và văn bản */
+        vertical-align: middle; /* Căn giữa icon với văn bản */
+    }
+</style>
+<script>
+    window.onload = function () {
+        var statusMessage = document.querySelector('.custom-alert');
+        if (statusMessage) {
+            statusMessage.classList.add('show');
+            setTimeout(function () {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+    };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"
+        integrity="sha512-6sSYJqDreZRZGkJ3b+YfdhB3MzmuP9R7X1QZ6g5aIXhRvR1Y/N/P47jmnkENm7YL3oqsmI6AK+V6AD99uWDnIw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+<style>
+    .filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        margin-right: 15px;
+    }
+
+    .filter-input label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .filter-input input:focus,
+    .filter-input select:focus {
+        background-color: #fff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    .filter-buttons {
+        display: flex;
+        align-items: center;
+        padding-top: 25px;
+    }
+
+    #filter-button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #filter-button:hover {
+        background-color: #0056b3;
+    }
+
+    #filter-button i {
+        margin-right: 5px;
+    }
+
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container, .table-container {
+
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    h2, h3 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+
+    .filter-inputs {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .filter-input {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .filter-input input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table th, table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+        background-color: #f4f4f9;
+    }
+
+    table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+
+    #pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #pagination button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+
+    #pagination button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    #loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .spinner-border {
+        width: 2rem;
+        height: 2rem;
+    }
+    .status-active {
+        background-color: #28a745; /* Màu xanh lá */
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .status-inactive {
+        background-color: #dc3545; /* Màu đỏ */
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+     .table-container table {
+         width: 100%;
+         border-collapse: collapse;
+     }
+
+    .table-container th, .table-container td {
+        text-align: left;
+        padding: 8px;
+        vertical-align: middle; /* Đảm bảo các phần tử thẳng hàng theo chiều dọc */
+    }
+
+    .table-container th {
+        background-color: #f2f2f2;
+    }
+
+    .table-container tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-container th, .table-container td {
+        text-align: left;
+        padding: 12px 15px;
+        vertical-align: middle; /* Đảm bảo các phần tử thẳng hàng theo chiều dọc */
+    }
+
+    .table-container th {
+        background-color: #f2f2f2;
+    }
+
+    .table-container tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table-container td {
+        white-space: nowrap;  /* Giúp tránh tình trạng chữ bị tràn dòng */
+    }
+
+
+
+
+</style>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm</title>
+
+
+</head>
+<body th:fragment="sanpham">
+
+<h2>Sản Phẩm</h2>
+
+<div class="filter-container">
+    <div class="filter-input">
+        <label for="title-author">Tên sản phẩm</label>
+        <input type="text" id="filter-tensp" placeholder="Nhập tên sản phẩm">
+    </div>
+    <div class="filter-input">
+        <label for="filter-trangthai">Trạng thái</label>
+        <select id="filter-trangthai">
+            <option value="">Tất cả</option>
+            <option value="1">Đang bán</option>
+            <option value="0">Ngừng bán</option>
+        </select>
+    </div>
+    <div class="filter-buttons">
+        <button id="filter-button" class="btn btn-dark"><i class="fa fa-search" style="color: #ffffff;"></i> Tìm kiếm</button>
+    </div>
+</div>
+
+
+<div style="text-align: right">
+    <a class="btn btn-success" th:href="@{/panda/sanpham/add}">
+        <i class="fa-solid fa-plus" style="color: #fff;"></i> Thêm sản phẩm
+    </a>
+</div>
+
+<div class="table-container">
+    <h3><i class="fa-solid fa-list" style="color: #000;"></i> Danh sách sản phẩm</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Mã sản phẩm</th>
+            <th>Tên sản phẩm</th>
+            <th>Ngày tạo</th>
+            <th>Trạng thái</th>
+            <th>Ảnh sản phẩm</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+
+        <tbody id="sanPhamtable"></tbody>
+    </table>
+
+    <div id="pagination">
+        <button id="prev" disabled><i class="fa-solid fa-chevron-left"></i> Trước</button>
+        <span id="pageInfo"></span>
+        <button id="next"><i class="fa-solid fa-chevron-right"></i> Sau</button>
+    </div>
+</div>
+
+<div id="loading" class="d-none">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<script>
+    jQuery(document).ready(function($) {
+
+        var currentPage = 0;
+        var pageSize = 5;
+
+        function loadSanPham(page) {
+            var tenSP = $('#filter-tensp').val();
+            var trangThai = $('#filter-trangthai').val();
+
+            $('#loading').removeClass('d-none').addClass('d-block');
+
+            $.ajax({
+                type: 'GET',
+                url: '/panda/sanpham/list',
+                data: {
+                    page: page,
+                    tensp: tenSP,
+                    trangthai: trangThai
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);  // Log để kiểm tra dữ liệu
+                    $('#sanPhamtable').empty();
+                    if (response && response.content && Array.isArray(response.content)) {
+                        response.content.forEach(function (sp, index) {
+                            let ngayTaoFormatted = new Date(sp.ngaytao).toLocaleDateString("vi-VN");
+                            var statusClass = sp.trangthai === 1 ? 'status-active' : 'status-inactive';
+                            var statusText = sp.trangthai === 1 ? "Đang bán" : "Ngừng bán";
+
+                            // Kiểm tra xem có ảnh sản phẩm hay không
+                            var productImage = sp.anhsp ?
+                                '<img src="data:image/png;base64,' + sp.anhsp + '" alt="Ảnh sản phẩm" style="width: 100px; height: auto;">' :
+                                '<span>Không có ảnh</span>';
+
+                            $('#sanPhamtable').append(
+                                '<tr>' +
+                                '<td>' + ((currentPage * pageSize) + index + 1) + '</td>' +
+                                '<td>' + sp.masp + '</td>' +
+                                '<td>' + sp.tensp + '</td>' +
+                                '<td>' + ngayTaoFormatted + '</td>' +
+                                '<td class="' + statusClass + '" style="margin-top: 50px;">' + statusText + '</td>' +  <!-- Thêm style vertical-align: middle -->
+                                '<td>' + productImage + '</td>' +
+                                '<td><a href="/panda/sanpham/spct?id=' + sp.id + '">' +
+                                '<i class="fa-solid fa-eye" style="color: #000000; font-size: 20px;"></i>' +
+                                '</a></td>' +
+                                '</tr>'
+                            );
+
+                        });
+                        $('#pageInfo').text('Trang ' + (currentPage + 1) + ' / ' + response.totalPages);
+                        $('#prev').prop('disabled', currentPage <= 0);
+                        $('#next').prop('disabled', currentPage >= response.totalPages - 1);
+                    } else {
+                        $('#sanPhamtable').html('<tr><td colspan="7">Không có sản phẩm nào.</td></tr>');  // Cập nhật số cột là 7 thay vì 6
+                    }
+                    $('#loading').removeClass('d-block').addClass('d-none');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Có lỗi xảy ra:', error);
+                    alert('Có lỗi khi lấy dữ liệu sản phẩm!');
+                    $('#loading').removeClass('d-block').addClass('d-none');
+                }
+            });
+        }
+
+        $('#filter-button').click(function() {
+            currentPage = 0;
+            loadSanPham(currentPage);
+        });
+
+        loadSanPham(currentPage);
+
+        $('#prev').click(function() {
+            if (currentPage > 0) {
+                currentPage--;
+                loadSanPham(currentPage);
+            }
+        });
+
+        $('#next').click(function() {
+            currentPage++;
+            loadSanPham(currentPage);
+        });
+
+        $('#filter-tensp').keydown(function(event) {
+            if (event.key === 'Enter') {
+                $('#filter-button').click();
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

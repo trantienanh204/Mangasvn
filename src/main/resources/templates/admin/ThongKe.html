@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+            integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body th:fragment="ThongKe">
+<!-- MAIN -->
+<section id="content">
+    <main>
+        <div class="head-title">
+            <div class="left">
+                <h1>Thống Kê</h1>
+            </div>
+            <a href="/panda/excel" class="btn-download">
+                <i style="margin-right: 5px" class='bx bxs-cloud-download'></i>
+                <span class="text"> export file exel</span>
+            </a>
+        </div>
+
+        <ul class="box-info">
+            <li>
+                <i class='bx bxs-calendar-check' style="color: #FF6347;"></i> <!-- Màu đỏ -->
+                <span class="text">
+                <h3><span th:text="${successfulProductsCount}"></span></h3>
+                <p>Đơn hàng thành công</p>
+            </span>
+            </li>
+            <li>
+                <i class='bx bxs-group' style="color: #4682B4;"></i> <!-- Màu xanh dương -->
+                <span class="text">
+                    <h3><span th:text="${totalCustomers}"></span></h3>
+                    <p>Khách hàng</p>
+            </span>
+            </li>
+            <li>
+                <i class='bx bxs-dollar-circle' style="color: #32CD32;"></i> <!-- Màu xanh lá -->
+                <span class="text">
+                <h3><span style="font-size: 20px" th:text="${totalRevenue}"></span></h3>
+                <p>Doanh thu</p>
+            </span>
+            </li>
+        </ul>
+    </main>
+</section>
+<!-- Filter section -->
+<form id="dateForm" action="/panda/thongkeDoanhThu" method="get">
+    <div class="filter-container">
+        <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
+        <hr>
+        <div class="filter-inputs">
+            <div class="filter-input">
+                <label for="ngayBatDau">Ngày bắt đầu</label>
+                <input type="date" id="ngayBatDau" name="startDate">
+            </div>
+            <div class="filter-input">
+                <label for="ngayKetThuc" >Ngày kết thúc</label>
+                <input type="date" id="ngayKetThuc" name="endDate">
+            </div>
+
+            <!-- Thêm phần lọc theo tháng -->
+            <div class="filter-input">
+                <label for="selectMonth">Tháng</label>
+                <select id="selectMonth"name="month" onchange="fetchRevenueByMonth()">
+                    <option value="2024-01">Tháng 1</option>
+                    <option value="2024-02">Tháng 2</option>
+                    <option value="2024-03">Tháng 3</option>
+                    <option value="2024-04">Tháng 4</option>
+                    <option value="2024-05">Tháng 5</option>
+                    <option value="2024-06">Tháng 6</option>
+                    <option value="2024-07">Tháng 7</option>
+                    <option value="2024-08">Tháng 8</option>
+                    <option value="2024-09">Tháng 9</option>
+                    <option value="2024-10">Tháng 10</option>
+                    <option value="2024-11">Tháng 11</option>
+                    <option value="2024-12">Tháng 12</option>
+                </select>
+            </div>
+
+            <div class="filter-input">
+                <label for="selectYear">Chọn năm:</label>
+                <select id="selectYear"></select>
+            </div>
+        </div>
+        <div class="filter-buttons">
+            <button><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i> Tìm kiếm</button>
+        </div>
+    </div>
+</form>
+
+<!-- Charts Section -->
+<div class="row">
+    <!-- Cột Doanh thu theo tháng -->
+    <div class="col-md-6">
+        <h3>Doanh thu theo năm</h3>
+        <canvas id="annualRevenueChartCanvas"></canvas>
+    </div>
+
+    <!-- Cột Doanh thu theo ngày -->
+    <div class="col-md-6">
+        <h3>Doanh thu theo ngày</h3>
+        <canvas id="revenueChartDay"></canvas>
+    </div>
+</div>
+<h3>Số lượng sp hiện có</h3>
+<div class="table-container">
+    <canvas id="myChart"></canvas>
+</div>
+<h3>Doanh thu theo tháng</h3>
+<div>
+    <canvas id="monthlyRevenueChartCanvas"></canvas>
+</div>
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-inputs {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        width: 18%;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+        padding-top: 30px;
+        font-weight: bold;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-buttons {
+        text-align: center;
+    }
+
+    .filter-buttons button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #555;
+    }
+
+    #myChart {
+        margin: auto;
+        width: 100%; /* Thay đổi về 100% để biểu đồ có thể co dãn theo chiều rộng */
+        width: 800px; /* Giới hạn chiều rộng tối đa */
+        height: 100px; /* Chiều cao biểu đồ */
+    }
+    #revenueChart{
+        margin: auto;
+        width: 450px; /* Giới hạn chiều rộng tối đa cho mỗi biểu đồ */
+        height: 200px; /* Chiều cao cố định cho biểu đồ */
+    }
+
+    /* Thêm CSS cho phần thống kê */
+    #content main {
+        width: 100%;
+        padding: 36px 24px;
+        font-family: var(--poppins);
+        max-height: calc(100vh - 56px);
+        overflow-y: auto;
+    }
+    #content main .head-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        grid-gap: 16px;
+        flex-wrap: wrap;
+    }
+    #content main .head-title .left h1 {
+        font-size: 36px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--dark);
+    }
+    #content main .head-title .left .breadcrumb {
+        display: flex;
+        align-items: center;
+        grid-gap: 16px;
+    }
+    #content main .head-title .left .breadcrumb li {
+        color: var(--dark);
+    }
+    #content main .head-title .left .breadcrumb li a {
+        color: var(--dark-grey);
+        pointer-events: none;
+    }
+    #content main .head-title .left .breadcrumb li a.active {
+        color: var(--blue);
+        pointer-events: unset;
+    }
+    #content main .head-title .btn-download {
+        height: 36px;
+        padding: 0 16px;
+        border-radius: 36px;
+        background: var(--blue);
+        color: var(--light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        transition: all .3s ease;
+    }
+    #content main .head-title .btn-download:hover {
+        background: var(--dark);
+    }
+    #content main .box-info {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    #content main .box-info li {
+        width: calc(33.33% - 10px);
+        height: 100px;
+        padding: 16px;
+        border-radius: 8px;
+        background: var(--light);
+        display: flex;
+        align-items: center;
+        grid-gap: 16px;
+        transition: all .3s ease;
+        cursor: pointer;
+    }
+    #content main .box-info li:hover {
+        background: var(--blue);
+    }
+    #content main .box-info li i {
+        font-size: 30px;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+    #content main .box-info li .text {
+        display: flex;
+        flex-direction: column;
+    }
+    #content main .box-info li .text h3 {
+        font-size: 30px;
+        font-weight: 600;
+        color: var(--dark);
+    }
+    #content main .box-info li .text p {
+        font-size: 14px;
+        color: var(--dark-grey);
+    }
+    .custom-alert {
+        position: fixed;
+        top: 20px; /* Cách từ đỉnh */
+        right: 20px; /* Cách từ bên phải */
+        background-color: #4CAF50; /* Màu nền thông báo thành công */
+        color: white; /* Màu chữ */
+        padding: 15px; /* Padding xung quanh */
+        border-radius: 5px; /* Bo góc */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+        z-index: 9999; /* Đảm bảo thông báo luôn nằm trên cùng */
+        opacity: 0; /* Ban đầu ẩn */
+        visibility: hidden; /* Không hiển thị */
+        transition: opacity 0.5s ease-in-out, visibility 0.5s; /* Hiệu ứng chuyển đổi */
+    }
+
+    .custom-alert.show {
+        opacity: 1; /* Hiển thị thông báo */
+        visibility: visible; /* Đặt thông báo là có thể nhìn thấy */
+    }
+</style>
+<script th:inline="javascript">
+    // Lấy dữ liệu sản phẩm từ Thymeleaf và chuyển đổi thành mảng
+    const productData = JSON.parse(/*[[${productData}]]*/ '[]');
+
+    console.log("Dữ liệu sản phẩm:", productData); // Kiểm tra dữ liệu sản phẩm
+
+    if (productData.length > 0) {
+        const labels = productData.map(item => item[0]); // Tên sản phẩm
+        const data = productData.map(item => item[1]); // Số lượng
+
+        // Tạo một mảng màu sắc ngẫu nhiên cho từng cột
+        const backgroundColors = data.map(() => {
+            const randomColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`;
+            return randomColor;
+        });
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Số lượng sản phẩm',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(color => color.replace('0.5', '1')), // Tạo đường viền đậm hơn
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Thống kê số lượng sản phẩm'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } else {
+        console.log("Không có dữ liệu để hiển thị biểu đồ.");
+    }
+    // doanh thu theo năm
+    // // Giả sử monthlyRevenue là đối tượng đã được truyền từ backend
+    // const monthlyRevenue = JSON.parse([[${monthlyRevenue}]]);
+    //
+    // // Định nghĩa mảng revenueData
+    // const revenueData = [];
+    //
+    // // Chuyển đổi dữ liệu từ monthlyRevenue sang định dạng cho biểu đồ
+    // for (let month = 1; month <= 12; month++) {
+    //     // Mặc định là 0 nếu không có dữ liệu
+    //     const revenue = monthlyRevenue[month] || 0;
+    //     revenueData.push(revenue); // Không cần toFixed ở đây
+    // }
+    //
+    // // Kiểm tra dữ liệu trước khi vẽ biểu đồ
+    // console.log("Dữ liệu doanh thu cho biểu đồ:", revenueData);
+    //
+    // // Cấu hình biểu đồ
+    // const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+    // const revenueChart = new Chart(ctxRevenue, {
+    //     type: 'bar', // Có thể đổi thành 'line', 'pie' tùy theo nhu cầu
+    //     data: {
+    //         labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    //         datasets: [{
+    //             label: 'Doanh thu theo tháng (VND)',
+    //             data: revenueData, // Sử dụng revenueData đã được định nghĩa
+    //             backgroundColor: 'rgba(75, 192, 192, 0.2)',
+    //             borderColor: 'rgba(75, 192, 192, 1)',
+    //             borderWidth: 1
+    //         }]
+    //     },
+    //     options: {
+    //         scales: {
+    //             y: {
+    //                 beginAtZero: true
+    //             }
+    //         }
+    //     }
+    // });
+    // doanh thu theo năm
+    let annualRevenueChart;
+
+    // Tạo danh sách các năm từ hiện tại đến 10 năm trước
+    function populateYearOptions() {
+        const selectYear = document.getElementById("selectYear");
+        const currentYear = new Date().getFullYear();
+
+        // Xóa các tùy chọn cũ (nếu có)
+        selectYear.innerHTML = '';
+
+        // Tạo tùy chọn cho 10 năm gần đây
+        for (let year = currentYear; year >= currentYear - 10; year--) {
+            const option = document.createElement("option");
+            option.value = year;
+            option.text = year;
+            selectYear.appendChild(option);
+        }
+
+        // Mặc định chọn năm hiện tại
+        selectYear.value = currentYear;
+    }
+
+    // Lắng nghe sự kiện thay đổi năm
+    document.getElementById("selectYear").addEventListener("change", fetchRevenueByYear);
+
+    // Hàm lấy dữ liệu doanh thu theo năm
+    function fetchRevenueByYear() {
+        const year = document.getElementById("selectYear").value;
+
+        if (year) {
+            fetch(`/panda/thongkeDoanhThuTheoNam?year=${year}`)
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => parseInt(item.month.replace('Tháng', '').trim()));  // Lấy số tháng (1, 2, 3, ...)
+                    const revenues = data.map(item => item.revenue);
+
+                    // Cập nhật biểu đồ
+                    renderAnnualRevenueChart(labels, revenues);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
+    // Hàm hiển thị biểu đồ doanh thu theo năm
+    function renderAnnualRevenueChart(labels, data) {
+        const ctx = document.getElementById('annualRevenueChartCanvas').getContext('2d');
+
+        // Nếu biểu đồ đã tồn tại, hủy biểu đồ cũ trước khi tạo mới
+        if (annualRevenueChart) {
+            annualRevenueChart.destroy();
+        }
+
+        // Tạo biểu đồ mới
+        annualRevenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels, // Hiển thị tháng dưới dạng số (1, 2, 3, ...)
+                datasets: [{
+                    label: 'Doanh thu theo tháng',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tháng'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VND)'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw.toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                });
+                                return `Doanh thu: ${value}`;
+                            }
+                        }
+                    },
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Gọi hàm khi trang được tải
+    document.addEventListener("DOMContentLoaded", function () {
+        populateYearOptions();  // Tạo danh sách năm
+        fetchRevenueByYear();    // Lấy doanh thu cho năm mặc định (năm hiện tại)
+    });
+
+
+    // Tạo biểu đồ mặc định khi trang tải
+    const ctx = document.getElementById('revenueChartDay').getContext('2d');
+    // Dữ liệu mặc định (trống hoặc giá trị nào đó)
+    const defaultData = {
+        labels: [''],
+        datasets: [{
+            label: 'Doanh thu theo ngày (VND)',
+            data: [0, 0, 0], // Dữ liệu mặc định (có thể là 0 hoặc giá trị khác)
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 1
+        }]
+    };
+
+    // Tạo biểu đồ ban đầu với dữ liệu mặc định
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: defaultData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    // doanh thu theo ngày
+    // Xử lý khi người dùng submit form
+    document.getElementById('dateForm').addEventListener('submit', function(event) {
+        event.preventDefault();  // Ngừng form submit theo cách mặc định
+
+        // Lấy ngày bắt đầu và ngày kết thúc từ form
+        const startDate = document.getElementById('ngayBatDau').value;
+        const endDate = document.getElementById('ngayKetThuc').value;
+
+        // Kiểm tra nếu người dùng chưa chọn ngày
+        if (!startDate || !endDate) {
+            alert("Vui lòng chọn ngày bắt đầu và ngày kết thúc!");
+            return;
+        }
+
+        // Gửi yêu cầu API để lấy dữ liệu doanh thu
+        fetch(`/panda/thongkeDoanhThu?startDate=${startDate}&endDate=${endDate}`)
+            .then(response => response.json())  // Parse JSON từ server
+            .then(data => {
+                // Kiểm tra dữ liệu
+                if (data && Object.keys(data).length > 0) {
+                    const labels = Object.keys(data);  // Lấy các ngày
+                    const revenue = Object.values(data);  // Lấy các giá trị doanh thu
+
+                    // Cập nhật dữ liệu cho biểu đồ
+                    myChart.data.labels = labels;  // Cập nhật nhãn (ngày)
+                    myChart.data.datasets[0].data = revenue;  // Cập nhật dữ liệu doanh thu
+
+                    // Cập nhật biểu đồ với dữ liệu mới
+                    myChart.update();
+                } else {
+                    alert("Không có dữ liệu để hiển thị.");
+                }
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra khi lấy dữ liệu:', error);
+                alert("Đã xảy ra lỗi khi tải dữ liệu.");
+            });
+    });
+    let monthlyRevenueChart; // Đổi tên biến toàn cục cho biểu đồ
+
+    function fetchRevenueByMonth() {
+        const month = document.getElementById("selectMonth").value;
+
+        if (month) {
+            // Gửi yêu cầu đến API
+            fetch(`/panda/thongkeDoanhThuTheoThang?month=${month}`)
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => item.date); // Giả sử "date" là khóa cho ngày
+                    const revenues = data.map(item => item.revenue); // Giả sử "revenue" là khóa cho doanh thu
+
+                    // Hiển thị dữ liệu trên biểu đồ
+                    renderMonthlyRevenueChart(labels, revenues);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function renderMonthlyRevenueChart(labels, data) {
+        const ctx = document.getElementById('monthlyRevenueChartCanvas').getContext('2d');
+
+        // Nếu biểu đồ đã tồn tại, cần phải xóa trước khi tạo lại
+        if (monthlyRevenueChart) {
+            monthlyRevenueChart.destroy();
+        }
+
+        // Tạo biểu đồ mới
+        monthlyRevenueChart = new Chart(ctx, {
+            type: 'line', // Bạn có thể đổi sang 'bar' nếu muốn hiển thị dạng cột
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu từng ngày',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4 // Làm mượt đường biểu đồ
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Ngày trong tháng'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VND)'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw.toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                });
+                                return `Doanh thu: ${value}`;
+                            }
+                        }
+                    },
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    }
+    // show message
+    window.onload = function () {
+        var statusMessage = document.querySelector('.custom-alert');
+        if (statusMessage) {
+            statusMessage.classList.add('show');
+            setTimeout(function () {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+    };
+</script>
+</body>
+</html>

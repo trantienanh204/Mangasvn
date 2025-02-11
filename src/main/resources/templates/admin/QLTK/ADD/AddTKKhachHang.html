@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Nhân Viên</title>
+    <script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 500px; /* Wider card */
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+            padding: 15px 0;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Increased margin for better spacing */
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <a th:href="@{/panda/tkkhachhang}">
+                <i class="fa-solid fa-arrow-right fa-flip-horizontal" style="color: #000000;"></i>
+            </a>
+            <h2 class="text-center">Thêm Mới Tài Khoản Khách Hàng</h2>
+        </div>
+        <div class="card-body p-4">
+            <h3>Thông Tin Tài Khoản</h3>
+            <form th:action="@{/panda/tkkhachhang/save}" method="post" enctype="multipart/form-data"
+                  th:object="${khachHang}">
+
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="image"> Ảnh Đại Diện:</label>
+                        <input type="file" class="form-control-file" id="image" name="file" accept="image/*" required>
+                    </div>
+<!--                    <div class="form-group col-md-6">-->
+<!--                        <label> Mã Khách Hàng:</label>-->
+<!--                        <input type="text" class="form-control" th:field="*{makhachhang}"-->
+<!--                               placeholder="Mã khách hàng">-->
+<!--                        <div th:if="${#fields.hasErrors('makhachhang')}" class="text-danger">-->
+<!--                            <span th:errors="*{makhachhang}"></span>-->
+<!--                        </div>-->
+<!--                        <div th:if="${errorma}" class="text-danger">-->
+<!--                            <span th:text="${errorma}"></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+                    <div class="form-group col-md-6">
+                        <label> Họ Tên:</label>
+                        <input type="text" class="form-control" th:field="*{tenkhachhang}"
+                               placeholder="Họ tên khách hàng">
+                        <div th:if="${#fields.hasErrors('tenkhachhang')}" class="text-danger">
+                            <span th:errors="*{tenkhachhang}"></span>
+                        </div>
+                        <div th:if="${nameEmpty}" class="text-danger">
+                            <span th:text="${nameEmpty}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label> Email:</label>
+                        <input type="text" class="form-control" th:field="*{tentaikhoan}" placeholder="Email">
+                        <div th:if="${#fields.hasErrors('tentaikhoan')}" class="text-danger">
+                            <span th:errors="*{tentaikhoan}"></span>
+                        </div>
+                        <div th:if="${errortentk}" class="text-danger">
+                            <span th:text="${errortentk}"></span>
+                        </div>
+                        <div th:if="${emailExits}" class="text-danger">
+                            <span th:text="${emailExits}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label> Số Điện Thoại:</label>
+                        <input type="text" class="form-control" th:field="*{sdt}" placeholder="Số điện thoại">
+                        <div th:if="${errorsdt}" class="text-danger">
+                            <span th:text="${errorsdt}"></span>
+                        </div>
+                        <div th:if="${phoneErrors}" class="text-danger">
+                            <span th:text="${phoneErrors}"></span>
+                        </div>
+                        <div th:if="${phoneEmpty}" class="text-danger">
+                            <span th:text="${phoneEmpty}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Địa Chỉ:</label>
+                        <input type="text" class="form-control" th:field="*{diachi}" placeholder="Địa chỉ">
+                        <div th:if="${addressEmpty!= null}">
+                            <div style="color: red" th:each="error : ${addressEmpty}" th:text="${error}"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label class="form-label"> Giới tính:</label>
+                        <select class="form-control" th:field="*{gioitinh}">
+                            <option value="" disabled selected>Chọn giới tính</option>
+                            <option value="1">Nam</option>
+                            <option value="0">Nữ</option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('gioitinh')}" class="text-danger">
+                            <span th:errors="*{gioitinh}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Thêm</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

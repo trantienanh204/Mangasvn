@@ -1,0 +1,37 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Form login</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<nav th:replace="~{home/_menu::nav}"></nav>-->
+<!--<hr>-->
+<!--<h3> LOGIN</h3>-->
+<!--<h3 th:unless="${#request.remoteUser}"> &lt;!&ndash; nếu người dùng chưa đăng nhập &ndash;&gt;-->
+<!--    Chưa đăng nhập-->
+<!--</h3>-->
+
+<!--&lt;!&ndash; nếu người dùng đã đăng nhập &ndash;&gt;-->
+<!--<ul th:if="${#request.remoteUser}">-->
+
+<!--    &lt;!&ndash; KIỂM TRA QUYỀN &ndash;&gt;-->
+<!--    <li th:if="${#request.isUserInRole('ADMIN')}">-->
+<!--        Nội dung hiển thị nếu người dùng có vai trò 'ADMIN'</li>-->
+<!--    <li th:if="${#request.isUserInRole('USER') or #request.isUserInRole('ADMIN')}">-->
+<!--        &lt;!&ndash; Nội dung hiển thị nếu người dùng có vai trò 'USER' hoặc 'ADMIN' &ndash;&gt;-->
+<!--    </li>-->
+<!--    <li th:if="${#request.isUserInRole('GUEST')}">-->
+<!--        Nội dung hiển thị nếu người dùng có vai trò 'GUEST'-->
+<!--    </li>-->
+<!--</ul>-->
+<!--<hr>-->
+<!--<i th:text="${messages}" style="color: red"></i>-->
+<!--<form action="/auth/account" method="post">-->
+<!--    <input type="text"name="username" class="form-control" placeholder="Tên đăng nhập">-->
+<!--    <input type="password" name="password" class="form-control" placeholder="Mật khẩu">-->
+<!--<button>Login</button>-->
+<!--</form>-->
+<!--</body>-->
+<!--</html>-->

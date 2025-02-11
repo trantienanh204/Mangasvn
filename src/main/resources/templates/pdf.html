@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .header {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #d7d7d7;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .company-info {
+            text-align: left;
+        }
+        .company-info-3{
+            text-align: center;
+        }
+
+        .company-info h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #9a2b31;
+        }
+
+        .customer-info {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .invoice-table th, .invoice-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #d7d7d7;
+        }
+
+        .invoice-table th {
+            background-color: #f1f1f1;
+        }
+
+        .total {
+            /*display: flex;*/
+            display: block;
+            /*margin: 0 auto;*/
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-left: 335px;
+            margin-top: 30px;
+        }
+
+        .total p, .total strong {
+            margin: 0;  /* Xóa khoảng cách mặc định giữa các phần tử */
+        }
+
+        .footer {
+            margin-top: 30px;
+            border-top: 2px dashed #d7d7d7;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer div {
+            font-size: 14px;
+        }
+
+        .footer div h3 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            color: #9a2b31;
+        }
+
+        a {
+            text-decoration: none;
+            color: #9a2b31;
+        }
+    </style>
+</head>
+<body>
+<div class="invoice-container">
+    <div class="company-info-3">
+        <h1>Shop Panda-Shirt</h1>
+        <h5 th:text="${date} + ' - ' +${time}"></h5>
+    </div>
+
+    <div class="header">
+        <div class="company-info">
+           <h2>HÓA ĐƠN</h2>
+           <p th:text="'Mã hóa đơn : ' + ${hoadonct[0].hoaDon.mahoadon}"></p>
+           <p th:text="'Ngày mua : ' +${hoadonct[0].hoaDon.ngaymua}"></p>
+           <p th:text="'Nhân viên : ' +${hoadonct[0].hoaDon.nhanVien.tennhanvien}"></p>
+        </div>
+    </div>
+
+    <div class="customer-info">
+        <strong>Thông tin khách hàng</strong><br>
+        <span th:text="'Tên khách hàng : ' + ${hoadonct[0].hoaDon.khachHang.tenkhachhang}"></span> <br>
+        <span th:text="'Số điện  thoại : ' + ${hoadonct[0].hoaDon.khachHang.sdt == null ? '' : hoadonct[0].hoaDon.khachHang.sdt}"></span><br>
+        <div th:if="${hoadonct[0].hoaDon != null && hoadonct[0].hoaDon.khachHang != null}">
+            <span th:text="'Địa chỉ : '+ ${hoadonct[0].hoaDon.khachHang.diachi == null ?'Trống' : hoadonct[0].hoaDon.khachHang.diachi}"></span>
+            <span th:text="${#strings.isEmpty(hoadonct[0].hoaDon.khachHang.tentinh != null ? hoadonct[0].hoaDon.khachHang.tentinh.trim() : '')
+                         ? '' : '- ' + hoadonct[0].hoaDon.khachHang.tentinh}"></span>
+            <span th:text="${#strings.isEmpty(hoadonct[0].hoaDon.khachHang.tenhuyen != null ? hoadonct[0].hoaDon.khachHang.tenhuyen.trim() : '')
+                        ? '' : '- ' + hoadonct[0].hoaDon.khachHang.tenhuyen}"></span>
+            <span th:text="${#strings.isEmpty(hoadonct[0].hoaDon.khachHang.tenxa != null ? hoadonct[0].hoaDon.khachHang.tenxa.trim() : '')
+                        ? '' : '- ' + hoadonct[0].hoaDon.khachHang.tenxa}"></span>
+        </div>
+    </div>
+
+    <table class="invoice-table">
+        <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên sản phẩm</th>
+            <th>Màu sắc</th>
+            <th>Kích cỡ</th>
+            <th>Đơn giá</th>
+            <th>Số lượng</th>
+            <th>Tổng tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="hdct,i: ${hoadonct}">
+            <td th:text="${i.count}"></td>
+            <td th:text="${hdct.sanPhamChiTiet.sanPham.tensp}"></td>
+            <td th:text="${hdct.sanPhamChiTiet.mauSac.ten}"></td>
+            <td th:text="${hdct.sanPhamChiTiet.kichThuoc.ten}"></td>
+<!--            <td th:text="${hdct.sanPhamChiTiet.dongia}"></td>-->
+            <td th:text="${#numbers.formatDecimal(hdct.sanPhamChiTiet.dongia, 1, 'POINT',0, 'COMMA')}"></td>
+            <td th:text="${hdct.soluong}"></td>
+            <td th:text="${#numbers.formatDecimal(hdct.tongtien, 1, 'POINT',0, 'COMMA')}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="total">
+<!--        <p th:text="'Tổng cộng: ' + ${hoadonct[0].hoaDon.tongtien}"></p>-->
+<!--        <p th:text="'Giảm giá: ' + ${hoadonct[0].hoaDon.giagiam != null ? hoadonct[0].hoaDon.giagiam : '0'}"></p>-->
+<!--        <strong th:text="'Thành tiền: ' + ${hoadonct[0].hoaDon.thanhtien}"></strong>-->
+
+        <p th:text="'Tổng cộng: ' +${#numbers.formatDecimal(hoadonct[0].hoaDon.tongtien, 1, 'POINT',0, 'COMMA')} + ' VND'"></p>
+        <p th:text="'Giảm giá: ' + ${hoadonct[0].hoaDon.giagiam == '0' ||
+        hoadonct[0].hoaDon.giagiam == null ? '0 VND' : hoadonct[0].hoaDon.giagiam} "></p>
+<!--        <p th:text="${hd.giagiam == '0' || hd.giagiam == null ? '0 Đ' : hd.giagiam}"></p>-->
+        <strong th:text="'Thành tiền: ' + ${#numbers.formatDecimal(hoadonct[0].hoaDon.thanhtien, 1, 'POINT',0, 'COMMA')} + ' VND'"></strong>
+        <br>
+        <div th:if="${hoadonct[0].hoaDon.tttt == 1 && hoadonct[0].hoaDon.tttt != null}">
+            <strong th:text="'Tiền cần trả : ' + ${#numbers.formatDecimal(hoadonct[0].hoaDon.thanhtien, 1, 'POINT',0, 'COMMA')} + ' VND'"></strong>
+        </div>
+        <div th:if="${hoadonct[0].hoaDon.tttt == 0 || hoadonct[0].hoaDon.tttt == null}">
+            <strong th:text="'Tiền cần trả : 0 VND'"></strong>
+        </div>
+    </div>
+
+    <div class="footerfooter">
+        <div>
+            <h3>Thông tin thanh toán</h3>
+            Ngân hàng MB<br>
+            Tên tài khoản: NGO VAN THAI<br>
+            Số tài khoản: 0368864959<br>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm chất liệu</title>
+    <script src="https://kit.fontawesome.com/bd9b5e640d.js" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .form-check-label {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <a th:href="@{/panda/chatlieu}">
+                <i class="fa-solid fa-arrow-right fa-flip-horizontal" style="color: #000000;"></i>
+            </a>
+            <h2 style="padding-left: 470px">
+                Thêm chất liệu
+            </h2>
+        </div>
+        <div class="card-body p-4">
+            <form class="login-form" th:method="post" th:action="@{/panda/chatlieu/add}" th:object="${chatLieu}">
+                <div class="form-group">
+                    <label>Mã chất liệu:</label>
+                    <input type="text" class="form-control" name="maChatLieu" th:field="*{maChatLieu}">
+                    <div th:if="${errorma}" th:text="${errorma}" style="color: red;"></div>
+                    <div th:if="${#fields.hasErrors('maChatLieu')}" class="text-danger"><span th:errors="*{maChatLieu}"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tên chất liệu:</label>
+                    <input type="text" class="form-control" name="tenChatLieu" th:field="*{tenChatLieu}">
+                    <div th:if="${errorten}" th:text="${errorten}" style="color: red;"></div>
+                    <div th:if="${#fields.hasErrors('tenChatLieu')}" class="text-danger">
+                        <span th:errors="*{tenChatLieu}"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"> Trạng thái</label><br>
+                    <input type="radio" th:field="*{trangThai}" th:value="0" >
+                    Hoạt động
+                    <input type="radio" th:field="*{trangThai}" th:value="1">
+                    Ngừng hoạt động
+                    <div th:if="${#fields.hasErrors('trangThai')}" class="text-danger">
+                        <span th:errors="*{trangThai}"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Thêm</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

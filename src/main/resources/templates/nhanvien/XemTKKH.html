@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm khách hàng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body th:fragment="tkkhachhang">
+<!-- Thông báo -->
+<h2>Tài Khoản Khách Hàng</h2>
+<form th:action="@{/panda/nhanvien/tkkhachhang/hienthi}" method="get">
+    <div class="filter-container">
+        <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
+        <hr>
+        <div class="filter-inputs">
+            <div class="filter-input">
+                <label>Mã khách hàng</label>
+                <input type="text" name="makh" th:value="${makh}" placeholder="Mã khách hàng ">
+            </div>
+            <div class="filter-input">
+                <label>Tên khách hàng</label>
+                <input type="text" name="tenkh" th:value="${tenkh}" placeholder="Tên khách hàng">
+            </div>
+            <div class="filter-input">
+                <label for="period">Trạng thái</label>
+                <select id="period" name="trangThai">
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option th:value="1" th:selected="${trangthai == 1}">Hoạt động</option>
+                    <option th:value="0" th:selected="${trangthai == 0}">Ngừng hoạt động</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-buttons">
+            <button type="submit" class="btn btn-dark">
+                <i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i> Tìm kiếm
+            </button>
+            <a class="btn btn-dark" th:href="@{/panda/nhanvien/tkkhachhang/hienthi}">
+                <i class="fa-solid fa-rotate-right" style="color: #ffffff;padding-top: 10px"></i> Làm mới
+            </a>
+        </div>
+    </div>
+</form>
+
+<!-- Danh sách khách hàng -->
+<div class="table-container">
+    <h3><i class="fa-solid fa-list" style="color: #000000;"></i> Danh sách khách hàng</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Ảnh đại diện</th>
+            <th>Mã khách hàng</th>
+            <th>Tên khách hàng</th>
+            <th>Giới tính</th>
+            <th>Ngày tạo</th>
+            <th>Ngày sửa</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${list.empty}">
+            <td colspan="10" style="text-align: center; color: red;">Không có dữ liệu</td>
+        </tr>
+        <tr th:each="tkkhachhang, i : ${list}">
+            <td th:text="${(currentPage * pageSize) + i.index + 1}"></td>
+            <td>
+                <img th:if="${tkkhachhang.image != null}"
+                     th:src="@{'/panda/image/'+ ${tkkhachhang.id}}"
+                     alt="Hình ảnh"
+                     style="width: 50px; height: auto;"/>
+                <img th:if="${tkkhachhang.image == null}"
+                     src="@{/images/default-avatar.png}"
+                     alt="Hình ảnh mặc định"
+                     style="width: 100px; height: auto;"/>
+            </td>
+
+            <td th:text="${tkkhachhang.makhachhang}"></td>
+            <td th:text="${tkkhachhang.tenkhachhang}"></td>
+            <td th:text="${tkkhachhang.gioitinh == 1 ? 'Nam' : 'Nữ'}"></td>
+            <td th:text="${tkkhachhang.ngaytao != null ? #temporals.format(tkkhachhang.ngaytao, 'dd/MM/yyyy') : 'Chưa có'}"></td>
+            <td th:text="${tkkhachhang.ngaysua != null ? #temporals.format(tkkhachhang.ngaysua, 'dd/MM/yyyy') : 'Chưa có'}"></td>
+            <td th:if="${tkkhachhang.trangthai} == 1">
+                <span class="status-label status-green" th:text="'Hoạt động'"></span>
+            </td>
+            <td th:if="${tkkhachhang.trangthai} == 0">
+                <span class="status-label status-orange" th:text="'Ngừng hoạt động'"></span>
+            </td>
+            <td>
+                <a class="btn" th:href="@{/panda/nhanvien/tkkhachhang/chitiet(id=${tkkhachhang.id})}"
+                   data-bs-toggle="modal"
+                   data-bs-target="#add"
+                   th:data-tentk="${tkkhachhang.tentaikhoan}"
+                   th:data-sdt="${tkkhachhang.sdt}"
+                   th:data-diachi="${tkkhachhang.diachi}">
+                    <i class="fa-regular fa-eye" style="color: #000000;font-size: 25px"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- Phân trang -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/panda/nhanvien/tkkhachhang/hienthi(page=${currentPage == 0 ? 0 : currentPage - 1}, makh=${makh}, tenkh=${tenkh}, trangThai=${trangthai})}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" th:text="${currentPage + 1}" disabled></a>
+            </li>
+            <li class="page-item" th:classappend="${list.size() < pageSize} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/panda/nhanvien/tkkhachhang/hienthi(page=${currentPage + 1}, makh=${makh}, tenkh=${tenkh}, trangThai=${trangthai})}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal chi tiết khách hàng -->
+<div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Chi tiết khách hàng: <span id="modal-makh"></span>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <span id="modal-avt"></span>
+                    </div>
+                    <div class="col-md-8">
+                        <ul>
+                            <li id="modal-tenkh"></li>
+                            <li id="modal-tentk"></li>
+                            <li id="modal-gioitinh"></li>
+                            <li id="modal-sdt"></li>
+                            <!--                            <li>-->
+                            <!--                                <span id="modal-diachi"></span>-->
+                            <!--                                <span id="modal-tinh"></span>-->
+                            <!--                            </li>-->
+                            <li>
+                                <lable>Ngày tạo:</lable>
+                                <span style="padding-right: 50px" id="modal-ngaytao"></span>
+                                <lable>Ngày sửa:</lable>
+                                <span id="modal-ngaysua"></span>
+                            </li>
+                            <li>
+                                <lable>Trạng thái:</lable>
+                                <span id="modal-trangthai"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('a[data-bs-toggle="modal"]').click(function () {
+            var makh = $(this).closest('tr').find('td:eq(2)').text();
+            var tenkh = $(this).closest('tr').find('td:eq(3)').text();
+            var gioitinh = $(this).closest('tr').find('td:eq(4)').text();
+            var sdt = $(this).data('sdt');
+            var tentk = $(this).data('tentk');
+            var diachi = $(this).data('diachi');
+            var ngaytao = $(this).closest('tr').find('td:eq(5)').text();
+            var ngaysua = $(this).closest('tr').find('td:eq(6)').text();
+            var trangthai = $(this).closest('tr').find('td:eq(7)').text();
+            var avatarSrc = $(this).closest('tr').find('img').attr('src');
+
+            $('#modal-makh').text(makh);
+            $('#modal-tenkh').text(tenkh);
+            $('#modal-gioitinh').text(gioitinh);
+            $('#modal-sdt').text(sdt);
+            $('#modal-tentk').text(tentk);
+            $('#modal-diachi').text(diachi);
+            $('#modal-ngaytao').text(ngaytao);
+            $('#modal-ngaysua').text(ngaysua);
+            $('#modal-trangthai').text(trangthai);
+            $('#modal-avt').html('<img src="' + avatarSrc + '" style="width: 150px; height: auto;" alt="Avatar"/>');
+        });
+    });
+</script>
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-inputs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+        padding-top: 10px;
+        font-weight: bold;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-buttons {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .filter-buttons button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #555;
+    }
+
+    .table-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container h3 {
+        margin-bottom: 20px;
+        font-size: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+        background-color: #f4f4f9;
+    }
+
+    table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .status-label {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+    }
+
+    .status-green {
+        background-color: #4CAF50;
+    }
+
+    .status-orange {
+        background-color: #ff9800;
+    }
+
+
+    .action-icons i {
+        font-size: 18px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+
+    #modal-avt img {
+        max-width: 100px; /* Giới hạn chiều rộng tối đa */
+        height: auto; /* Tự động điều chỉnh chiều cao */
+        margin: 0 auto; /* Căn giữa ảnh */
+        border-radius: 50%; /* Làm tròn ảnh để giống avatar */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Thêm bóng đổ cho ảnh */
+        margin-left: 50px;
+    }
+
+    .modal-body ul li {
+        margin-bottom: 15px; /* Thay đổi giá trị theo nhu cầu */
+    }
+
+</style>
+<script>
+    window.onload = function () {
+        var statusMessage = document.querySelector('.custom-alert');
+        if (statusMessage) {
+            statusMessage.classList.add('show');
+            setTimeout(function () {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+    };
+</script>
+</body>
+</html>

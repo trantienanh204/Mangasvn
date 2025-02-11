@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body th:fragment="updatehdc">
+<h2>Hóa đơn</h2>
+<div class="filter-container">
+    <h3><i class="fa-solid fa-square-plus" style="color: #000000;"></i> Sửa</h3><hr>
+    <form th:action="@{/panda/hoadon/update}" th:method="POST" th:object="${hoadon}">
+        <div>
+            <label class="form-lable">ID</label>
+            <input class="form-control" type="text" th:field="*{id}" readonly>
+
+            <label class="form-lable">Mã hóa đơn chi tiết</label>
+            <input class="form-control" type="text" th:field="*{mahoadon}">
+            <div th:if="${errorma}" th:text="${errorma}" style="color: red;"></div>
+
+            <label class="form-lable">Tổng tiền</label>
+            <input class="form-control" type="text" th:field="*{tongtien}">
+            <div th:if="${errorten}" th:text="${errorten}" style="color: red;"></div>
+
+            <label class="form-lable">Ngày mua</label>
+            <input class="form-control" type="text" th:field="*{ngaymua}">
+            <div th:if="${errorma}" th:text="${errorma}" style="color: red;"></div>
+
+            <label class="form-lable">Nhân viên</label>
+            <select name="nhanVien" id="nhanVien" class="form-control">
+                <th:block th:each="nv : ${listnhanvien}">
+                    <option th:value="${nv.id}"
+                            th:text="${nv.tennhanvien}"
+                            th:selected="${hoadon.nhanVien.id == nv.id}"></option>
+                </th:block>
+            </select><br>
+            <label class="form-lable">Khách hàng</label>
+            <select name="khachHang" id="khachHang" class="form-control">
+                <th:block th:each="kh : ${listkhachhang}">
+                    <option th:value="${kh.id}"
+                            th:text="${kh.tenkhachhang}"
+                            th:selected="${hoadon.khachHang.id == kh.id}"></option>
+                </th:block>
+            </select>
+            <br>
+<!--            <button type="submit" class="btn btn-danger">Sửa</button>-->
+            <a th:href="@{/panda/hoadon}"type="submit" class="btn btn-danger">Quay lại</a>
+        </div>
+    </form>
+</div>
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-inputs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+
+        font-weight: bold;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        padding-top: 25px;
+    }
+
+    .filter-buttons button {
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #555;
+    }
+</style>
+</body>
+
+</html>

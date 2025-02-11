@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <label class="form-label" style="margin-left: 35px">Tên sản phẩm</label>
+    <input class="form-control" type="text" name="tensp" th:value="${sp.tensp}" style="margin-left: 35px;width: 30%" readonly>
+    <input class="form-control" type="text" name="idsp"  th:value="${sp.id}" style="margin-left: 35px;width: 30%" readonly>
+</div>
+<div style="margin-left: 10px">
+    <form th:action="@{/panda/sanpham/change}" th:method="GET">
+        <input class="form-control" type="text" name="idsp"  th:value="${sp.id}" hidden>
+        <div th:each="spct : ${spctnot}">
+            <input type="radio" name="checkmausac" th:value="${spct.mauSac.id}">
+            <span th:text="${spct.mauSac.tenmausac}"></span> &nbsp; <!-- Khoảng trắng giữa các thuộc tính -->
+            <span th:text="${spct.sanPham.tensp}"></span> &nbsp;
+            <span th:style="'background-color:' + ${spct.mauSac.mamausac}" th:text="${spct.mauSac.mamausac}"></span> &nbsp;
+        </div>
+        <button type="submit" class="btn btn-primary">Gửi</button>
+    </form>
+</div>
+</body>
+</html>

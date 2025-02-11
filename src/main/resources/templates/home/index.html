@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<nav th:replace="~{index/_menu ::nav}"></nav>
+    <span th:text="${message}"></span>
+<nav th:replace="~{index/_info ::main}"></nav>
+</body>
+</html>
