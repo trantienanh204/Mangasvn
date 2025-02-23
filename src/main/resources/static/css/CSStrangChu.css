@@ -1,0 +1,30 @@
+
+.img-shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Đổ bóng */
+    border-radius: 8px;
+    /* Bo tròn góc nếu muốn */
+}
+
+.img-carousel {
+    width: 15%;
+    /* Ảnh chiếm 15% chiều rộng */
+    height: 100%;
+    /* Chiều cao ảnh tự động phù hợp */
+    object-fit: cover;
+    /* Đảm bảo ảnh được cắt và bao phủ hết diện tích */
+}
+
+.text-container {
+    width: 85%;
+    /* Phần text chiếm 85% chiều rộng */
+    padding: 1rem;
+    background-color: #f8f9fa;
+}
+
+body {
+    margin-top: 70px;
+}
+.navbar {
+    z-index: 1030;
+}
