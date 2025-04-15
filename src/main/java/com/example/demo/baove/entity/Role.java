@@ -13,27 +13,19 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USERS")
-public class user {
+@Table(name = "ROLE")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "USERNAME")
-    private String username;
-
-    @Column(name = "PASS")
-    private String pass;
-
-    @Column(name = "EMAIL")
-    private String email;
+    @Column(name = "ROLE_NAME")
+    private String roleName;
 
     @Column(name = "TRANG_THAI")
-    private boolean trang_Thai;
-
-    @Column(name = "ROLE")
-    private String role;
+    private boolean trangThai;
 
     @Column(name = "NGAY_TAO")
-    private LocalDate ngay_Tao;
+    private LocalDate ngayTao;
+
 }

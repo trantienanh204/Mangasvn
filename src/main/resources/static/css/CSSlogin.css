@@ -1,0 +1,240 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background: url('https://i.postimg.cc/cCy0Tk54/hehe.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #ff4d88;
+}
+
+.login-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #ff4d88, #ff9a56, #ff4d88);
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #ff4d88;
+    box-shadow: 0 5px 15px rgba(255, 77, 136, 0.3);
+}
+
+.logo img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+h1 {
+    color: #ff4d88;
+    margin-bottom: 30px;
+    font-size: 28px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ff4d88;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.input-group input:focus {
+    border-color: #ff4d88;
+    box-shadow: 0 0 0 3px rgba(255, 77, 136, 0.2);
+    outline: none;
+}
+
+.input-group input::placeholder {
+    color: #aaa;
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 5px;
+}
+
+.forgot-password a {
+    color: #ff4d88;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(45deg, #ff4d88, #ff9a56);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(255, 77, 136, 0.3);
+}
+
+.login-button:hover {
+    background: linear-gradient(45deg, #ff9a56, #ff4d88);
+    box-shadow: 0 6px 8px rgba(255, 77, 136, 0.4);
+    transform: translateY(-2px);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.signup-link {
+    color: #666;
+    font-size: 14px;
+}
+
+.signup-link a {
+    color: #ff4d88;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+.manga-decoration {
+    position: absolute;
+    font-size: 24px;
+    color: #ff4d88;
+}
+
+.manga-decoration.top-left {
+    top: 10px;
+    left: 15px;
+}
+
+.manga-decoration.top-right {
+    top: 10px;
+    right: 15px;
+}
+
+.manga-decoration.bottom-left {
+    bottom: 10px;
+    left: 15px;
+}
+
+.manga-decoration.bottom-right {
+    bottom: 10px;
+    right: 15px;
+}
+
+/* Thêm đoạn này vào phần <style> */
+@media only screen and (max-width: 768px) {
+    .login-container {
+        width: 90% !important;
+        padding: 20px !important;
+        margin: 10px auto !important;
+    }
+
+    h1 {
+        font-size: 22px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .input-group input {
+        padding: 10px !important;
+    }
+
+    .login-button {
+        padding: 10px !important;
+    }
+
+    .logo {
+        width: 80px !important;
+        height: 80px !important;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .remember-forgot {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+}

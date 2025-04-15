@@ -13,22 +13,21 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "CHAPTERS")
-public class chapters {
+@Table(name = "WISHLIST")
+public class Wishlist {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "TEN_CHAP")
-    private String tenChap;
+    @ManyToOne
+    @JoinColumn(name = "ID_USER",referencedColumnName = "id")
+    private Users users;
 
-    @Column(name = "TRANG_THAI")
-    private Boolean trangThai;
+    @ManyToOne
+    @JoinColumn(name = "ID_COMIC",referencedColumnName = "id")
+    private comics comics;
 
     @Column(name = "NGAY_TAO")
     private LocalDate ngayTao;
-
-    @Column(name = "NGAY_SUA")
-    private LocalDate ngaySua;
-
 }
