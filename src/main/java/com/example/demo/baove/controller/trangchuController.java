@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping()
+@RequestMapping("/api/auth/")
 public class trangchuController {
     @GetMapping()
     public String trangChu(Model model){
