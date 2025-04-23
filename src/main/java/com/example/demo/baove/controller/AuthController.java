@@ -25,6 +25,18 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/user-info")
+    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtUtil.getUsernameFromToken(jwt);
+            String role = jwtUtil.getRoleFromToken(jwt).replace("ROLE_", "");
+            return ResponseEntity.ok(new UserInfoResponse(username, role.toUpperCase()));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Token không hợp lệ");
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         Users user = userService.registerUser(
@@ -93,4 +105,18 @@ class LoginResponse {
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
+}
+class UserInfoResponse {
+    private String username;
+    private String role;
+
+    public UserInfoResponse(String username, String role) {
+        this.username = username;
+        this.role = role;
+    }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }
