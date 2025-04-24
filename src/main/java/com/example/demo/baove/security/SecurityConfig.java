@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/css/**", "/js/**", "/login.html", "/view/trangchu.html").permitAll()
+                        .requestMatchers("/api/auth/**", "/css/**", "/js/**", "/login.html", "/view/trangchu.html","/api/truyen/list", "/api/truyen/hot").permitAll()
                         .requestMatchers("/api/truyen/list").permitAll() // Công khai cho Guest
                         .requestMatchers("/api/truyen/**").hasAnyRole("translator", "admin")
                         .requestMatchers("/api/admin/**").hasRole("admin")

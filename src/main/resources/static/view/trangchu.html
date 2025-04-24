@@ -90,44 +90,7 @@
     <div>
         <p>Truyện hot</p>
         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" style="width: 100%;">
-            <div class="carousel-inner">
-                <!-- Slide 1 -->
-                <div class="carousel-item active">
-                    <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
-                        <img src="https://cdn.truyenqqto.net/tieuthuyet/ta-la-nu-dau-bep-o-tuu-lau.jpg"
-                             class="img-shadow img-fluid img-carousel" alt="...">
-                        <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
-                            <h5 class="text-title">Card 1</h5>
-                            <p class="text-content">This is the content of the first card. Customize it as needed.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Slide 2 -->
-                <div class="carousel-item">
-                    <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
-                        <img src="https://cdn.truyenqqto.net/tieuthuyet/ta-la-nu-dau-bep-o-tuu-lau.jpg"
-                             class="img-shadow img-fluid img-carousel" alt="...">
-                        <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
-                            <h5 class="text-title">Card 2</h5>
-                            <p class="text-content">This is the content of the second card. Adjust as necessary.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Slide 3 -->
-                <div class="carousel-item">
-                    <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
-                        <img src="https://cdn.truyenqqto.net/tieuthuyet/ta-la-nu-dau-bep-o-tuu-lau.jpg"
-                             class="img-shadow img-fluid img-carousel" alt="...">
-                        <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
-                            <h5 class="text-title">Card 3</h5>
-                            <p class="text-content">This is the content of the third card. Adjust as necessary.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="carousel-inner" id="hot-truyen-carousel"></div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
@@ -138,7 +101,6 @@
             </button>
         </div>
     </div>
-
     <!-- Danh sách truyện -->
     <div class="truyen-list">
         <h5>Danh sách truyện</h5>
@@ -184,39 +146,102 @@
             loginLink.show();
             logoutLink.hide();
         }
-
-        // Gọi API để lấy danh sách truyện (công khai)
         $.ajax({
-            url: "http://localhost:8080/api/truyen/list",
+            url: "http://localhost:8080/api/truyen/hot",
             method: "GET",
             success: function(data) {
-                const truyenListDiv = $("#truyen-list");
-                if (Array.isArray(data)) {
-                    data.forEach(truyen => {
-                        truyenListDiv.append(`
-                            <div class="truyen-item">
-                                <a href="/read/${truyen.id}">${truyen.tenTruyen}</a>
-                                <p>${truyen.moTa || "Không có mô tả"}</p>
+                const carouselInner = $("#hot-truyen-carousel");
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach((truyen, index) => {
+                        const isActive = index === 0 ? "active" : "";
+                        carouselInner.append(`
+                            <div class="carousel-item ${isActive}">
+                                <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
+                                    <img src="${truyen.anhLink || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
+                                         class="img-shadow img-fluid img-carousel" alt="${truyen.tenTruyen}">
+                                    <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
+                                        <h5 class="text-title">${truyen.tenTruyen}</h5>
+                                        <p class="text-content">${truyen.moTa || "Không có mô tả"}</p>
+                                        <a href="/read/${truyen.id}" class="btn btn-primary">Đọc ngay</a>
+                                    </div>
+                                </div>
                             </div>
                         `);
                     });
                 } else {
-                    truyenListDiv.text(data);
+                    carouselInner.append('<div class="carousel-item active"><p>Không có truyện hot</p></div>');
                 }
             },
             error: function() {
-                $("#truyen-list").text("Lỗi khi tải danh sách truyện");
+                $("#hot-truyen-carousel").append('<div class="carousel-item active"><p>Lỗi khi tải truyện hot</p></div>');
             }
         });
     });
 
+    $.ajax({
+        url: "http://localhost:8080/api/truyen/list",
+        method: "GET",
+        success: function(data) {
+            const truyenListDiv = $("#truyen-list");
+            const token = localStorage.getItem("token");
+            if (Array.isArray(data)) {
+                data.forEach(truyen => {
+                    const favoriteButton = token ? `<button onclick="addFavorite(${truyen.id})" class="btn btn-sm btn-outline-primary">Thêm vào yêu thích</button>` : '';
+                    truyenListDiv.append(`
+                    <div class="truyen-item">
+                        <a href="/read/${truyen.id}">${truyen.tenTruyen}</a>
+                        <p>${truyen.moTa || "Không có mô tả"}</p>
+                        ${favoriteButton}
+                    </div>
+                `);
+                });
+            } else {
+                truyenListDiv.text(data);
+            }
+        },
+        error: function() {
+            $("#truyen-list").text("Lỗi khi tải danh sách truyện");
+        }
+    });
+
+    function addFavorite(truyenId) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Vui lòng đăng nhập để thêm truyện vào yêu thích!");
+            window.location.href = "/login.html";
+            return;
+        }
+
+        $.ajax({
+            url: `http://localhost:8080/api/truyen/favorite/${truyenId}`,
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function() {
+                alert("Đã thêm vào danh sách yêu thích!");
+            },
+            error: function(xhr) {
+                if (xhr.status === 401 || xhr.status === 403) {
+                    alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+                    localStorage.removeItem("token");
+                    window.location.href = "/login.html";
+                } else {
+                    alert("Lỗi khi thêm vào danh sách yêu thích!");
+                }
+            }
+        });
+    }
+        // Gọi API để lấy danh sách truyện (công khai)
+
     function logout() {
         localStorage.removeItem("token");
-        window.location.href = "/login.html";
+        window.location.href = "/view/trangchu.html";
     }
 </script>
 </body>
 </html>
+
 <!--<!DOCTYPE html>-->
 <!--<html lang="vi">-->
 <!--<head>-->
