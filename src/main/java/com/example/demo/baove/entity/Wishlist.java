@@ -8,25 +8,24 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "WISHLIST")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "WISHLIST")
 public class Wishlist {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_USER",referencedColumnName = "id")
-    private Users users;
+    @JoinColumn(name = "ID_USER", referencedColumnName = "id")
+    private User users;
 
     @ManyToOne
-    @JoinColumn(name = "ID_COMIC",referencedColumnName = "id")
-    private comics comics;
+    @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
+    private Comic comics;
 
     @Column(name = "NGAY_TAO")
     private LocalDate ngayTao;

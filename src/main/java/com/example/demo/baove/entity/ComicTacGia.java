@@ -6,22 +6,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
+@Table(name = "COMIC_TACGIA")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "COMIC_DANHMUC")
-public class Comic_DanhMuc {
+public class ComicTacGia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_DANH_MUC",referencedColumnName = "id")
+    @JoinColumn(name = "ID_TAC_GIA", referencedColumnName = "id")
     private TacGia tacGia;
 
     @ManyToOne
-    @JoinColumn(name = "ID_COMIC",referencedColumnName = "id")
-    private comics comics;
+    @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
+    private Comic comics;
 }

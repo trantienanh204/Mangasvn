@@ -8,27 +8,25 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "VIEWED")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "CHAPTERS")
-public class chapters {
+public class Viewed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "TEN_CHAP")
-    private String tenChap;
+    @ManyToOne
+    @JoinColumn(name = "ID_USER", referencedColumnName = "id")
+    private User users;
 
-    @Column(name = "TRANG_THAI")
-    private Boolean trangThai;
+    @ManyToOne
+    @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
+    private Comic comics;
 
     @Column(name = "NGAY_TAO")
     private LocalDate ngayTao;
-
-    @Column(name = "NGAY_SUA")
-    private LocalDate ngaySua;
-
 }

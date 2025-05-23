@@ -8,28 +8,28 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "COMMENTS")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "COMMENTS")
-public class comments {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_USER",referencedColumnName = "id")
-    private Users users;
+    @JoinColumn(name = "ID_USER", referencedColumnName = "id")
+    private User users;
 
     @ManyToOne
-    @JoinColumn(name = "ID_COMIC",referencedColumnName = "id")
-    private comics comics;
+    @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
+    private Comic comics;
 
     @ManyToOne
-    @JoinColumn(name = "ID_CHAPTER",referencedColumnName = "id")
-    private chapters chapters;
+    @JoinColumn(name = "ID_CHAPTER", referencedColumnName = "id")
+    private Chapter chapters;
 
     @Column(name = "comment")
     private String comment;

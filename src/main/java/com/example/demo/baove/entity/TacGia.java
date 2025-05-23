@@ -9,19 +9,18 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "TAC_GIA")
 @Getter
 @Setter
-@Table(name = "TAC_GIA")
+@NoArgsConstructor
+@AllArgsConstructor
 public class TacGia {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
     @Column(name = "TEN_TAC_GIA")
-    private String tenTacGIA;
+    private String tenTacGia;
 
     @Column(name = "TRANG_THAI")
     private boolean trangThai;
@@ -31,6 +30,4 @@ public class TacGia {
 
     @Column(name = "NGAY_SUA")
     private LocalDate ngaySua;
-
-
 }

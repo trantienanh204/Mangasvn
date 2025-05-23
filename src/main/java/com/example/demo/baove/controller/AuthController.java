@@ -1,8 +1,8 @@
 package com.example.demo.baove.controller;
 
-import com.example.demo.baove.entity.Users;
-import com.example.demo.baove.security.JwtUtil; // Đổi từ jwt_utility thành JwtUtil
-import com.example.demo.baove.service.UserService; // Đổi từ userService thành UserService
+import com.example.demo.baove.entity.User;
+import com.example.demo.baove.security.JwtUtil;
+import com.example.demo.baove.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        Users user = userService.registerUser(
+        User user = userService.registerUser(
                 request.getUserName(),
                 request.getPassword(),
                 request.getEmail(),
@@ -56,7 +56,7 @@ public class AuthController {
             );
 
             UserDetails userDetails = userService.loadUserByUsername(request.getUserName());
-            String role = userDetails.getAuthorities().iterator().next().getAuthority(); // Không loại bỏ ROLE_
+            String role = userDetails.getAuthorities().iterator().next().getAuthority();
             String token = jwtUtil.generateToken(request.getUserName(), role);
 
             return ResponseEntity.ok(new LoginResponse(token));

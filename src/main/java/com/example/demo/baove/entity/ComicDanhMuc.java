@@ -6,23 +6,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Entity
+@Table(name = "COMIC_DANHMUC")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "IMAGE_CHAPTER")
-public class Image_Chapters {
+@AllArgsConstructor
+public class ComicDanhMuc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_CHAPTER",referencedColumnName = "id")
-    private chapters chapters;
+    @JoinColumn(name = "ID_DANH_MUC", referencedColumnName = "id")
+    private DanhMuc danhMuc;
 
-    @Column(name = "NGAY_TAO")
-    private LocalDate ngayTao;
+    @ManyToOne
+    @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
+    private Comic comics;
 }

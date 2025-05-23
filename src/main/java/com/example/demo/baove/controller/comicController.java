@@ -1,21 +1,21 @@
 package com.example.demo.baove.controller;
 
-import com.example.demo.baove.entity.comics;
+import com.example.demo.baove.entity.User;
+import com.example.demo.baove.entity.Wishlist;
+import com.example.demo.baove.entity.Comic;
 import com.example.demo.baove.repository.comicRepository;
+import com.example.demo.baove.repository.wishlistRepository;
 import com.example.demo.baove.security.JwtUtil;
 import com.example.demo.baove.service.comicService;
 import com.example.demo.baove.service.UserService;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/truyen")
@@ -29,6 +29,9 @@ public class comicController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private wishlistRepository wishlistRepository;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -46,7 +49,7 @@ public class comicController {
         String username = jwtUtil.getUsernameFromToken(token);
         Integer userId = userService.findByUsername(username).getId();
 
-        comics truyen = truyenService.createTruyen(request.getMoTa(), request.getGhiChu(), userId);
+        Comic truyen = truyenService.createTruyen(request.getMoTa(), request.getGhiChu(), userId);
         return ResponseEntity.ok(truyen);
     }
 
@@ -57,54 +60,126 @@ public class comicController {
         String role = jwtUtil.getRoleFromToken(token);
         Integer userId = userService.findByUsername(username).getId();
 
-        comics truyen = truyenService.updateTruyen(id, request.getMoTa(), request.getGhiChu(), userId, role);
+        Comic truyen = truyenService.updateTruyen(id, request.getMoTa(), request.getGhiChu(), userId, role);
         return ResponseEntity.ok(truyen);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<comics>> getAllTruyen() {
-        List<comics> truyenList = comicRepository.findAll();
+    public ResponseEntity<List<Comic>> getAllTruyen() {
+        List<Comic> truyenList = comicRepository.findAll();
         return ResponseEntity.ok(truyenList);
     }
 
     @GetMapping("/hot")
-    public ResponseEntity<List<comics>> getHotTruyen() {
-        // Lấy 3 truyện hot (ví dụ: dựa trên lượt xem, mới nhất, hoặc admin chọn)
-        List<comics> hotTruyen = comicRepository.findTop3ByOrderByNgayTaoDesc();
+    public ResponseEntity<List<Comic>> getHotTruyen() {
+        List<Comic> hotTruyen = comicRepository.findTop5ByOrderByLuotXemDesc();
         return ResponseEntity.ok(hotTruyen);
     }
-//    @PostMapping("/favorite/{truyenId}")
-//    public ResponseEntity<?> addToFavorite(@PathVariable int truyenId, @RequestHeader("Authorization") String authorizationHeader) {
-//        try {
-//            String jwt = authorizationHeader.substring(7);
-//            String username = jwtUtil.getUsernameFromToken(jwt);
-//
-//            comics truyen = comicRepository.findById(truyenId)
-//                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
-//
-//            Favorite favorite = new Favorite();
-//            favorite.setUsername(username);
-//            favorite.setTruyenId(truyenId);
-//            favoriteRepository.save(favorite);
-//
-//            return ResponseEntity.ok("Thêm vào yêu thích thành công");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(401).body("Token không hợp lệ hoặc lỗi: " + e.getMessage());
-//        }
-//    }
+    @GetMapping("/moi")
+    public ResponseEntity<List<Comic>> getMoiTruyen() {
+        List<Comic> hotTruyen = comicRepository.findTop5ByOrderByNgayTaoDesc();
+        return ResponseEntity.ok(hotTruyen);
+    }
+    @GetMapping("/favorite/status/{truyenId}")
+    public ResponseEntity<Boolean> checkFavoriteStatus(@PathVariable int truyenId, @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtUtil.getUsernameFromToken(jwt);
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(404).body(false);
+            }
+
+            Comic truyen = comicRepository.findById(truyenId)
+                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
+            boolean isFavorited = wishlistRepository.existsByUsersAndComics(user, truyen);
+            return ResponseEntity.ok(isFavorited);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(false);
+        }
+    }
+    @PostMapping("/favorite/{truyenId}")
+    public ResponseEntity<?> addToFavorite(@PathVariable int truyenId, @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtUtil.getUsernameFromToken(jwt);
+            String role = jwtUtil.getRoleFromToken(jwt);
+
+            if (!role.equals("ROLE_user") && !role.equals("ROLE_translator") && !role.equals("ROLE_admin")) {
+                return ResponseEntity.status(403).body("Bạn không có quyền thêm truyện vào danh sách yêu thích!");
+            }
+
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(404).body("Người dùng không tồn tại!");
+            }
+
+            Comic truyen = comicRepository.findById(truyenId)
+                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
+
+            if (wishlistRepository.existsByUsersAndComics(user, truyen)) {
+                return ResponseEntity.status(200).body("Truyện đã có trong danh sách yêu thích!");
+            }
+
+            Wishlist favorite = new Wishlist();
+            favorite.setUsers(user);
+            favorite.setComics(truyen);
+            favorite.setNgayTao(LocalDate.now());
+            wishlistRepository.save(favorite);
+
+            return ResponseEntity.ok("Thêm vào yêu thích thành công");
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Token không hợp lệ hoặc lỗi: " + e.getMessage());
+        }
+    }
+    @DeleteMapping("/favorite/{truyenId}")
+    public ResponseEntity<?> removeFromFavorite(@PathVariable int truyenId, @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtUtil.getUsernameFromToken(jwt);
+            String role = jwtUtil.getRoleFromToken(jwt);
+
+            if (!role.equals("ROLE_user") && !role.equals("ROLE_translator") && !role.equals("ROLE_admin")) {
+                return ResponseEntity.status(403).body("Bạn không có quyền xóa truyện khỏi danh sách yêu thích!");
+            }
+
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(404).body("Người dùng không tồn tại!");
+            }
+
+            Comic truyen = comicRepository.findById(truyenId)
+                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
+
+            Wishlist favorite = wishlistRepository.findByUsersAndComics(user, truyen)
+                    .orElseThrow(() -> new RuntimeException("Truyện không có trong danh sách yêu thích!"));
+
+            wishlistRepository.delete(favorite);
+            return ResponseEntity.ok("Đã xóa khỏi danh sách yêu thích!");
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Token không hợp lệ hoặc lỗi: " + e.getMessage());
+        }
+    }
+    @GetMapping("/search")
+    public List<Comic> searchTruyen(@RequestParam("query") String query) {
+        String[] keywords = query.toLowerCase().split("\\s+");
+        return comicRepository.findAll().stream()
+                .filter(truyen -> {
+                    for (String keyword : keywords) {
+                        if (truyen.getTenTruyen().toLowerCase().contains(keyword)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
+    @GetMapping("/{id}")
+    public Comic getComicById(@PathVariable("id") int id) {
+        return comicRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Truyện với ID " + id + " không tồn tại"));
+    }
 }
-
-//@Entity
-//public class Favorite {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//    private String username;
-//    private Long truyenId;
-//
-//    // Getters và setters
-//}
-
 
 
 class TruyenRequest {

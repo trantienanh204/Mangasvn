@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="/css/CSStrangChu.css">
     <style>
         .truyen-list {
@@ -74,9 +76,12 @@
                             <a class="nav-link" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a>
                         </li>
                     </ul>
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    <form class="d-flex search-container" style="position: relative;">
+                        <input class="form-control me-2" type="search" id="search-input" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit" id="search-button">Search</button>
+                        <div id="search-suggestions" style="position: absolute; top: 100%; left: 0; width: 300px; background-color: #fff; border: 1px solid #ddd; display: none; z-index: 1000; max-height: 200px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">
+                            <!-- Danh sách gợi ý sẽ được thêm bằng JavaScript -->
+                        </div>
                     </form>
                 </div>
             </div>
@@ -87,8 +92,8 @@
     <div style="margin-top: 80px;"></div>
 
     <!-- Truyện hot -->
-    <div>
-        <p>Truyện hot</p>
+    <div class="truyen-section">
+        <h5>Truyện hot</h5>
         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" style="width: 100%;">
             <div class="carousel-inner" id="hot-truyen-carousel"></div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
@@ -101,182 +106,33 @@
             </button>
         </div>
     </div>
+
+    <!-- Danh sách truyện nổi bật -->
+    <div class="truyen-section">
+        <h5>Danh sách truyện nổi bật</h5>
+        <div class="truyen-list-container">
+            <button class="scroll-btn scroll-left" onclick="scrollTruyenList('left')">❮</button>
+            <div class="truyen-list-hot" id="truyen-list-hot"></div>
+            <button class="scroll-btn scroll-right" onclick="scrollTruyenList('right')">❯</button>
+        </div>
+    </div>
+
     <!-- Danh sách truyện -->
-    <div class="truyen-list">
+    <div class="truyen-section">
         <h5>Danh sách truyện</h5>
-        <div id="truyen-list"></div>
+        <div class="truyen-list" id="truyen-list"></div>
+    </div>
+
+    <!-- Danh sách truyện mới -->
+    <div class="truyen-section">
+        <h5>Danh sách truyện mới</h5>
+        <div class="truyen-list-new" id="truyen-list-new"></div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 <script src="/js/JStrangChu.js"></script>
-<script>
-    $(document).ready(function() {
-        const token = localStorage.getItem("token");
-        const userInfo = $("#user-info");
-        const loginLink = $("#login-link");
-        const logoutLink = $("#logout-link");
 
-
-        if (token) {
-            $.ajax({
-                url: "http://localhost:8080/api/auth/user-info",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + token
-                },
-                success: function(data) {
-                    userInfo.text("Xin chào, " + data.role);
-                    loginLink.hide();
-                    logoutLink.show();
-                },
-                error: function(xhr) {
-                    if (xhr.status === 401 || xhr.status === 403) {
-                        localStorage.removeItem("token"); // Xóa token nếu không hợp lệ
-                        userInfo.text("");
-                        loginLink.show();
-                        logoutLink.hide();
-                    }
-                }
-            });
-        } else {
-            userInfo.text("");
-            loginLink.show();
-            logoutLink.hide();
-        }
-        $.ajax({
-            url: "http://localhost:8080/api/truyen/hot",
-            method: "GET",
-            success: function(data) {
-                const carouselInner = $("#hot-truyen-carousel");
-                if (Array.isArray(data) && data.length > 0) {
-                    data.forEach((truyen, index) => {
-                        const isActive = index === 0 ? "active" : "";
-                        carouselInner.append(`
-                            <div class="carousel-item ${isActive}">
-                                <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
-                                    <img src="${truyen.anhLink || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
-                                         class="img-shadow img-fluid img-carousel" alt="${truyen.tenTruyen}">
-                                    <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
-                                        <h5 class="text-title">${truyen.tenTruyen}</h5>
-                                        <p class="text-content">${truyen.moTa || "Không có mô tả"}</p>
-                                        <a href="/read/${truyen.id}" class="btn btn-primary">Đọc ngay</a>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-                    });
-                } else {
-                    carouselInner.append('<div class="carousel-item active"><p>Không có truyện hot</p></div>');
-                }
-            },
-            error: function() {
-                $("#hot-truyen-carousel").append('<div class="carousel-item active"><p>Lỗi khi tải truyện hot</p></div>');
-            }
-        });
-    });
-
-    $.ajax({
-        url: "http://localhost:8080/api/truyen/list",
-        method: "GET",
-        success: function(data) {
-            const truyenListDiv = $("#truyen-list");
-            const token = localStorage.getItem("token");
-            if (Array.isArray(data)) {
-                data.forEach(truyen => {
-                    const favoriteButton = token ? `<button onclick="addFavorite(${truyen.id})" class="btn btn-sm btn-outline-primary">Thêm vào yêu thích</button>` : '';
-                    truyenListDiv.append(`
-                    <div class="truyen-item">
-                        <a href="/read/${truyen.id}">${truyen.tenTruyen}</a>
-                        <p>${truyen.moTa || "Không có mô tả"}</p>
-                        ${favoriteButton}
-                    </div>
-                `);
-                });
-            } else {
-                truyenListDiv.text(data);
-            }
-        },
-        error: function() {
-            $("#truyen-list").text("Lỗi khi tải danh sách truyện");
-        }
-    });
-
-    function addFavorite(truyenId) {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            alert("Vui lòng đăng nhập để thêm truyện vào yêu thích!");
-            window.location.href = "/login.html";
-            return;
-        }
-
-        $.ajax({
-            url: `http://localhost:8080/api/truyen/favorite/${truyenId}`,
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token
-            },
-            success: function() {
-                alert("Đã thêm vào danh sách yêu thích!");
-            },
-            error: function(xhr) {
-                if (xhr.status === 401 || xhr.status === 403) {
-                    alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
-                    localStorage.removeItem("token");
-                    window.location.href = "/login.html";
-                } else {
-                    alert("Lỗi khi thêm vào danh sách yêu thích!");
-                }
-            }
-        });
-    }
-        // Gọi API để lấy danh sách truyện (công khai)
-
-    function logout() {
-        localStorage.removeItem("token");
-        window.location.href = "/view/trangchu.html";
-    }
-</script>
 </body>
 </html>
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="vi">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Trang chủ Manga World</title>-->
-<!--    <link rel="stylesheet" href="/css/CSStrangChu.css">-->
-<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-<!--    <script src="/js/JStrangChu.js"></script>-->
-<!--    <style>-->
-<!--        .auth-buttons {-->
-<!--            position: absolute;-->
-<!--            top: 20px;-->
-<!--            right: 20px;-->
-<!--        }-->
-<!--        .auth-buttons a {-->
-<!--            padding: 10px;-->
-<!--            background-color: #dc3545;-->
-<!--            color: white;-->
-<!--            text-decoration: none;-->
-<!--            border-radius: 3px;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--<div class="auth-buttons">-->
-<!--    <a href="/api/auth/login">Đăng xuất</a>-->
-<!--</div>-->
-<!--<h1>Chào mừng đến với Manga World</h1>-->
-<!--<script>-->
-<!--    // Kiểm tra token-->
-<!--    const token = localStorage.getItem("token");-->
-<!--    if (!token) {-->
-<!--        window.location.href = "/api/auth/login";-->
-<!--    }-->
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->

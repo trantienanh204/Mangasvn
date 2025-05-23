@@ -9,21 +9,25 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "ROLE")
+@Table(name = "IMAGE_CHAPTER")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
+public class ImageChapter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ROLE_NAME")
-    private String roleName;
+    @ManyToOne
+    @JoinColumn(name = "ID_CHAPTER", referencedColumnName = "id")
+    private Chapter chapter;
 
-    @Column(name = "TRANG_THAI")
-    private boolean trangThai;
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
+
+    @Column(name = "PAGE_NUMBER")
+    private int pageNumber;
 
     @Column(name = "NGAY_TAO")
     private LocalDate ngayTao;

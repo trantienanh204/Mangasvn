@@ -1,7 +1,7 @@
 package com.example.demo.baove.controller;
 
-import com.example.demo.baove.entity.Users;
-import com.example.demo.baove.repository.userRepository;
+import com.example.demo.baove.entity.User;
+import com.example.demo.baove.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
@@ -16,12 +16,12 @@ import java.util.Optional;
     public class nhanvienController {
 
     @Autowired
-    userRepository userRepository ;
+    UserRepository userRepository ;
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<Users> getUserById(@PathVariable("id") Integer id) {
-        Optional<Users> user = userRepository.findById(id);
+    public ResponseEntity<User> getUserById(@PathVariable("id") Integer id) {
+        Optional<User> user = userRepository.findById(id);
         return user.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

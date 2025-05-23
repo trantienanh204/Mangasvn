@@ -8,36 +8,36 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "USERS")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "USERS")
-public class Users {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private int id;
 
     @Column(name = "USERNAME")
-    private String userName;
+    private String username;
 
     @Column(name = "PASS")
-    private String Pass;
+    private String password;
 
     @Column(name = "EMAIL")
-    private String Email;
+    private String email;
 
     @Column(name = "TRANG_THAI")
-    private boolean trang_Thai;
+    private boolean trangThai;
 
     @ManyToOne
-    @JoinColumn(name = "id_role",referencedColumnName = "id")
-    private Role Role;
+    @JoinColumn(name = "id_role", referencedColumnName = "id")
+    private Role role;
 
     @Column(name = "NGAY_TAO")
-    private LocalDate ngay_Tao;
+    private LocalDate ngayTao;
 
     @Column(name = "AVATA")
-    private String Avata;
+    private String avatar;
 }
