@@ -160,20 +160,24 @@ public class comicController {
             return ResponseEntity.status(401).body("Token không hợp lệ hoặc lỗi: " + e.getMessage());
         }
     }
-    @GetMapping("/search")
-    public List<Comic> searchTruyen(@RequestParam("query") String query) {
-        String[] keywords = query.toLowerCase().split("\\s+");
-        return comicRepository.findAll().stream()
-                .filter(truyen -> {
-                    for (String keyword : keywords) {
-                        if (truyen.getTenTruyen().toLowerCase().contains(keyword)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
-    }
+//    @GetMapping("/search")
+//    public List<Comic> searchTruyen(@RequestParam("query") String query) {
+//        String[] keywords = query.toLowerCase().split("\\s+");
+//        return comicRepository.findAll().stream()
+//                .filter(truyen -> {
+//                    for (String keyword : keywords) {
+//                        if (truyen.getTenTruyen().toLowerCase().contains(keyword)) {
+//                            return true;
+//                        }
+//                    }
+//                    return false;
+//                })
+//                .collect(Collectors.toList());
+//    }
+@GetMapping("/search")
+public List<Comic> searchComics(@RequestParam("query") String query) {
+    return comicRepository.findByTenTruyenContainingIgnoreCase(query);
+}
     @GetMapping("/{id}")
     public Comic getComicById(@PathVariable("id") int id) {
         return comicRepository.findById(id)

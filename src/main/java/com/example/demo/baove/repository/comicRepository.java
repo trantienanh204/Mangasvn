@@ -10,4 +10,5 @@ import java.util.List;
 public interface comicRepository extends JpaRepository<Comic,Integer> {
     List<Comic> findTop5ByOrderByNgayTaoDesc();
     List<Comic> findTop5ByOrderByLuotXemDesc();
+    List<Comic> findByTenTruyenContainingIgnoreCase(String tenTruyen);
 }

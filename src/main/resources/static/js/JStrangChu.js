@@ -185,7 +185,7 @@ $(document).ready(function() {
         }
     });
 
-    // Gọi API để lấy danh sách truyện mới (grid, 5 card mỗi hàng)
+    // Gọi API để lấy danh sách truyen mới (grid, 5 card mỗi hàng)
     $.ajax({
         url: "http://localhost:8080/api/truyen/moi",
         method: "GET",
@@ -225,7 +225,7 @@ $(document).ready(function() {
         }
     });
 
-    // Hàm cuộn danh sách truyện (cho truyện nổi bật)
+    // Hàm cuộn danh sách truyện (cho truyen nổi bật)
     window.scrollTruyenList = function(direction) {
         const list = document.getElementById("truyen-list-hot");
         const scrollAmount = 300;
@@ -253,12 +253,20 @@ $(document).ready(function() {
         const url = `http://localhost:8080/api/truyen/favorite/${truyenId}`;
         const method = isAdding ? "POST" : "DELETE";
 
+        // Cập nhật nút trên tất cả các card (trang chủ, trang đọc, trang tìm kiếm, v.v.)
         $(`[id$="truyen-${truyenId}"]`).each(function() {
             const newButtonHtml = isAdding
                 ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
                 : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
             $(this).find(".favorite-btn").replaceWith(newButtonHtml);
         });
+
+        // Cập nhật nút yêu thích trên trang đọc
+        const favoriteButtonContainer = $("#favorite-button-container");
+        const newButtonHtml = isAdding
+            ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
+            : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
+        favoriteButtonContainer.html(newButtonHtml);
 
         Toastify({
             text: isAdding ? "Đã thêm vào danh sách yêu thích!" : "Đã xóa khỏi danh sách yêu thích!",
@@ -290,6 +298,13 @@ $(document).ready(function() {
                                     : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
                                 $(this).find(".favorite-btn").replaceWith(correctedButtonHtml);
                             });
+
+                            // Cập nhật lại nút trên trang đọc
+                            const correctedButtonHtml = isFavorited
+                                ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
+                                : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
+                            $("#favorite-button-container").html(correctedButtonHtml);
+
                             Toastify({
                                 text: "Trạng thái yêu thích đã được cập nhật từ server!",
                                 duration: 3000,
@@ -317,6 +332,12 @@ $(document).ready(function() {
                         : `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`;
                     $(this).find(".favorite-btn").replaceWith(revertButtonHtml);
                 });
+
+                // Khôi phục nút trên trang đọc
+                const revertButtonHtml = isAdding
+                    ? `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`
+                    : `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`;
+                $("#favorite-button-container").html(revertButtonHtml);
 
                 if (xhr.status === 401 || xhr.status === 403) {
                     Toastify({
@@ -356,12 +377,20 @@ $(document).ready(function() {
         return text;
     }
 
-    // Tìm kiếm gợi ý
+    // Xử lý tìm kiếm
+    $("#search-form").on("submit", function(e) {
+        e.preventDefault();
+        const query = $("#search-input").val().trim();
+        if (query) {
+            window.location.href = `/view/search.html?query=${encodeURIComponent(query)}`;
+        }
+    });
+
     $("#search-input").on("input", function() {
         const query = $(this).val().trim();
         const suggestions = $("#search-suggestions");
 
-        console.log("Searching with query:", query); // Debug
+        console.log("Searching with query:", query);
 
         if (query.length < 2) {
             suggestions.hide().empty();
@@ -372,7 +401,7 @@ $(document).ready(function() {
             url: `http://localhost:8080/api/truyen/search?query=${encodeURIComponent(query)}`,
             method: "GET",
             success: function(data) {
-                console.log("API response:", data); // Debug
+                console.log("API response:", data);
                 suggestions.empty();
                 if (Array.isArray(data) && data.length > 0) {
                     data.slice(0, 5).forEach(truyen => {
@@ -394,13 +423,12 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.log("Error in search API:", status, error); // Debug
+                console.log("Error in search API:", status, error);
                 suggestions.hide();
             }
         });
     });
 
-    // Chọn truyện từ danh sách gợi ý
     $(document).on("click", ".suggestion-item", function() {
         const truyenId = $(this).data("truyen-id");
         if (truyenId) {
@@ -408,32 +436,9 @@ $(document).ready(function() {
         }
     });
 
-    // Ẩn danh sách gợi ý khi click ra ngoài
     $(document).on("click", function(e) {
         if (!$(e.target).closest(".search-container").length) {
             $("#search-suggestions").hide();
-        }
-    });
-
-    // Xử lý khi nhấn nút tìm kiếm
-    $("#search-button").on("click", function(e) {
-        e.preventDefault(); // Ngăn form submit mặc định
-        const query = $("#search-input").val().trim();
-        console.log("Search button clicked with query:", query); // Debug
-        if (query) {
-            window.location.href = `/view/search.html?query=${encodeURIComponent(query)}`;
-        }
-    });
-
-    // Xử lý khi nhấn Enter trong ô tìm kiếm
-    $("#search-input").on("keypress", function(e) {
-        if (e.which === 13) { // Phím Enter
-            e.preventDefault(); // Ngăn form submit mặc định
-            const query = $(this).val().trim();
-            console.log("Enter pressed with query:", query); // Debug
-            if (query) {
-                window.location.href = `/view/search.html?query=${encodeURIComponent(query)}`;
-            }
         }
     });
 
@@ -448,7 +453,7 @@ $(document).ready(function() {
                 url: `http://localhost:8080/api/truyen/search?query=${encodeURIComponent(query)}`,
                 method: "GET",
                 success: function(data) {
-                    console.log("Search results:", data); // Debug
+                    console.log("Search results:", data);
                     const searchResults = $("#search-results");
                     searchResults.empty();
                     if (Array.isArray(data) && data.length > 0) {
@@ -531,7 +536,7 @@ $(document).ready(function() {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.log("Error in search results API:", status, error); // Debug
+                    console.log("Error in search results API:", status, error);
                     $("#search-results").html('<p style="color: #ff4444; padding: 20px;">Lỗi khi tải kết quả tìm kiếm: ' + error + '</p>');
                 }
             });
@@ -549,14 +554,35 @@ $(document).ready(function() {
             method: "GET",
             success: function(truyen) {
                 $("#comic-title").text(truyen.tenTruyen || "Không có tiêu đề");
-                $("#image-container").prepend(`
-                <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" alt="${truyen.tenTruyen || 'Bìa truyện'}" style="max-width: 100%; height: auto;">
-                <p>Mô tả: ${truyen.moTa || 'Không có mô tả'}</p>
-                <p>Lượt thích: ${truyen.luotThich || 0}</p>
-                <p>Lượt xem: ${truyen.luotXem || 0}</p>
-                <p>Ghi chú: ${truyen.ghiChu || 'Không có ghi chú'}</p>
-                <p>Người dịch: ${truyen.translator?.username || 'Không có thông tin'}</p>
-            `);
+                $("#comic-cover").attr("src", truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+                $("#comic-cover").attr("alt", truyen.tenTruyen || 'Bìa truyện');
+                $("#comic-description").text(truyen.moTa || "Không có mô tả");
+                $("#comic-likes").text(truyen.luotThich || 0);
+                $("#comic-views").text(truyen.luotXem || 0);
+                $("#comic-note").text(truyen.ghiChu || "Không có ghi chú");
+                $("#comic-translator").text(truyen.translator?.username || "Không có thông tin");
+
+                // Hiển thị nút yêu thích trên trang đọc
+                if (token) {
+                    $.ajax({
+                        url: `http://localhost:8080/api/truyen/favorite/status/${truyenId}`,
+                        method: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        },
+                        success: function(isFavorited) {
+                            const buttonHtml = isFavorited
+                                ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
+                                : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
+                            $("#favorite-button-container").html(buttonHtml);
+                        },
+                        error: function(xhr, status, error) {
+                            console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyenId}: ${status} - ${error}`);
+                            const buttonHtml = `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
+                            $("#favorite-button-container").html(buttonHtml);
+                        }
+                    });
+                }
             },
             error: function(xhr, status, error) {
                 $("#comic-title").text("Lỗi khi tải thông tin truyện: " + error);
@@ -574,14 +600,14 @@ $(document).ready(function() {
                 if (Array.isArray(chapters) && chapters.length > 0) {
                     chapters.forEach(chapter => {
                         chapterList.append(`
-                        <button class="btn btn-outline-primary" data-chapter-id="${chapter.id}">
-                            ${chapter.tenChap}
-                        </button>
-                    `);
+                            <button class="btn btn-outline-primary" data-chapter-id="${chapter.id}">
+                                ${chapter.tenChap}
+                            </button>
+                        `);
                     });
-                    // Chọn chapter đầu tiên mặc định
                     currentChapterId = chapters[0].id;
                     loadChapterImages(currentChapterId);
+                    $("#chapter-title").text(chapters[0].tenChap);
                 } else {
                     chapterList.append('<p>Không có chapter nào.</p>');
                 }
@@ -599,9 +625,8 @@ $(document).ready(function() {
             loadChapterImages(currentChapterId);
         });
 
-        // Hàm tải ảnh của chapter
         function loadChapterImages(chapterId) {
-            const imageContainer = $("#chapter-images"); // Cập nhật ID
+            const imageContainer = $("#chapter-images");
             imageContainer.empty();
             $.ajax({
                 url: `http://localhost:8080/api/images?id_chapter=${chapterId}`,
@@ -611,8 +636,8 @@ $(document).ready(function() {
                         images.sort((a, b) => a.pageNumber - b.pageNumber);
                         images.forEach(image => {
                             imageContainer.append(`
-                        <img src="${image.imageUrl || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" alt="Ảnh trang ${image.pageNumber}">
-                    `);
+                                <img src="${image.imageUrl || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" alt="Ảnh trang ${image.pageNumber}">
+                            `);
                         });
                     } else {
                         imageContainer.append('<p>Không có ảnh cho chapter này.</p>');
@@ -625,6 +650,7 @@ $(document).ready(function() {
             });
         }
     }
+
     // Hàm đăng xuất
     window.logout = function() {
         localStorage.removeItem("token");

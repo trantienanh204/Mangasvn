@@ -10,145 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="/css/CSStrangChu.css">
-    <style>
-        /* Thanh navbar */
-        .navbar {
-            background-color: #f8f9fa;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .navbar-brand {
-            font-weight: bold;
-            color: #007bff !important;
-        }
-        .navbar-nav .nav-link {
-            color: #000;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #007bff;
-        }
-
-        /* Thanh tìm kiếm */
-        .search-container {
-            position: relative;
-            width: 300px;
-        }
-        #search-input {
-            border-radius: 20px;
-        }
-        #search-button {
-            border-radius: 20px;
-            margin-left: 5px;
-        }
-        #search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 300px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            display: none;
-            z-index: 1000;
-            max-height: 200px;
-            overflow-y: auto;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        #search-suggestions div {
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        #search-suggestions div:hover {
-            background-color: #f0f0f0;
-        }
-
-        /* Nội dung chính */
-        .content {
-            margin-top: 80px;
-            padding: 20px;
-        }
-        .comic-info {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 20px;
-        }
-        .comic-info .cover-image {
-            flex: 0 0 200px;
-        }
-        .comic-info .cover-image img {
-            width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
-        .comic-info .details {
-            flex: 1;
-        }
-        .chapter-section {
-            margin-bottom: 20px;
-        }
-        .chapter-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .chapter-list button {
-            width: 100%;
-            text-align: left;
-            margin-bottom: 5px;
-            border-radius: 3px;
-            transition: background-color 0.2s;
-        }
-        .chapter-list button:hover {
-            background-color: #e9ecef;
-        }
-        .image-section {
-            margin-bottom: 20px;
-        }
-        .image-container {
-            max-width: 100%;
-            margin: 20px auto;
-            text-align: center;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            margin: 5px 0;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .image-container img:hover {
-            transform: scale(1.05);
-        }
-        #chapter-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .scroll-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        .scroll-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/CSSread.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -219,14 +81,17 @@
             <p><strong>Lượt xem:</strong> <span id="comic-views"></span></p>
             <p><strong>Ghi chú:</strong> <span id="comic-note"></span></p>
             <p><strong>Người dịch:</strong> <span id="comic-translator"></span></p>
+            <div id="favorite-button-container"></div>
         </div>
     </div>
 
     <div class="chapter-section">
         <h4>Danh sách chapter</h4>
-        <button class="scroll-btn scroll-left" onclick="scrollChapterList('left')">❮</button>
-        <div class="chapter-list" id="chapter-list"></div>
-        <button class="scroll-btn scroll-right" onclick="scrollChapterList('right')">❯</button>
+        <div class="chapter-controls">
+            <button class="scroll-btn scroll-left" onclick="scrollChapterList('left')">❮</button>
+            <div class="chapter-list" id="chapter-list"></div>
+            <button class="scroll-btn scroll-right" onclick="scrollChapterList('right')">❯</button>
+        </div>
     </div>
 
     <div class="image-section">
@@ -235,28 +100,14 @@
     </div>
 </div>
 
+<!-- Nút Lên đầu trang -->
+<button id="back-to-top" title="Lên đầu trang">↑</button>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 <script src="/js/JStrangChu.js"></script>
-<script>
-    // Hàm phóng to ảnh khi click
-    $(document).on('click', '.image-container img', function() {
-        const src = $(this).attr('src');
-        const img = `<img src="${src}" style="max-width: 90%; height: auto; display: block; margin: 20px auto;" onclick="this.style.display='none';">`;
-        $('body').append(`<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000;" onclick="this.remove()">${img}</div>`);
-    });
-
-    // Hàm cuộn danh sách chapter
-    function scrollChapterList(direction) {
-        const container = $('#chapter-list');
-        const scrollAmount = 100;
-        if (direction === 'left') {
-            container.scrollLeft(container.scrollLeft() - scrollAmount);
-        } else {
-            container.scrollLeft(container.scrollLeft() + scrollAmount);
-        }
-    }
+<script src="/js/JSread.js">
 </script>
 </body>
 </html>
