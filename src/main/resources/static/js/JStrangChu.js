@@ -54,7 +54,7 @@ $(document).ready(function() {
                         <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
                             <div style="position: relative;">
                                 <a href="/read/${truyen.id}">
-                                    <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                                    <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                          alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                          style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
                                 </a>
@@ -75,7 +75,7 @@ $(document).ready(function() {
                         <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
                             <div style="position: relative;">
                                 <a href="/read/${truyen.id}">
-                                    <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                                    <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                          alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                          style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
                                 </a>
@@ -95,7 +95,7 @@ $(document).ready(function() {
                 <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
                     <div style="position: relative;">
                         <a href="/read/${truyen.id}">
-                            <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                            <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                  alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                  style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
                         </a>
@@ -122,7 +122,7 @@ $(document).ready(function() {
                     carouselInner.append(`
                         <div class="carousel-item ${isActive}">
                             <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
-                                <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
+                                <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
                                      class="img-shadow img-fluid img-carousel" alt="${truyen.tenTruyen}">
                                 <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
                                     <h5 class="text-title">${truyen.tenTruyen}</h5>
@@ -143,7 +143,7 @@ $(document).ready(function() {
         }
     });
 
-    // Gọi API để lấy danh sách truyện nổi bật (cuộn ngang)
+    // Gọi API để lấy danh sách truyen nổi bật (cuộn ngang)
     $.ajax({
         url: "http://localhost:8080/api/truyen/hot",
         method: "GET",
@@ -164,7 +164,7 @@ $(document).ready(function() {
         }
     });
 
-    // Gọi API để lấy danh sách truyện (grid, 5 card mỗi hàng)
+    // Gọi API để lấy danh sách truyen (grid, 5 card mỗi hàng)
     $.ajax({
         url: "http://localhost:8080/api/truyen/list",
         method: "GET",
@@ -225,7 +225,7 @@ $(document).ready(function() {
         }
     });
 
-    // Hàm cuộn danh sách truyện (cho truyen nổi bật)
+    // Hàm cuộn danh sách truyen (cho truyen nổi bật)
     window.scrollTruyenList = function(direction) {
         const list = document.getElementById("truyen-list-hot");
         const scrollAmount = 300;
@@ -369,7 +369,7 @@ $(document).ready(function() {
         toggleFavorite(truyenId, isAdding);
     });
 
-    // Hàm viết tắt tên truyện
+    // Hàm viết tắt tên truyen
     function truncateText(text, maxLength = 20) {
         if (text.length > maxLength) {
             return text.substring(0, maxLength) + "...";
@@ -407,7 +407,7 @@ $(document).ready(function() {
                     data.slice(0, 5).forEach(truyen => {
                         suggestions.append(`
                             <div class="suggestion-item" data-truyen-id="${truyen.id}" style="display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
-                                <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                                <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                      style="width: 40px; height: 60px; object-fit: cover; margin-right: 10px;">
                                 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -477,7 +477,7 @@ $(document).ready(function() {
                                             <div class="card" id="${cardId}">
                                                 <div style="position: relative;">
                                                     <a href="/read/${truyen.id}">
-                                                        <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                                                        <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                                              alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                                              style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
                                                     </a>
@@ -497,7 +497,7 @@ $(document).ready(function() {
                                             <div class="card" id="${cardId}">
                                                 <div style="position: relative;">
                                                     <a href="/read/${truyen.id}">
-                                                        <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                                                        <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                                              alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                                              style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
                                                     </a>
@@ -517,7 +517,7 @@ $(document).ready(function() {
                                     <div class="card" id="${cardId}">
                                         <div style="position: relative;">
                                             <a href="/read/${truyen.id}">
-                                                <img src="${truyen.image_comic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
+                                                <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                                      style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
                                             </a>
@@ -548,7 +548,7 @@ $(document).ready(function() {
         const truyenId = window.location.pathname.split("/").pop();
         let currentChapterId = null;
 
-        // Lấy thông tin truyện
+        // Lấy thông tin truyen
         $.ajax({
             url: `http://localhost:8080/api/truyen/${truyenId}`,
             method: "GET",
@@ -585,7 +585,7 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                $("#comic-title").text("Lỗi khi tải thông tin truyện: " + error);
+                $("#comic-title").text("Lỗi khi tải thông tin truyen: " + error);
                 console.log("Lỗi API /api/truyen/{id}: ", status, error);
             }
         });
@@ -606,7 +606,7 @@ $(document).ready(function() {
                         `);
                     });
                     currentChapterId = chapters[0].id;
-                    loadChapterImages(currentChapterId);
+                    loadChapterImages(currentChapterId); // Sử dụng hàm từ read.html
                     $("#chapter-title").text(chapters[0].tenChap);
                 } else {
                     chapterList.append('<p>Không có chapter nào.</p>');
@@ -622,33 +622,8 @@ $(document).ready(function() {
         $(document).on("click", "#chapter-list button", function() {
             currentChapterId = $(this).data("chapter-id");
             $("#chapter-title").text($(this).text());
-            loadChapterImages(currentChapterId);
+            window.loadChapterImages(currentChapterId); // Gọi hàm toàn cục từ read.html
         });
-
-        function loadChapterImages(chapterId) {
-            const imageContainer = $("#chapter-images");
-            imageContainer.empty();
-            $.ajax({
-                url: `http://localhost:8080/api/images?id_chapter=${chapterId}`,
-                method: "GET",
-                success: function(images) {
-                    if (Array.isArray(images) && images.length > 0) {
-                        images.sort((a, b) => a.pageNumber - b.pageNumber);
-                        images.forEach(image => {
-                            imageContainer.append(`
-                                <img src="${image.imageUrl || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" alt="Ảnh trang ${image.pageNumber}">
-                            `);
-                        });
-                    } else {
-                        imageContainer.append('<p>Không có ảnh cho chapter này.</p>');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    imageContainer.html('<p>Lỗi khi tải ảnh: ' + error + '</p>');
-                    console.log("Lỗi API /api/images: ", status, error);
-                }
-            });
-        }
     }
 
     // Hàm đăng xuất

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Truyện - Manga World</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="/css/CSStrangChu.css">
+    <style>
+        .dashboard {
+            margin-top: 80px;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+        .form-group label {
+            font-weight: 500;
+        }
+        .chapter-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .chapter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .chapter-item:last-child {
+            border-bottom: none;
+        }
+        .btn-add-chapter {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-add-chapter:hover {
+            background-color: #218838;
+        }
+        #upload-progress {
+            display: none;
+            margin-top: 10px;
+        }
+        .invalid-feedback {
+            display: none;
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        #comic-select {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/view/trangchu.html">TRANG CHỦ</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <span class="nav-link" id="user-info"></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="login-link" href="/api/auth/login" style="display: none;">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a>
+                    </li>
+                    <li class="nav-item" id="admin-menu" style="display: none;">
+                        <a class="nav-link" href="/admin">Quản lý truyện</a>
+                    </li>
+                </ul>
+                <form class="d-flex search-container" style="position: relative;" id="search-form">
+                    <input class="form-control me-2" type="search" id="search-input" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit" id="search-button">Search</button>
+                    <div id="search-suggestions"></div>
+                </form>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="container dashboard">
+    <h2 class="text-center mb-4">Quản lý Truyện</h2>
+
+    <div class="card">
+        <div class="card-header">Đăng/Cập nhật Truyện</div>
+        <div class="card-body">
+            <form id="upload-form">
+                <div class="form-group mb-3" id="comic-select-group">
+                    <label for="comic-select">Chọn Truyện (nếu cập nhật)</label>
+                    <select class="form-control" id="comic-select">
+                        <option value="0">Tạo truyện mới</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3" id="new-comic-fields">
+                    <label for="comic-title">Tên Truyện</label>
+                    <input type="text" class="form-control" id="comic-title" required>
+                </div>
+                <div class="form-group mb-3" id="new-comic-description">
+                    <label for="comic-description">Mô tả</label>
+                    <textarea class="form-control" id="comic-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group mb-3" id="new-comic-note">
+                    <label for="comic-note">Ghi chú</label>
+                    <input type="text" class="form-control" id="comic-note" required>
+                </div>
+                <div class="form-group mb-3" id="new-comic-cover">
+                    <label for="comic-cover">Ảnh Bìa</label>
+                    <input type="file" class="form-control" id="comic-cover" accept="image/*" required>
+                    <div class="invalid-feedback">Vui lòng chọn file ảnh bìa.</div>
+                </div>
+                <div class="form-group mb-3">
+                    <label>Danh sách Chapter</label>
+                    <div id="chapter-list">
+                        <div class="chapter-item">
+                            <input type="text" class="form-control chapter-name" placeholder="Tên Chapter" required>
+                            <input type="file" class="form-control chapter-zip" accept=".zip" required>
+                            <div class="invalid-feedback">Vui lòng upload file ZIP với tên ảnh theo số thứ tự (ví dụ: 1.jpg, 2.png).</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-chapter mt-2" onclick="addChapter()">Thêm Chapter</button>
+                </div>
+                <button type="submit" class="btn btn-primary" id="create-btn">Đăng Truyện</button>
+                <button type="submit" class="btn btn-success" id="update-btn" style="display: none;">Cập nhật Chapter</button>
+                <div id="upload-progress" class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Danh sách Truyện</div>
+        <div class="card-body">
+            <ul id="comic-list" class="list-group"></ul>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function() {
+        const isAdmin = true; // Thay bằng logic kiểm tra thực tế
+        if (isAdmin) {
+            $('#admin-menu').show();
+        }
+
+        // Load danh sách truyện để chọn
+        function loadComics() {
+            $.ajax({
+                url: 'http://localhost:8080/api/truyen/list',
+                method: 'GET',
+                success: function(comics) {
+                    const comicSelect = $('#comic-select');
+                    comicSelect.empty();
+                    comicSelect.append('<option value="0">Tạo truyện mới</option>');
+                    comics.forEach(comic => {
+                        comicSelect.append(`<option value="${comic.id}">${comic.tenTruyen}</option>`);
+                    });
+                    const comicList = $('#comic-list');
+                    comicList.empty();
+                    comics.forEach(comic => {
+                        comicList.append(`<li class="list-group-item">${comic.tenTruyen}</li>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log('Lỗi tải danh sách truyện:', error);
+                }
+            });
+        }
+
+        window.addChapter = function() {
+            const chapterItem = `
+            <div class="chapter-item">
+                <input type="text" class="form-control chapter-name" placeholder="Tên Chapter" required>
+                <input type="file" class="form-control chapter-zip" accept=".zip" required>
+                <div class="invalid-feedback">Vui lòng upload file ZIP với tên ảnh theo số thứ tự (ví dụ: 1.jpg, 2.png).</div>
+            </div>
+        `;
+            $('#chapter-list').append(chapterItem);
+        };
+
+        function validateZipOrder(zip) {
+            return new Promise((resolve, reject) => {
+                const files = Object.entries(zip.files).sort((a, b) => {
+                    const numA = parseInt(a[0].match(/^(\d+)/)[1]);
+                    const numB = parseInt(b[0].match(/^(\d+)/)[1]);
+                    return numA - numB;
+                });
+                let expectedIndex = 1;
+                for (const [relativePath, file] of files) {
+                    if (!file.dir) {
+                        const match = relativePath.match(/^(\d+)\.(jpg|png|jpeg)$/i);
+                        if (!match) {
+                            reject(new Error('Tên file không đúng định dạng (phải là số.jpg/png/jpeg): ' + relativePath));
+                            return;
+                        }
+                        const pageNumber = parseInt(match[1]);
+                        if (pageNumber !== expectedIndex) {
+                            reject(new Error('Thứ tự file không liên tục, mong đợi ' + expectedIndex + ' nhưng nhận được ' + pageNumber));
+                            return;
+                        }
+                        expectedIndex++;
+                    }
+                }
+                resolve();
+            });
+        }
+
+        $('#upload-form').on('submit', async function(e) {
+            e.preventDefault();
+
+            const comicId = $('#comic-select').val();
+            const isUpdate = comicId !== '0';
+            const formData = new FormData();
+            let url = 'http://localhost:8080/api/truyen';
+            let method = 'POST';
+
+            if (isUpdate) {
+                url = `http://localhost:8080/api/truyen/${comicId}/chapters`;
+                method = 'PUT';
+                $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').hide().find('input, textarea').prop('required', false);
+                $('#create-btn').hide();
+                $('#update-btn').show();
+            } else {
+                $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').show().find('input, textarea').prop('required', true);
+                formData.append('title', $('#comic-title').val());
+                formData.append('description', $('#comic-description').val());
+                formData.append('note', $('#comic-note').val());
+                const coverFile = $('#comic-cover')[0].files[0];
+                if (!coverFile) {
+                    $('#comic-cover').next('.invalid-feedback').show();
+                    return;
+                }
+                formData.append('cover', coverFile);
+            }
+
+            const chapterPromises = [];
+            let isValid = true;
+            const chapters = [];
+
+            $('#chapter-list .chapter-item').each(function(index) {
+                const chapterName = $(this).find('.chapter-name').val();
+                const zipFile = $(this).find('.chapter-zip')[0].files[0];
+                if (!zipFile) {
+                    $(this).find('.invalid-feedback').show();
+                    isValid = false;
+                    return;
+                }
+
+                const promise = JSZip.loadAsync(zipFile)
+                    .then(function(zip) {
+                        return validateZipOrder(zip).then(() => {
+                            return { chapterName, zipFile, valid: true };
+                        });
+                    })
+                    .catch(error => {
+                        $(this).find('.invalid-feedback').text(error.message).show();
+                        return { chapterName, zipFile, valid: false };
+                    });
+
+                chapterPromises.push(promise);
+            });
+
+            const chapterResults = await Promise.all(chapterPromises);
+
+            for (const result of chapterResults) {
+                if (!result.valid) {
+                    isValid = false;
+                    continue;
+                }
+                formData.append('chapterZip', result.zipFile);
+                formData.append('chapterName', result.chapterName);
+                chapters.push({ name: result.chapterName, zip: result.zipFile });
+            }
+
+            if (!isValid) return;
+
+            // Đặt lại thanh tiến trình trước khi upload
+            const progressBar = $('#upload-progress .progress-bar');
+            $('#upload-progress').show();
+            progressBar.css('width', '0%').attr('aria-valuenow', 0).text('0%');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += 10;
+                    progressBar.css('width', progress + '%').attr('aria-valuenow', progress).text(progress + '%');
+                }
+            }, 500);
+
+            $.ajax({
+                url: url,
+                type: method,
+                data: formData,
+                contentType: false,
+                processData: false,
+                timeout: 30000,
+                headers: {
+                    'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiZXRhbmgiLCJyb2xlIjoiUk9MRV9hZG1pbiIsImlhdCI6MTc0ODE4NTk4NywiZXhwIjoxNzQ4MjcyMzg3fQ.T3Cbmlvoca4R5rub8_s9B1WecOufz48GW6eBiOqzioAyIXYw4tc7OPfkPxZKkxmYkFLj54jKfWOjGYVdZmFdRw'
+                },
+                success: function(response) {
+                    clearInterval(interval);
+                    progressBar.css('width', '100%').attr('aria-valuenow', 100).text('100%');
+                    Toastify({
+                        text: isUpdate ? 'Cập nhật chapter thành công!' : 'Đăng truyện thành công!',
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'right',
+                        style: { background: '#28a745' }
+                    }).showToast();
+                    $('#upload-form')[0].reset();
+                    $('#chapter-list').empty().append(`
+                <div class="chapter-item">
+                    <input type="text" class="form-control chapter-name" placeholder="Tên Chapter" required>
+                    <input type="file" class="form-control chapter-zip" accept=".zip" required>
+                    <div class="invalid-feedback">Vui lòng upload file ZIP với tên ảnh theo số thứ tự (ví dụ: 1.jpg, 2.png).</div>
+                </div>
+            `);
+                    loadComics();
+                    // Ẩn thanh tiến trình sau khi hoàn tất
+                    setTimeout(() => $('#upload-progress').hide(), 1000);
+                },
+                error: function(xhr, status, error) {
+                    clearInterval(interval);
+                    progressBar.css('width', '100%').attr('aria-valuenow', 100).text('Lỗi!');
+                    let errorMessage = isUpdate ? 'Cập nhật chapter thất bại' : 'Đăng truyện thất bại';
+                    if (status === 'timeout') {
+                        errorMessage += ': Thời gian xử lý vượt quá 30 giây. Vui lòng kiểm tra file ZIP hoặc thử lại.';
+                    } else if (xhr.responseText && xhr.responseText.includes('MaxUploadSizeExceededException')) {
+                        errorMessage += ': Kích thước file vượt quá giới hạn (tối đa 50MB).';
+                    } else {
+                        errorMessage += ': ' + (xhr.responseText || error);
+                    }
+                    Toastify({
+                        text: errorMessage,
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'right',
+                        style: { background: '#dc3545' }
+                    }).showToast();
+                    // Ẩn thanh tiến trình sau khi hoàn tất
+                    setTimeout(() => $('#upload-progress').hide(), 1000);
+                },
+                xhr: function() {
+                    const xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', function(e) {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            progressBar.css('width', percent + '%').attr('aria-valuenow', percent).text(percent + '%');
+                        }
+                    });
+                    return xhr;
+                }
+            });
+        });
+        // Chuyển đổi giữa tạo mới và cập nhật
+        $('#comic-select').on('change', function() {
+            const comicId = $(this).val();
+            if (comicId === '0') {
+                $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').show().find('input, textarea').prop('required', true);
+                $('#create-btn').show();
+                $('#update-btn').hide();
+            } else {
+                $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').hide().find('input, textarea').prop('required', false);
+                $('#create-btn').hide();
+                $('#update-btn').show();
+            }
+        });
+
+        loadComics();
+    });
+</script>
+</body>
+</html>

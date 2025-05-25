@@ -97,9 +97,20 @@
     <div class="image-section">
         <h4 id="chapter-title"></h4>
         <div class="image-container" id="chapter-images"></div>
+        <button id="toggle-reading-mode">Chuyển sang chế độ đọc sách</button>
+        <button id="load-all" class="load-more">Hiển thị tất cả</button>
+        <button id="load-15" class="load-more">Hiển thị 15 trang nữa</button>
     </div>
 </div>
 
+<!-- Chế độ đọc sách -->
+<div class="reading-mode" id="reading-mode">
+    <button class="close-btn" id="close-reading-mode">&times;</button>
+    <button class="nav-btn prev" onclick="changePage(-1)">←</button>
+    <img class="reading-image" id="reading-image" src="" alt="Trang truyện">
+    <button class="nav-btn next" onclick="changePage(1)">→</button>
+    <div class="pagination" id="pagination"></div>
+</div>
 <!-- Nút Lên đầu trang -->
 <button id="back-to-top" title="Lên đầu trang">↑</button>
 
@@ -107,7 +118,6 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 <script src="/js/JStrangChu.js"></script>
-<script src="/js/JSread.js">
-</script>
+<script src="/js/JSread.js"></script>
 </body>
 </html>

@@ -64,4 +64,11 @@ public class UserService implements UserDetailsService {
         }
         return user;
     }
+    public User findById(int id) {
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        return user;
+    }
 }

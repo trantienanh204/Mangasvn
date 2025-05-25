@@ -4,6 +4,7 @@ package com.example.demo.baove.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,11 +17,11 @@ import java.util.function.Function;
 @Service
 @Component
 public class JwtService {
-    @Value("${jwt.secret}")
-    private String SECRET_KEY ;
+    @Autowired
+    private String secret ;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String extractUsername(String token) {
