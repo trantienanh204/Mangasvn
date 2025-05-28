@@ -1,5 +1,6 @@
 package com.example.demo.baove.controller;
 
+import com.example.demo.baove.controller.DTO.ImageDTO;
 import com.example.demo.baove.entity.ImageChapter;
 import com.example.demo.baove.repository.ImageChapterRepository;
 import jakarta.persistence.EntityManager;
@@ -45,28 +46,3 @@ public class ImageController {
 //    }
 }
 
-class ImageDTO {
-    private String imageUrl;
-    private int pageNumber;
-
-    public ImageDTO(String imageUrl, int pageNumber) {
-        this.imageUrl = imageUrl;
-        this.pageNumber = pageNumber;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public int getPageNumber() {
-        return pageNumber;
-    }
-
-    public void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber;
-    }
-}

@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
     public User registerUser(String userName, String password, String email, String roleName) {
         User user = new User();
         user.setUsername(userName);
-        user.setPassword(passwordEncoder.encode(password)); // Mã hóa mật khẩu
+        user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         user.setTrangThai(true);
         user.setNgayTao(LocalDate.now());

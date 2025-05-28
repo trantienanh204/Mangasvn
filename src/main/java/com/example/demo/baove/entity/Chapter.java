@@ -1,5 +1,6 @@
 package com.example.demo.baove.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,4 +34,9 @@ public class Chapter {
 
     @Column(name = "ID_COMIC")
     private int idComic;
+
+    @ManyToOne
+    @JoinColumn(name = "ID_COMIC", insertable = false, updatable = false)
+    @JsonBackReference
+    private Comic comic;
 }

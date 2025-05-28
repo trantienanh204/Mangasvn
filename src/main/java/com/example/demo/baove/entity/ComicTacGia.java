@@ -1,5 +1,6 @@
 package com.example.demo.baove.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,11 +18,13 @@ public class ComicTacGia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "ID_TAC_GIA", referencedColumnName = "id")
-    private TacGia tacGia;
 
-    @ManyToOne
-    @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_comic", nullable = false)
+    @JsonBackReference
     private Comic comics;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tac_gia", nullable = false)
+    private TacGia tacGia;
 }

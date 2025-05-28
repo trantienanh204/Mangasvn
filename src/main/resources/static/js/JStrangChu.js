@@ -13,7 +13,7 @@ $(document).ready(function() {
                 "Authorization": "Bearer " + token
             },
             success: function(data) {
-                userInfo.text("Xin chào, " + data.role);
+                userInfo.text("Xin chào, " + data.username);
                 loginLink.hide();
                 logoutLink.show();
             },
@@ -110,7 +110,7 @@ $(document).ready(function() {
         }
     }
 
-    // Gọi API để lấy danh sách truyện hot (carousel chính)
+    //  danh sách truyện hot
     $.ajax({
         url: "http://localhost:8080/api/truyen/hot",
         method: "GET",
@@ -143,7 +143,7 @@ $(document).ready(function() {
         }
     });
 
-    // Gọi API để lấy danh sách truyen nổi bật (cuộn ngang)
+    //  sách truyen nổi bật
     $.ajax({
         url: "http://localhost:8080/api/truyen/hot",
         method: "GET",
@@ -164,7 +164,7 @@ $(document).ready(function() {
         }
     });
 
-    // Gọi API để lấy danh sách truyen (grid, 5 card mỗi hàng)
+    // sách truyen
     $.ajax({
         url: "http://localhost:8080/api/truyen/list",
         method: "GET",
@@ -185,7 +185,7 @@ $(document).ready(function() {
         }
     });
 
-    // Gọi API để lấy danh sách truyen mới (grid, 5 card mỗi hàng)
+    // danh sách truyen mới
     $.ajax({
         url: "http://localhost:8080/api/truyen/moi",
         method: "GET",
@@ -225,7 +225,7 @@ $(document).ready(function() {
         }
     });
 
-    // Hàm cuộn danh sách truyen (cho truyen nổi bật)
+    //cuộn danh sách truyen
     window.scrollTruyenList = function(direction) {
         const list = document.getElementById("truyen-list-hot");
         const scrollAmount = 300;
@@ -236,7 +236,7 @@ $(document).ready(function() {
         }
     };
 
-    // Hàm chuyển đổi trạng thái yêu thích
+    //  đổi trạng thái yêu thích
     function toggleFavorite(truyenId, isAdding) {
         if (!token) {
             Toastify({
@@ -253,7 +253,6 @@ $(document).ready(function() {
         const url = `http://localhost:8080/api/truyen/favorite/${truyenId}`;
         const method = isAdding ? "POST" : "DELETE";
 
-        // Cập nhật nút trên tất cả các card (trang chủ, trang đọc, trang tìm kiếm, v.v.)
         $(`[id$="truyen-${truyenId}"]`).each(function() {
             const newButtonHtml = isAdding
                 ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
@@ -261,7 +260,6 @@ $(document).ready(function() {
             $(this).find(".favorite-btn").replaceWith(newButtonHtml);
         });
 
-        // Cập nhật nút yêu thích trên trang đọc
         const favoriteButtonContainer = $("#favorite-button-container");
         const newButtonHtml = isAdding
             ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
@@ -299,7 +297,6 @@ $(document).ready(function() {
                                 $(this).find(".favorite-btn").replaceWith(correctedButtonHtml);
                             });
 
-                            // Cập nhật lại nút trên trang đọc
                             const correctedButtonHtml = isFavorited
                                 ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
                                 : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
@@ -333,7 +330,6 @@ $(document).ready(function() {
                     $(this).find(".favorite-btn").replaceWith(revertButtonHtml);
                 });
 
-                // Khôi phục nút trên trang đọc
                 const revertButtonHtml = isAdding
                     ? `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`
                     : `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`;
@@ -362,14 +358,12 @@ $(document).ready(function() {
         });
     }
 
-    // Gắn sự kiện cho nút yêu thích
     $(document).on('click', '.favorite-btn', function() {
         const truyenId = $(this).data('truyen-id');
         const isAdding = $(this).hasClass('btn-outline-primary');
         toggleFavorite(truyenId, isAdding);
     });
 
-    // Hàm viết tắt tên truyen
     function truncateText(text, maxLength = 20) {
         if (text.length > maxLength) {
             return text.substring(0, maxLength) + "...";
@@ -377,7 +371,6 @@ $(document).ready(function() {
         return text;
     }
 
-    // Xử lý tìm kiếm
     $("#search-form").on("submit", function(e) {
         e.preventDefault();
         const query = $("#search-input").val().trim();
@@ -442,7 +435,6 @@ $(document).ready(function() {
         }
     });
 
-    // Xử lý trang kết quả tìm kiếm (chỉ chạy trên search.html)
     if (window.location.pathname.includes("search.html")) {
         const urlParams = new URLSearchParams(window.location.search);
         const query = urlParams.get("query") || "";
@@ -548,73 +540,46 @@ $(document).ready(function() {
         const truyenId = window.location.pathname.split("/").pop();
         let currentChapterId = null;
 
-        // Lấy thông tin truyen
-        $.ajax({
-            url: `http://localhost:8080/api/truyen/${truyenId}`,
-            method: "GET",
-            success: function(truyen) {
-                $("#comic-title").text(truyen.tenTruyen || "Không có tiêu đề");
-                $("#comic-cover").attr("src", truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
-                $("#comic-cover").attr("alt", truyen.tenTruyen || 'Bìa truyện');
-                $("#comic-description").text(truyen.moTa || "Không có mô tả");
-                $("#comic-likes").text(truyen.luotThich || 0);
-                $("#comic-views").text(truyen.luotXem || 0);
-                $("#comic-note").text(truyen.ghiChu || "Không có ghi chú");
-                $("#comic-translator").text(truyen.translator?.username || "Không có thông tin");
-
-                // Hiển thị nút yêu thích trên trang đọc
-                if (token) {
-                    $.ajax({
-                        url: `http://localhost:8080/api/truyen/favorite/status/${truyenId}`,
-                        method: "GET",
-                        headers: {
-                            "Authorization": "Bearer " + token
-                        },
-                        success: function(isFavorited) {
-                            const buttonHtml = isFavorited
-                                ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
-                                : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
-                            $("#favorite-button-container").html(buttonHtml);
-                        },
-                        error: function(xhr, status, error) {
-                            console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyenId}: ${status} - ${error}`);
-                            const buttonHtml = `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
-                            $("#favorite-button-container").html(buttonHtml);
-                        }
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                $("#comic-title").text("Lỗi khi tải thông tin truyen: " + error);
-                console.log("Lỗi API /api/truyen/{id}: ", status, error);
-            }
-        });
-
         // Lấy danh sách chapter
         $.ajax({
             url: `http://localhost:8080/api/chapters?id_comic=${truyenId}`,
             method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
             success: function(chapters) {
                 const chapterList = $("#chapter-list");
                 chapterList.empty();
+                console.log("Phản hồi API /api/chapters:", chapters);
                 if (Array.isArray(chapters) && chapters.length > 0) {
                     chapters.forEach(chapter => {
                         chapterList.append(`
                             <button class="btn btn-outline-primary" data-chapter-id="${chapter.id}">
-                                ${chapter.tenChap}
+                                ${chapter.tenChap || `Chapter ${chapter.id}`}
                             </button>
                         `);
                     });
                     currentChapterId = chapters[0].id;
-                    loadChapterImages(currentChapterId); // Sử dụng hàm từ read.html
-                    $("#chapter-title").text(chapters[0].tenChap);
+                    window.loadChapterImages(currentChapterId); // Sử dụng hàm từ phía JSread.js
+                    $("#chapter-title").text(chapters[0].tenChap || `Chapter ${chapters[0].id}`);
                 } else {
                     chapterList.append('<p>Không có chapter nào.</p>');
                 }
             },
             error: function(xhr, status, error) {
-                $("#chapter-list").html('<p>Lỗi khi tải danh sách chapter: ' + error + '</p>');
-                console.log("Lỗi API /api/chapters: ", status, error);
+                $("#chapter-list").html('<p>Lỗi khi tải danh sách chapter: ' + (xhr.responseText || error) + '</p>');
+                console.log("Lỗi API /api/chapters: ", status, error, xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    Toastify({
+                        text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: { background: "#ff4444" }
+                    }).showToast();
+                    localStorage.removeItem("token");
+                    window.location.href = "/login.html";
+                }
             }
         });
 
@@ -622,11 +587,10 @@ $(document).ready(function() {
         $(document).on("click", "#chapter-list button", function() {
             currentChapterId = $(this).data("chapter-id");
             $("#chapter-title").text($(this).text());
-            window.loadChapterImages(currentChapterId); // Gọi hàm toàn cục từ read.html
+            window.loadChapterImages(currentChapterId); // Gọi hàm toàn cục từ JSread.js
         });
     }
 
-    // Hàm đăng xuất
     window.logout = function() {
         localStorage.removeItem("token");
         window.location.href = "/view/trangchu.html";

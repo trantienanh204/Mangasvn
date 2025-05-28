@@ -1,5 +1,6 @@
 package com.example.demo.baove.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "COMICS")
@@ -46,4 +49,16 @@ public class Comic {
  @ManyToOne
  @JoinColumn(name = "id_translator")
  private User translator;
+
+ @OneToMany(mappedBy = "comic", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+ @JsonManagedReference
+ private List<Chapter> chapters = new ArrayList<>();
+
+ @OneToMany(mappedBy = "comics", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+ @JsonManagedReference
+ private List<ComicDanhMuc> comicDanhMucs = new ArrayList<>();
+
+ @OneToMany(mappedBy = "comics", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+ @JsonManagedReference
+ private List<ComicTacGia> comicTacGias = new ArrayList<>();
 }

@@ -5,10 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface comicRepository extends JpaRepository<Comic,Integer> {
     List<Comic> findTop5ByOrderByNgayTaoDesc();
-    List<Comic> findTop5ByOrderByLuotXemDesc();
+    List<Comic> findTop6ByOrderByLuotXemDesc();
     List<Comic> findByTenTruyenContainingIgnoreCase(String tenTruyen);
+    Optional<Comic> findByTenTruyen(String tenTruyen);
 }

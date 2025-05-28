@@ -73,72 +73,9 @@
     </nav>
 </div>
 
-<!-- Nội dung chính -->
-<div class="container content">
-    <div class="comic-info">
-        <div class="cover-image">
-            <img id="comic-cover" src="" alt="Bìa truyện">
-        </div>
-        <div class="details">
-            <h2 id="comic-title"></h2>
-            <p><strong>Mô tả:</strong> <span id="comic-description"></span></p>
-            <p><strong>Lượt thích:</strong> <span id="comic-likes"></span></p>
-            <p><strong>Lượt xem:</strong> <span id="comic-views"></span></p>
-            <p><strong>Ghi chú:</strong> <span id="comic-note"></span></p>
-            <p><strong>Người dịch:</strong> <span id="comic-translator"></span></p>
-            <p><strong>Tác giả:</strong> <span id="comic-authors">Chưa cập nhật</span></p>
-            <p><strong>Danh mục:</strong> <span id="comic-categories">Chưa cập nhật</span></p>
-            <div id="favorite-button-container"></div>
-        </div>
-    </div>
 
-    <div class="chapter-section">
-        <h4>Danh sách chapter</h4>
-        <div class="chapter-controls">
-            <button class="scroll-btn scroll-left" onclick="scrollChapterList('left')">❮</button>
-            <div class="chapter-list" id="chapter-list"></div>
-            <button class="scroll-btn scroll-right" onclick="scrollChapterList('right')">❯</button>
-        </div>
-    </div>
 
-    <div class="image-section">
-        <h4 id="chapter-title"></h4>
-        <button id="toggle-reading-mode" class="btn btn-success mb-3">Chuyển sang chế độ đọc sách</button>
-        <div class="image-container" id="chapter-images"></div>
-        <button id="load-all" class="load-more">Hiển thị tất cả</button>
-        <button id="load-15" class="load-more">Hiển thị 15 trang nữa</button>
-    </div>
-</div>
 
-<!-- Chế độ đọc sách -->
-<div class="reading-mode" id="reading-mode">
-    <button class="close-btn" id="close-reading-mode">×</button>
-    <img class="reading-image" id="reading-image" src="" alt="Trang truyện">
-    <div class="pagination" id="pagination"></div>
-</div>
-
-<!-- Nút Lên đầu trang -->
-<button id="back-to-top" title="Lên đầu trang">↑</button>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-<script src="/js/JStrangChu.js"></script>
-<script src="/js/JSread.js"></script>
-<script>
-    const toggleReadingModeBtn = document.getElementById('toggle-reading-mode');
-    const readingModeDiv = document.getElementById('reading-mode');
-    const closeReadingModeBtn = document.getElementById('close-reading-mode');
-
-    toggleReadingModeBtn.addEventListener('click', () => {
-        readingModeDiv.classList.add('active');
-    });
-
-    closeReadingModeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        readingModeDiv.classList.remove('active');
-    });
-</script>
 
 </body>
 </html>
