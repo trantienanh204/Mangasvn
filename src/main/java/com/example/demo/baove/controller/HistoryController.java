@@ -27,6 +27,8 @@ public class HistoryController {
     @Autowired
     private ViewedService viewedService;
 
+
+
     @GetMapping
     public ResponseEntity<List<HistoryResponse>> getHistory(Principal principal) {
         if (principal == null) {

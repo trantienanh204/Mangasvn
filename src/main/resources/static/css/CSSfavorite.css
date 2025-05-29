@@ -1,0 +1,115 @@
+/* /css/CSSfavorite.css */
+.custom-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #f5f6fa; /* Nền sáng */
+    color: #333;
+    position: relative;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.image-title-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-img {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    position: relative; /* Đảm bảo ảnh không bị chồng lấn */
+    z-index: 1; /* Đưa ảnh lên trên nút */
+}
+
+.card-title {
+    margin: 0;
+    font-size: 20px; /* Tăng kích thước tiêu đề */
+    font-weight: bold; /* Làm đậm */
+    color: #2c3e50; /* Màu đậm hơn để nổi bật */
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-actions {
+    text-align: right;
+    margin-top: 10px; /* Tạo khoảng cách dưới tiêu đề */
+    position: absolute; /* Tách nút ra khỏi ảnh */
+    bottom: 10px;
+    right: 10px;
+}
+
+.btn-outline-danger {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: #ff4444;
+    color: #fff;
+    border: none;
+}
+
+.btn-outline-danger:hover {
+    background-color: #cc0000;
+    color: #fff;
+}
+
+.hot-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ff4444;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2; /* Đảm bảo "Hot" nằm trên ảnh */
+}
+
+.time-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    z-index: 2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-img {
+        width: 80px;
+        height: 120px;
+    }
+    .card-title {
+        font-size: 18px;
+    }
+    .card-actions {
+        bottom: 5px;
+        right: 5px;
+    }
+    .btn-outline-danger {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}

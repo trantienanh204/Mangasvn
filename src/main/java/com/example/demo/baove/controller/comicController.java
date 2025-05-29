@@ -519,6 +519,33 @@ public class comicController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    @GetMapping("/favorite/list")
+    public ResponseEntity<List<FavoriteResponse>> getFavoriteList(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtUtil.getUsernameFromToken(jwt);
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                logger.warn("Không tìm thấy người dùng với username: {}", username);
+                return ResponseEntity.status(404).body(null);
+            }
+
+            List<Wishlist> favorites = wishlistRepository.findByUsers(user);
+            List<FavoriteResponse> response = favorites.stream().map(favorite -> {
+                FavoriteResponse fr = new FavoriteResponse();
+                fr.setComicId((long) favorite.getComics().getId());
+                fr.setTenTruyen(favorite.getComics().getTenTruyen());
+                fr.setImageComic(favorite.getComics().getImageComic());
+                return fr;
+            }).collect(Collectors.toList());
+
+            logger.info("Lấy danh sách yêu thích thành công cho user: {}", username);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Lỗi khi lấy danh sách yêu thích: {}", e.getMessage(), e);
+            return ResponseEntity.status(401).body(null);
+        }
+    }
 
     @GetMapping("/favorite/status/{truyenId}")
     public ResponseEntity<Boolean> checkFavoriteStatus(@PathVariable int truyenId, @RequestHeader("Authorization") String authorizationHeader) {
@@ -813,4 +840,35 @@ class TruyenRequest {
     public void setMoTa(String moTa) { this.moTa = moTa; }
     public String getGhiChu() { return ghiChu; }
     public void setGhiChu(String ghiChu) { this.ghiChu = ghiChu; }
+
+
+}
+class FavoriteResponse {
+    private Long comicId;
+    private String tenTruyen;
+    private String imageComic;
+
+    public Long getComicId() {
+        return comicId;
+    }
+
+    public void setComicId(Long comicId) {
+        this.comicId = comicId;
+    }
+
+    public String getTenTruyen() {
+        return tenTruyen;
+    }
+
+    public void setTenTruyen(String tenTruyen) {
+        this.tenTruyen = tenTruyen;
+    }
+
+    public String getImageComic() {
+        return imageComic;
+    }
+
+    public void setImageComic(String imageComic) {
+        this.imageComic = imageComic;
+    }
 }
