@@ -2,7 +2,7 @@ package com.example.demo.baove.service;
 
 import com.example.demo.baove.entity.Role;
 import com.example.demo.baove.entity.User;
-import com.example.demo.baove.repository.roleRepository;
+import com.example.demo.baove.repository.RoleRepository;
 import com.example.demo.baove.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,7 +23,7 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
-    private roleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

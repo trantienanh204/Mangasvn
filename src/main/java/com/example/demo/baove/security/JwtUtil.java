@@ -17,23 +17,19 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-   @Autowired
+    @Autowired
     private String secret;
     private long expiration = 86400000; // 1 ngày
 
     public String generateToken(String username, String role) {
+        String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase();
         Key key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS512.getJcaName());
-
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
-        System.out.println("Creating token at: " + now + " (" + now.getTime() + ")");
-        System.out.println("Token expires at: " + expiryDate + " (" + expiryDate.getTime() + ")");
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", role)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .claim("role", formattedRole)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -41,12 +37,16 @@ public class JwtUtil {
     public Claims getClaimsFromToken(String token) {
         Key key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS512.getJcaName());
 
-        return Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        System.out.println("Decoded Claims: " + claims);
+        return claims;
     }
+
 
     public String getUsernameFromToken(String token) {
         return getClaimsFromToken(token).getSubject();

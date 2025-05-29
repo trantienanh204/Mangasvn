@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "VIEWED")
@@ -28,5 +29,5 @@ public class Viewed {
     private Comic comics;
 
     @Column(name = "NGAY_TAO")
-    private LocalDate ngayTao;
+    private LocalDateTime ngayTao;
 }

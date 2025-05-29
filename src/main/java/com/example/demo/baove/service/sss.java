@@ -11,6 +11,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.security.Principal;
 
 @SpringBootApplication
 public class sss{
@@ -24,10 +27,12 @@ public class sss{
 //
 //    }
 
-    public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load();
-        System.out.println("Access Key: " + dotenv.get("CLOUDFLARE_ACCESS_KEY"));
-    }
+//    public static void main(String[] args) {
+//        Dotenv dotenv = Dotenv.load();
+//        System.out.println("Access Key: " + dotenv.get("CLOUDFLARE_ACCESS_KEY"));
+//    }
+
+
 
 }
 

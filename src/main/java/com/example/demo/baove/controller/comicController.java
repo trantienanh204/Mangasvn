@@ -549,7 +549,7 @@ public class comicController {
             String username = jwtUtil.getUsernameFromToken(jwt);
             String role = jwtUtil.getRoleFromToken(jwt);
 
-            if (!role.equals("ROLE_user") && !role.equals("ROLE_translator") && !role.equals("ROLE_admin")) {
+            if (!role.equals("ROLE_CHUTUT") && !role.equals("ROLE_DOCGIA") && !role.equals("ROLE_ADMIN")) {
                 logger.warn("Người dùng không có quyền thêm truyện vào danh sách yêu thích: role={}", role);
                 return ResponseEntity.status(403).body("Bạn không có quyền thêm truyện vào danh sách yêu thích!");
             }
@@ -594,9 +594,9 @@ public class comicController {
             String username = jwtUtil.getUsernameFromToken(jwt);
             String role = jwtUtil.getRoleFromToken(jwt);
 
-            if (!role.equals("ROLE_user") && !role.equals("ROLE_translator") && !role.equals("ROLE_admin")) {
-                logger.warn("Người dùng không có quyền xóa truyện khỏi danh sách yêu thích: role={}", role);
-                return ResponseEntity.status(403).body("Bạn không có quyền xóa truyện khỏi danh sách yêu thích!");
+            if (!role.equals("ROLE_CHUTUT") && !role.equals("ROLE_DOCGIA") && !role.equals("ROLE_ADMIN")) {
+                logger.warn("Người dùng không có quyền thêm truyện vào danh sách yêu thích: role={}", role);
+                return ResponseEntity.status(403).body("Bạn không có quyền thêm truyện vào danh sách yêu thích!");
             }
 
             User user = userService.findByUsername(username);

@@ -40,7 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-
+        System.out.println("Authorization Header hiện tại là : " + authorizationHeader);
         String username = null;
         String jwt = null;
 
@@ -48,6 +48,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.getUsernameFromToken(jwt);
+
+                System.out.println("Received JWT: " + jwt);
+                System.out.println("Extracted Username: " + username);
+                System.out.println("Extracted Role: " + jwtUtil.getRoleFromToken(jwt));
+
             } catch (IllegalArgumentException e) {
                 System.out.println("Không thể lấy JWT Token");
             } catch (ExpiredJwtException e) {
@@ -59,16 +64,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
             if (jwtUtil.validateToken(jwt)) {
-                // Lấy vai trò trực tiếp từ token
                 String role = jwtUtil.getRoleFromToken(jwt);
+
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, authorities);
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                System.out.println("✅ Authentication sau khi đặt: " + SecurityContextHolder.getContext().getAuthentication());
+
             }
         }
         chain.doFilter(request, response);
