@@ -48,17 +48,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.getUsernameFromToken(jwt);
-
                 System.out.println("Received JWT: " + jwt);
                 System.out.println("Extracted Username: " + username);
-                System.out.println("Extracted Role: " + jwtUtil.getRoleFromToken(jwt));
-
+                String role = jwtUtil.getRoleFromToken(jwt);
+                System.out.println("Extracted Role: " + role);
             } catch (IllegalArgumentException e) {
-                System.out.println("Không thể lấy JWT Token");
+                System.out.println("Không thể lấy JWT Token: " + e.getMessage());
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token đã hết hạn");
+                System.out.println("JWT Token đã hết hạn: " + e.getMessage());
             } catch (MalformedJwtException | SignatureException e) {
-                System.out.println("JWT Token không hợp lệ");
+                System.out.println("JWT Token không hợp lệ: " + e.getMessage());
             }
         }
 
@@ -66,20 +65,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwt)) {
                 String role = jwtUtil.getRoleFromToken(jwt);
+                System.out.println("Validated Role from Token: " + role);
 
+                // Sử dụng vai trò từ token thay vì từ UserDetailsService
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+                System.out.println("Authorities set: " + authorities);
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
                 System.out.println("✅ Authentication sau khi đặt: " + SecurityContextHolder.getContext().getAuthentication());
-
+            } else {
+                System.out.println("❌ Token không hợp lệ, không đặt Authentication");
             }
+        } else {
+            System.out.println("❌ Không thể đặt Authentication: username=" + username + ", existing auth=" + SecurityContextHolder.getContext().getAuthentication());
         }
+
         chain.doFilter(request, response);
     }
-
 }

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -138,7 +140,7 @@ public class comicController {
         }
 
         String role = jwtUtil.getRoleFromToken(token);
-        if (!role.equals("ROLE_admin")) {
+        if (!(role.equals("ROLE_ADMIN") || role.equals("ROLE_CHUTUT"))){
             logger.warn("Người dùng không có quyền tạo truyện mới: role={}", role);
             return ResponseEntity.status(403).body("Bạn không có quyền tạo truyện mới!");
         }
@@ -358,7 +360,7 @@ public class comicController {
             Comic comic = comicRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Truyen voi ID " + id + " khong ton tai"));
 
-            if (!"ROLE_admin".equals(role)) {
+            if (!(role.equals("ROLE_ADMIN") || role.equals("ROLE_CHUTUT"))){
                 logger.warn("Nguoi dung khong co quyen cap nhat truyen: role={}", role);
                 return ResponseEntity.status(403).body("Ban khong co quyen cap nhat truyen!");
             }
@@ -451,7 +453,108 @@ public class comicController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    @GetMapping("/listloc")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ComicDTO>> getAllTruyendaloc(Principal principal) {
+        try {
+            List<Comic> truyenList = comicRepository.findAll();
+            List<ComicDTO> comicDTOs = truyenList.stream().filter(comic -> comic.getTranslator().getUsername().equals(principal.getName())).map(comic -> {
+                ComicDTO dto = new ComicDTO();
+                dto.setId(comic.getId());
+                dto.setTenTruyen(comic.getTenTruyen());
+                dto.setMoTa(comic.getMoTa());
+                dto.setGhiChu(comic.getGhiChu());
+                dto.setImageComic(comic.getImageComic());
+                dto.setLuotXem(comic.getLuotXem());
+                dto.setLuotThich(comic.getLuotThich());
+                dto.setNgayTao(comic.getNgayTao());
+                dto.setNgaySua(comic.getNgaySua());
+                // Lấy danh sách categoryIds
+                List<Integer> categoryIds = comic.getComicDanhMucs().stream()
+                        .map(comicDanhMuc -> comicDanhMuc.getDanhMuc().getId())
+                        .collect(Collectors.toList());
+                dto.setCategoryIds(categoryIds);
+                // Lấy danh sách authorIds
+                List<Integer> authorIds = comic.getComicTacGias().stream()
+                        .map(comicTacGia -> comicTacGia.getTacGia().getId())
+                        .collect(Collectors.toList());
+                dto.setAuthorIds(authorIds);
+                return dto;
+            }).collect(Collectors.toList());
+            return ResponseEntity.ok(comicDTOs);
+        } catch (Exception e) {
+            logger.error("Lỗi khi lấy danh sách truyện: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 
+    @GetMapping("/authors")
+    @Transactional(readOnly = true)
+   // @PreAuthorize("hasAnyRole('ADMIN', 'CHUTUT')")
+    public ResponseEntity<List<TacGia>> getAllAuthors(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        logger.info("Received request with authHeader: {}", authHeader);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.error("Authorization header không hợp lệ hoặc thiếu Bearer");
+            return ResponseEntity.status(401).body(null);
+        }
+
+        String token = authHeader.substring(7);
+        try {
+            String username = jwtUtil.getUsernameFromToken(token);
+            logger.info("Extracted username: {}", username);
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                logger.error("Không tìm thấy người dùng với username: {}", username);
+                return ResponseEntity.status(404).body(null);
+            }
+
+            String role = jwtUtil.getRoleFromToken(token);
+            logger.info("User role: {}", role);
+            if (!(role.equals("ROLE_ADMIN") || role.equals("ROLE_CHUTUT"))) {
+                logger.warn("Người dùng không có quyền truy cập danh sách tác giả: role={}", role);
+                return ResponseEntity.status(403).body(null);
+            }
+
+            List<TacGia> authors = tacGiaRepository.findAll();
+            return ResponseEntity.ok(authors);
+        } catch (Exception e) {
+            logger.error("Lỗi khi lấy danh sách tác giả: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+    @PostMapping("/authors")
+    public ResponseEntity<TacGia> addAuthorNew(@org.springframework.web.bind.annotation.RequestBody TacGia author, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.error("Authorization header không hợp lệ hoặc thiếu Bearer");
+            return ResponseEntity.status(401).body(null);
+        }
+
+        String token = authHeader.substring(7);
+        try {
+            String username = jwtUtil.getUsernameFromToken(token);
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                logger.error("Không tìm thấy người dùng với username: {}", username);
+                return ResponseEntity.status(404).body(null);
+            }
+
+            String role = jwtUtil.getRoleFromToken(token);
+            if (!(role.equals("ROLE_ADMIN") || role.equals("ROLE_CHUTUT"))) {
+                logger.warn("Người dùng không có quyền thêm tác giả: role={}", role);
+                return ResponseEntity.status(403).body(null);
+            }
+
+            author.setNgayTao(LocalDate.now());
+            author.setTrangThai(true);
+            TacGia savedAuthor = tacGiaRepository.save(author);
+            return ResponseEntity.ok(savedAuthor);
+        } catch (Exception e) {
+            logger.error("Lỗi khi thêm tác giả: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
     @GetMapping("/hot")
     @Transactional(readOnly = true)
     public ResponseEntity<List<ComicDTO>> getHotTruyen() {

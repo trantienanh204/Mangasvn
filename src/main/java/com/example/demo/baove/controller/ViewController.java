@@ -23,7 +23,7 @@ public class ViewController {
     }
 
     @GetMapping("/api/admin")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CHUTUT')")
+    //@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CHUTUT')")
     public String noideadminORchututlamviec(){
         return "admin";
     }
