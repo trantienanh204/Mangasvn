@@ -1,9 +1,9 @@
 $(document).ready(function() {
     const token = localStorage.getItem("token");
-
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
     if (token) {
         $.ajax({
-            url: "http://localhost:8080/api/auth/user-info",
+            url: `${serverHost}/api/auth/user-info`,
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token
@@ -49,7 +49,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "http://localhost:8080/api/truyen/favorite/list",
+            url: `${serverHost}/api/truyen/favorite/list`,
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token
@@ -97,7 +97,7 @@ $(document).ready(function() {
             return;
         }
 
-        const url = `http://localhost:8080/api/truyen/favorite/${truyenId}`;
+        const url = `${serverHost}/api/truyen/favorite/${truyenId}`;
         const method = isAdding ? "POST" : "DELETE";
 
         const cardId = `favourite-truyen-${truyenId}`; // Giả định prefix là 'favourite-'

@@ -1,5 +1,5 @@
 
-    // Hàm logout
+const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
     // Hàm logout
     function logout() {
         localStorage.removeItem('token'); // Chỉ xóa token
@@ -21,7 +21,7 @@
 
         if (isLoggedIn) {
             $.ajax({
-                url: 'http://localhost:8080/api/history',
+                url: `${serverHost}/api/history`,
                 method: 'GET',
                 headers: { "Authorization": "Bearer " + token },
                 success: function(history) {
@@ -94,7 +94,7 @@
         if (isLoggedIn) {
             const token = localStorage.getItem("token");
             $.ajax({
-                url: `http://localhost:8080/api/history/${id}`,
+                url: `${serverHost}/api/history/${id}`,
                 method: 'DELETE',
                 headers: { "Authorization": "Bearer " + token },
                 success: function() {
@@ -128,7 +128,7 @@
         const token = localStorage.getItem("token");
         if (token) {
             $.ajax({
-                url: "http://localhost:8080/api/auth/user-info",
+                url: `${serverHost}/api/auth/user-info`,
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + token

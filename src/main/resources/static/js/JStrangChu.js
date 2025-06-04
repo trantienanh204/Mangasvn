@@ -4,10 +4,10 @@ $(document).ready(function() {
     const userInfo = $("#user-info");
     const loginLink = $("#login-link");
     const logoutLink = $("#logout-link");
-
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
     if (token) {
         $.ajax({
-            url: "http://localhost:8080/api/auth/user-info",
+            url: `${serverHost}/api/auth/user-info`,
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token
@@ -41,7 +41,7 @@ $(document).ready(function() {
 
         if (token) {
             $.ajax({
-                url: `http://localhost:8080/api/truyen/favorite/status/${truyen.id}`,
+                url: `${serverHost}/api/truyen/favorite/status/${truyen.id}`,
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + token
@@ -111,7 +111,7 @@ $(document).ready(function() {
     }
 
     $.ajax({
-        url: "http://localhost:8080/api/truyen/hot",
+        url: `${serverHost}/api/truyen/hot`,
         method: "GET",
         success: function(data) {
             const carouselInner = $("#hot-truyen-carousel");
@@ -143,7 +143,7 @@ $(document).ready(function() {
     });
 
     $.ajax({
-        url: "http://localhost:8080/api/truyen/hot",
+        url: `${serverHost}/api/truyen/hot`,
         method: "GET",
         success: function(data) {
             const truyenListHot = $("#truyen-list-hot");
@@ -163,7 +163,7 @@ $(document).ready(function() {
     });
 
     $.ajax({
-        url: "http://localhost:8080/api/truyen/list",
+        url: `${serverHost}/api/truyen/list`,
         method: "GET",
         success: function(data) {
             const truyenList = $("#truyen-list");
@@ -183,7 +183,7 @@ $(document).ready(function() {
     });
 
     $.ajax({
-        url: "http://localhost:8080/api/truyen/moi",
+        url: `${serverHost}/api/truyen/moi`,
         method: "GET",
         success: function(data) {
             const truyenListNew = $("#truyen-list-new");
@@ -194,7 +194,7 @@ $(document).ready(function() {
                 });
             } else {
                 $.ajax({
-                    url: "http://localhost:8080/api/truyen/list",
+                    url: `${serverHost}/api/truyen/list`,
                     method: "GET",
                     success: function(data) {
                         if (Array.isArray(data)) {
@@ -235,7 +235,7 @@ $(document).ready(function() {
         const truyenId = window.location.pathname.split("/").pop();
 
         $.ajax({
-            url: `http://localhost:8080/api/chapters?id_comic=${truyenId}`,
+            url: `${serverHost}/api/chapters?id_comic=${truyenId}`,
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("token")
@@ -274,6 +274,62 @@ $(document).ready(function() {
             }
         });
     }
+
+    async function checkAdminAccess() {
+        const token = localStorage.getItem("token");
+        const adminButtonContainer = document.getElementById("admin-button-container");
+
+        if (!token) {
+            adminButtonContainer.innerHTML = "";
+            return;
+        }
+
+        try {
+            const userInfoResponse = await fetch(`${serverHost}/api/auth/user-info`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!userInfoResponse.ok) {
+                throw new Error("Phiên đăng nhập hết hạn hoặc không hợp lệ.");
+            }
+
+            const userInfo = await userInfoResponse.json();
+            const userRole = userInfo.role;
+
+            if (userRole === "ADMIN" || userRole === "CHUTUT") {
+                adminButtonContainer.innerHTML = `
+                    <button id="goToAdmin">Truy cập Admin</button>
+                `;
+
+                document.getElementById("goToAdmin").addEventListener("click", async function() {
+                    try {
+                        const response = await fetch(`${serverHost}/api/admin`, {
+                            method: "GET",
+                            headers: { "Authorization": `Bearer ${token}` }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error("❌ Bạn không có quyền truy cập.");
+                        }
+
+                        window.location.href = `${serverHost}/api/admin`;
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                });
+            } else {
+
+                adminButtonContainer.innerHTML = "";
+            }
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra quyền truy cập:", error);
+            adminButtonContainer.innerHTML = "";
+        }
+    }
+    document.addEventListener("DOMContentLoaded", checkAdminAccess);
 
     window.logout = function() {
         localStorage.removeItem("token");

@@ -1,5 +1,6 @@
 
 $(document).ready(function() {
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
     $('#author-select').select2({
         placeholder: "Chọn tác giả",
         allowClear: true,
@@ -38,7 +39,7 @@ $(document).ready(function() {
         }
         // Kiểm tra vai trò để hiển thị menu admin
         $.ajax({
-            url: "http://localhost:8080/api/auth/user-info",
+            url: "${serverHost}/api/auth/user-info",
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token
@@ -67,7 +68,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: 'http://localhost:8080/api/truyen/listloc',
+            url: `${serverHost}/api/truyen/listloc`,
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(comics) {
@@ -93,7 +94,7 @@ $(document).ready(function() {
     function loadAuthors() {
         const token = localStorage.getItem('token');
         $.ajax({
-            url: 'http://localhost:8080/api/truyen/authors', // Cập nhật endpoint
+            url: `${serverHost}/api/truyen/authors`, // Cập nhật endpoint
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(authors) {
@@ -115,7 +116,7 @@ $(document).ready(function() {
     function loadCategories() {
         const token = localStorage.getItem('token');
         $.ajax({
-            url: 'http://localhost:8080/api/categories',
+            url: `${serverHost}/api/categories`,
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(categories) {
@@ -136,7 +137,7 @@ $(document).ready(function() {
             const newAuthorName = data.text;
             const token = localStorage.getItem('token');
             $.ajax({
-                url: 'http://localhost:8080/api/truyen/authors',
+                url: `${serverHost}/api/truyen/authors`,
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 data: JSON.stringify({ tenTacGia: newAuthorName }),
@@ -157,7 +158,7 @@ $(document).ready(function() {
     function loadComicDetails(comicId) {
         const token = localStorage.getItem('token');
         $.ajax({
-            url: `http://localhost:8080/api/truyen/${comicId}`,
+            url: `${serverHost}/api/truyen/${comicId}`,
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(comic) {
@@ -188,14 +189,15 @@ $(document).ready(function() {
     function validateZipOrder(zip) {
         return new Promise((resolve, reject) => {
             const files = Object.entries(zip.files).sort((a, b) => {
-                const numA = parseInt(a[0].match(/^(\d+)/)[1]);
-                const numB = parseInt(b[0].match(/^(\d+)/)[1]);
+                const numA = parseInt(a[0].match(/^0*(\d+)/)[1]);
+                const numB = parseInt(b[0].match(/^0*(\d+)/)[1]);
                 return numA - numB;
             });
+
             let expectedIndex = 1;
             for (const [relativePath, file] of files) {
                 if (!file.dir) {
-                    const match = relativePath.match(/^(\d+)\.(jpg|png|jpeg)$/i);
+                    const match = relativePath.match(/^0*(\d+)\.(jpg|png|jpeg)$/i);
                     if (!match) {
                         reject(new Error('Tên file không đúng định dạng (phải là số.jpg/png/jpeg): ' + relativePath));
                         return;
@@ -212,6 +214,7 @@ $(document).ready(function() {
         });
     }
 
+
     $('#upload-form').on('submit', async function(e) {
         e.preventDefault();
 
@@ -221,11 +224,11 @@ $(document).ready(function() {
 
         const comicId = $('#comic-select').val();
         const isUpdate = comicId !== '0';
-        let url = 'http://localhost:8080/api/truyen';
+        let url = `${serverHost}/api/truyen`;
         let method = 'POST';
 
         if (isUpdate) {
-            url = `http://localhost:8080/api/truyen/${comicId}`;
+            url = `${serverHost}/api/truyen/${comicId}`;
             method = 'PUT';
             $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').hide().find('input, textarea').prop('required', false);
             $('#create-btn').hide();
@@ -335,7 +338,7 @@ $(document).ready(function() {
 
         const token = localStorage.getItem('token');
         $.ajax({
-            url: isUpdate ? `http://localhost:8080/api/truyen/${comicId}/chapters` : url,
+            url: isUpdate ? `${serverHost}/api/truyen/${comicId}/chapters` : url,
             type: isUpdate ? 'PUT' : method,
             data: formData,
             contentType: false,
@@ -406,7 +409,7 @@ $(document).ready(function() {
 const token = localStorage.getItem("token");
 if (token) {
     $.ajax({
-        url: "http://localhost:8080/api/auth/user-info",
+        url: `${serverHost}/api/auth/user-info`,
         method: "GET",
         headers: {
             "Authorization": "Bearer " + token

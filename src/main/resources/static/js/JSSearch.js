@@ -1,7 +1,7 @@
 // JSSearch.js
 $(document).ready(function() {
     const token = localStorage.getItem("token");
-
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
     function toggleFavorite(truyenId, isAdding) {
         if (!token) {
             Toastify({
@@ -15,7 +15,7 @@ $(document).ready(function() {
             return;
         }
 
-        const url = `http://localhost:8080/api/truyen/favorite/${truyenId}`;
+        const url = `${serverHost}/api/truyen/favorite/${truyenId}`;
         const method = isAdding ? "POST" : "DELETE";
         const cardId = `favourite-truyen-${truyenId}`; // Dùng prefix 'favourite-' cho trang yêu thích
         const isFavouritePage = window.location.pathname.includes('/view/favourite'); // Kiểm tra trang hiện tại
@@ -133,7 +133,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: `http://localhost:8080/api/truyen/search?query=${encodeURIComponent(query)}`,
+            url: `${serverHost}/api/truyen/search?query=${encodeURIComponent(query)}`,
             method: "GET",
             success: function(data) {
                 console.log("API response:", data);
@@ -187,7 +187,7 @@ $(document).ready(function() {
 
         if (token) {
             $.ajax({
-                url: `http://localhost:8080/api/truyen/favorite/status/${truyen.id || truyen.comicId}`,
+                url: `${serverHost}/api/truyen/favorite/status/${truyen.id || truyen.comicId}`,
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + token

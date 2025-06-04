@@ -4,12 +4,12 @@ $(document).ready(function() {
     let images = [];
     let displayedCount = 0;
     let currentChapterId = null;
-
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
     // Hàm tải danh sách tác giả
     function loadAuthors(resolve) {
         const token = localStorage.getItem("token");
         $.ajax({
-            url: 'http://localhost:8080/api/authors',
+            url: `${serverHost}/api/authors`,
             method: 'GET',
             headers: { "Authorization": "Bearer " + token },
             success: function(authors) {
@@ -32,7 +32,7 @@ $(document).ready(function() {
     function loadCategories(resolve) {
         const token = localStorage.getItem("token");
         $.ajax({
-            url: 'http://localhost:8080/api/categories',
+            url: `${serverHost}/api/categories`,
             method: 'GET',
             headers: { "Authorization": "Bearer " + token },
             success: function(categories) {
@@ -108,7 +108,7 @@ $(document).ready(function() {
         if (isLoggedIn) {
             // Khi đã đăng nhập: lấy từ server
             $.ajax({
-                url: 'http://localhost:8080/api/history',
+                url: `${serverHost}/api/history`,
                 method: 'GET',
                 headers: { "Authorization": "Bearer " + token },
                 success: function(history) {
@@ -205,7 +205,7 @@ $(document).ready(function() {
         console.log("Tải ảnh chapter - Token:", token, "ChapterId:", chapterId); // Thêm log
 
         $.ajax({
-            url: `http://localhost:8080/api/images?id_chapter=${chapterId}`,
+            url: `${serverHost}/api/images?id_chapter=${chapterId}`,
             method: "GET",
             headers: { "Authorization": "Bearer " + token },
             success: function(imagesData) {
@@ -317,7 +317,7 @@ $(document).ready(function() {
         Promise.all([new Promise(resolve => loadAuthors(resolve)), new Promise(resolve => loadCategories(resolve))])
             .then(() => {
                 $.ajax({
-                    url: `http://localhost:8080/api/truyen/${truyenId}`,
+                    url: `${serverHost}/api/truyen/${truyenId}`,
                     method: "GET",
                     headers: { "Authorization": "Bearer " + token },
                     success: function(truyen) {
@@ -351,7 +351,7 @@ $(document).ready(function() {
 
                         if (token) {
                             $.ajax({
-                                url: `http://localhost:8080/api/truyen/favorite/status/${truyenId}`,
+                                url: `${serverHost}/api/truyen/favorite/status/${truyenId}`,
                                 method: "GET",
                                 headers: { "Authorization": "Bearer " + token },
                                 success: function(isFavorited) {

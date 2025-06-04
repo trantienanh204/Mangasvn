@@ -41,7 +41,17 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public User registerUser(String userName, String password, String email, String roleName) {
+    public User registerUser(String userName, String password, String email) {
+        // Kiểm tra trùng userName
+        if (userRepository.existsByUsername(userName)) {
+            throw new IllegalArgumentException("Tên người dùng '" + userName + "' đã tồn tại!");
+        }
+
+        // Kiểm tra trùng email
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email '" + email + "' đã được sử dụng!");
+        }
+
         User user = new User();
         user.setUsername(userName);
         user.setPassword(passwordEncoder.encode(password));
@@ -49,11 +59,13 @@ public class UserService implements UserDetailsService {
         user.setTrangThai(true);
         user.setNgayTao(LocalDate.now());
 
-        Role role = roleRepository.findByRoleName(roleName);
+        Role role = roleRepository.findByRoleName("DOCGIA");
         if (role == null) {
             throw new RuntimeException("Role not found");
         }
         user.setRole(role);
+
+        System.out.println("Tên mới tạo: " + user.getUsername() + " email: " + user.getEmail());
 
         return userRepository.save(user);
     }
@@ -64,6 +76,7 @@ public class UserService implements UserDetailsService {
         }
         return user;
     }
+
     public User findById(int id) {
         User user = userRepository.findById(id);
         if (user == null) {

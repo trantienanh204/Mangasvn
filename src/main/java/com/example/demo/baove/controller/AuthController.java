@@ -1,5 +1,6 @@
 package com.example.demo.baove.controller;
 
+import com.example.demo.baove.controller.DTO.LoginDTO;
 import com.example.demo.baove.entity.User;
 import com.example.demo.baove.security.JwtUtil;
 import com.example.demo.baove.service.UserService;
@@ -37,19 +38,10 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        User user = userService.registerUser(
-                request.getUserName(),
-                request.getPassword(),
-                request.getEmail(),
-                request.getRole()
-        );
-        return ResponseEntity.ok("User registered successfully");
-    }
+
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
@@ -70,31 +62,10 @@ public class AuthController {
     }
 }
 
-class RegisterRequest {
-    private String userName;
-    private String password;
-    private String email;
-    private String role;
 
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-}
 
-class LoginRequest {
-    private String userName;
-    private String password;
 
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-}
+
 
 class LoginResponse {
     private String token;
