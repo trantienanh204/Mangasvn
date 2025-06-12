@@ -4,8 +4,7 @@ $(document).ready(function() {
     let images = [];
     let displayedCount = 0;
     let currentChapterId = null;
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
-    // Hàm tải danh sách tác giả
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
     function loadAuthors(resolve) {
         const token = localStorage.getItem("token");
         $.ajax({
@@ -513,14 +512,14 @@ $(document).ready(function() {
         }
     });
 
-    // Hàm đăng xuất
+
     window.logout = function() {
         localStorage.removeItem("token");
         console.log("Đăng xuất thành công, token đã xóa");
         window.location.href = "/view/trangchu.html";
     }
 
-    // Gắn sự kiện xóa lịch sử (dùng chung cho cả trang đọc và trang lịch sử)
+
     $(document).on("click", "#clear-history", function() {
         if (!localStorage.getItem("token")) {
             window.clearLocalHistory();

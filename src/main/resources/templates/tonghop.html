@@ -72,8 +72,30 @@
         </div>
     </nav>
 </div>
+<div>
+    <div id="test"> </div>
+    <button onclick="test()">reset</button>
+</div>
 <script src="/js/JSSearch.js"></script>
 <script >
+    function test() {
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: "http://localhost:8080/search?id=4&page=0",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function (data) {
+                const test1 = $('#test');
+                data.forEach(comic => {
+                    test1.append(`<option value="${comic.id}">${comic.tenTruyen}</option>`);
+                });
+            }
+        });
+    }
+
+
 </script>
 </body>
 </html>

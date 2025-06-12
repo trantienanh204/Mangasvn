@@ -1,6 +1,6 @@
-
+const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
 $(document).ready(function() {
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
+
     $('#author-select').select2({
         placeholder: "Chọn tác giả",
         allowClear: true,
@@ -14,9 +14,9 @@ $(document).ready(function() {
             }
 
             return {
-                id: term, // Sử dụng tên tác giả làm ID tạm thời
+                id: term,
                 text: term,
-                newOption: true // Đánh dấu đây là tag mới
+                newOption: true
             };
         }
     });

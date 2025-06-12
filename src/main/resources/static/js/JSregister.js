@@ -1,6 +1,6 @@
 document.getElementById("login-form").addEventListener("submit", async function (event) {
     event.preventDefault();
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.156.147:8080";
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
     const password1 = document.getElementById("password1").value;
@@ -109,7 +109,6 @@ document.getElementById("login-form").addEventListener("submit", async function 
     }
 });
 
-// Giữ nguyên các sự kiện input
 document.getElementById("username").addEventListener("input", function () {
     const errorElement = document.getElementById("error");
     errorElement.style.display = "none";

@@ -21,7 +21,10 @@ public class ViewController {
     public String favourite() {
         return "wishlist";
     }
-
+    @GetMapping("theloai")
+    public String theloai() {
+        return "tonghop";
+    }
     @GetMapping("/api/admin")
     //@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CHUTUT')")
     public String noideadminORchututlamviec(){
