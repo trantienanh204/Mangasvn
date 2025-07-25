@@ -17,9 +17,9 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Autowired
+    @Value("${jwt.secret}")
     private String secret;
-    private long expiration = 86400000; // 1 ngày
+    private long expiration = 86400000;
 
     public String generateToken(String username, String role) {
         String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase();

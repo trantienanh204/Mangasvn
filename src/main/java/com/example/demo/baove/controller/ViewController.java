@@ -25,6 +25,10 @@ public class ViewController {
     public String theloai() {
         return "tonghop";
     }
+    @GetMapping("/view/test")
+    public String test() {
+        return "test";
+    }
     @GetMapping("/api/admin")
     //@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CHUTUT')")
     public String noideadminORchututlamviec(){

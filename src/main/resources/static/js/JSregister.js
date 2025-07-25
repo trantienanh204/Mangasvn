@@ -109,26 +109,26 @@ document.getElementById("login-form").addEventListener("submit", async function 
     }
 });
 
-document.getElementById("username").addEventListener("input", function () {
+ document.getElementById("username").addEventListener("input", function () {
     const errorElement = document.getElementById("error");
     errorElement.style.display = "none";
     errorElement.innerText = "";
-});
+ });
 
-document.getElementById("password").addEventListener("input", function () {
+ document.getElementById("password").addEventListener("input", function () {
     const errorElement = document.getElementById("error");
     errorElement.style.display = "none";
     errorElement.innerText = "";
-});
+ });
 
-document.getElementById("email").addEventListener("input", function () {
+ document.getElementById("email").addEventListener("input", function () {
     const errorElement = document.getElementById("error");
     errorElement.style.display = "none";
     errorElement.innerText = "";
-});
+ });
 
-document.getElementById("password1").addEventListener("input", function () {
+ document.getElementById("password1").addEventListener("input", function () {
     const errorElement = document.getElementById("error");
     errorElement.style.display = "none";
     errorElement.innerText = "";
-});
+ });

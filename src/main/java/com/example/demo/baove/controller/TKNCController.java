@@ -28,5 +28,5 @@ public class TKNCController {
         return comicService.searchcomictag(id,page);
     }
 
-    
+
 }

@@ -1,17 +1,17 @@
 
-const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";   // Hàm logout
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";   // Hàm logout
     function logout() {
-        localStorage.removeItem('token'); // Chỉ xóa token
+        localStorage.removeItem('token');
         $('#login-link').show();
         $('#logout-link').hide();
         $('#user-info').text('');
-        loadHistory(); // Tải lại lịch sử sau khi đăng xuất
+        loadHistory();
         console.log("Đăng xuất thành công, localHistory:", localStorage.getItem('localHistory'));
         Toastify({ text: "Đã đăng xuất!", duration: 3000, gravity: "top", position: "right", style: { background: "#28a745" } }).showToast();
         window.location.href = "/view/trangchu.html";
     }
 
-    // Hàm tải lịch sử từ server
+
     function loadHistory() {
         const historyList = $('#history-list');
         historyList.empty();
@@ -55,17 +55,16 @@ const serverHost = window.location.hostname === "localhost" ? "http://localhost:
                 }
             });
         } else {
-            loadLocalHistory(); // Chỉ gọi khi chưa đăng nhập
+            loadLocalHistory();
         }
     }
 
-    // Hàm tải lịch sử cục bộ
     function loadLocalHistory() {
         const historyList = $('#history-list');
         historyList.empty();
         const localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]');
 
-        console.log("Lịch sử local:", localHistory); // Thêm log để debug
+        console.log("Lịch sử local:", localHistory);
         if (localHistory.length > 0) {
             localHistory.forEach((item, index) => {
                 if (item.comicId) {
@@ -88,7 +87,7 @@ const serverHost = window.location.hostname === "localhost" ? "http://localhost:
     window.loadComicFromHistory = function(comicId) {
     window.location.href = `/read/${comicId}`;
 };
-    // Hàm xóa từng mục lịch sử
+
     window.deleteHistoryItem = function(id, isLoggedIn) {
         if (isLoggedIn) {
             const token = localStorage.getItem("token");
@@ -136,7 +135,7 @@ const serverHost = window.location.hostname === "localhost" ? "http://localhost:
                     $('#login-link').hide();
                     $('#logout-link').show();
                     $('#user-info').text("Xin chào, " + data.username);
-                    console.log("Đăng nhập thành công với user:", data.username); // Thêm log
+                    console.log("Đăng nhập thành công với user:", data.username);
                 },
                 error: function(xhr) {
                     if (xhr.status === 401 || xhr.status === 403) {

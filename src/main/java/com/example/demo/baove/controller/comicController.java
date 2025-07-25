@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -76,19 +77,19 @@ public class comicController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
+    @Value("${cloudflare.r2.access-key}")
     private String accessKey;
 
-    @Autowired
+    @Value("${cloudflare.r2.secret-key}")
     private String secretKey;
 
-    @Autowired
+    @Value("${cloudflare.r2.bucket-name}")
     private String bucketName;
 
-    @Autowired
+    @Value("${cloudflare.r2.upload-endpoint}")
     private String uploadEndpoint;
 
-    @Autowired
+    @Value("${cloudflare.r2.public-url}")
     private String publicUrl;
 
     private S3Client s3Client;

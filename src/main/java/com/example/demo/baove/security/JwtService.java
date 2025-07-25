@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Service
 @Component
 public class JwtService {
-    @Autowired
+    @Value("${jwt.secret}")
     private String secret ;
 
     private Key getSigningKey() {

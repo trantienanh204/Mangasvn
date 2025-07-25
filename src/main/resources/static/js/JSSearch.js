@@ -1,4 +1,4 @@
-// JSSearch.js
+
 $(document).ready(function() {
     const token = localStorage.getItem("token");
     const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
@@ -17,11 +17,11 @@ $(document).ready(function() {
 
         const url = `${serverHost}/api/truyen/favorite/${truyenId}`;
         const method = isAdding ? "POST" : "DELETE";
-        const cardId = `favourite-truyen-${truyenId}`; // Dùng prefix 'favourite-' cho trang yêu thích
-        const isFavouritePage = window.location.pathname.includes('/view/favourite'); // Kiểm tra trang hiện tại
+        const cardId = `favourite-truyen-${truyenId}`;
+        const isFavouritePage = window.location.pathname.includes('/view/favourite');
 
         if (isAdding || !isFavouritePage) {
-            // Logic cho các trang khác (trang chủ, read) hoặc khi thêm yêu thích
+
             $(`[id$="truyen-${truyenId}"]`).each(function() {
                 const newButtonHtml = isAdding
                     ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
@@ -52,9 +52,7 @@ $(document).ready(function() {
                 }).showToast();
 
                 if (!isAdding && isFavouritePage) {
-                    // Chỉ xóa card trong trang yêu thích
                     $(`#${cardId}`).remove();
-                    // Kiểm tra nếu danh sách rỗng
                     if ($('#favourite-list .custom-card').length === 0) {
                         $('#favourite-list').html('<p style="color: #ff4444; padding: 10px;">Bạn chưa có truyện yêu thích nào.</p>');
                     }
@@ -62,7 +60,6 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 if (isAdding || !isFavouritePage) {
-                    // Hoàn nguyên nút nếu lỗi (cho các trang khác)
                     $(`[id$="truyen-${truyenId}"]`).each(function() {
                         const revertButtonHtml = isAdding
                             ? `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`
@@ -112,7 +109,6 @@ $(document).ready(function() {
         return text;
     }
 
-    // Logic tìm kiếm
     $("#search-form").on("submit", function(e) {
         e.preventDefault();
         const query = $("#search-input").val().trim();
@@ -177,7 +173,6 @@ $(document).ready(function() {
         }
     });
 
-    // lấy tạm của trang chủ dùng haha
     window.displayTruyen = function(container, truyen, token, isScrollable = false, prefix = '') {
         const timeAgo = Math.floor(Math.random() * 10) + 1 + " Phút Trước";
         const isHot = Math.random() > 0.5 ? "Hot" : "";
@@ -195,7 +190,7 @@ $(document).ready(function() {
                 success: function(isFavorited) {
                     const buttonHtml = isFavorited
                         ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyen.id || truyen.comicId}">Xóa khỏi yêu thích</button>`
-                        : ''; // Chỉ hiển thị nút khi đã yêu thích
+                        : '';
                     container.append(`
                     <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
                         <div class="card-content">

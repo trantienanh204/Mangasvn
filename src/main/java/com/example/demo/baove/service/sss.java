@@ -17,15 +17,15 @@ import java.security.Principal;
 
 @SpringBootApplication
 public class sss{
-
+//
 //    public static void main(String[] args) {
-////        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-////
-////        String encodedPassword = passwordEncoder.encode("123456");
-////        System.out.println(encodedPassword); // In ra mật khẩu đã mã hóa
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//
+//        String encodedPassword = passwordEncoder.encode("123456");
+//        System.out.println(encodedPassword); // In ra mật khẩu đã mã hóa
 //
 //
-//    }
+//   }
 
 //    public static void main(String[] args) {
 //        Dotenv dotenv = Dotenv.load();

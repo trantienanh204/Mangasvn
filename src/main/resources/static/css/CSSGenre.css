@@ -1,0 +1,68 @@
+
+.filter-box {
+    background-color: #2e2e2e;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    margin-top: 20px;
+}
+
+.filter-box table {
+    width: 100%;
+}
+
+.filter-box th {
+    text-align: left;
+    padding: 10px 0;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 150px;
+}
+
+.filter-box td {
+    padding: 10px 0;
+}
+
+.filter-box select {
+    background-color: #1c1c1c;
+    color: white;
+    border: 1px solid #555;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.filter-box ul.choose {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-box ul.choose li a {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #1c1c1c;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.filter-box ul.choose li a:hover {
+    background-color: #3a3a3a;
+}
+
+.homepage_tags h1 {
+    font-size: 24px;
+    color: #03c2fc;
+}
+
+.tags_detail {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #2e2e2e;
+    color: #ccc;
+    border-radius: 8px;
+}
