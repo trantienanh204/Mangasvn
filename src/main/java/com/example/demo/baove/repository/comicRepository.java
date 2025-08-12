@@ -18,6 +18,7 @@ public interface comicRepository extends JpaRepository<Comic,Integer> {
     List<Comic> findByTenTruyenContainingIgnoreCase(String tenTruyen);
     Optional<Comic> findByTenTruyen(String tenTruyen);
 
+
     @Query("SELECT DISTINCT c FROM Comic c JOIN c.comicDanhMucs cd WHERE cd.danhMuc.id = :id")
     Page<Comic> findByDanhMucId(@Param("id") int id, Pageable pageable);
 

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ComicDanhMucRepository extends JpaRepository<ComicDanhMuc,Integer> {
     List<ComicDanhMuc> findByComicsId(int comicId);
+    List<ComicDanhMuc> findByDanhMucId(int comicId);
 }

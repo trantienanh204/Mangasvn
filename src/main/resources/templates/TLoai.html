@@ -16,19 +16,28 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
-<div class="container-fluid p-0  ">
+<div class="container-fluid p-0">
     <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/view/trangchu.html">TRANG CHỦ</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand fw-bold" href="/view/trangchu.html">MANGASVN</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view/trangchu.html">TRANG CHỦ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">TÌM KIẾM</a>
+                    </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            THỂ LOẠI
+                        </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="#">Action</a></li>
                             <li><a class="dropdown-item" href="#">Another action</a></li>
@@ -36,13 +45,23 @@
                             <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/view/favourite" aria-current="page">YÊU THÍCH</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/view/history" aria-current="page">LỊCH SỬ</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><span class="nav-link" id="user-info"></span></li>
-                    <li class="nav-item"><a class="nav-link" id="login-link" href="/api/auth/login" style="display: none;">Đăng nhập</a></li>
-                    <li class="nav-item"><a class="nav-link" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a></li>
-                    <li class="nav-item" id="admin-menu" style="display: none;"><a class="nav-link" href="/admin">Quản lý truyện</a></li>
+                    <li class="nav-item">
+                        <span class="nav-link" id="user-info"></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="login-link" href="/api/auth/login" style="display: none;">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a>
+                    </li>
                 </ul>
                 <form class="d-flex search-container" style="position: relative;" id="search-form">
                     <input class="form-control me-2" type="search" id="search-input" placeholder="Search" aria-label="Search">
@@ -53,20 +72,19 @@
         </div>
     </nav>
 </div>
-
 <div class="container mt-5 pt-5">
 <div class="container mt-5 pt-3 bg-dark text-white p-3">
     <div class="homepage_tags">
         <h1>
             <p class="text_list_update">
-                <i class="fa fa-font-awesome" aria-hidden="true"></i> Truyện Gender Bender
+                <i class="fa fa-font-awesome" aria-hidden="true"></i> Truyện <p id="theLoai"></p>
             </p>
         </h1>
         <div class="clear"></div>
     </div>
 
     <div class="tags_detail">
-        Là một thể loại trong đó giới tính của nhân vật bị lẫn lộn: nam hoá thành nữ, nữ hóa thành nam...
+        Là một thể loại trong đó xxx...
     </div>
 
     <div class="filter-box">
