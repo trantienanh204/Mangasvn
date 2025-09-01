@@ -31,7 +31,7 @@
                         <a class="nav-link" href="/view/trangchu.html">TRANG CHỦ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">TÌM KIẾM</a>
+                        <a class="nav-link" href="/theloai">TÌM KIẾM</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -73,60 +73,66 @@
     </nav>
 </div>
 <div class="container mt-5 pt-5">
-<div class="container mt-5 pt-3 bg-dark text-white p-3">
-    <div class="homepage_tags">
-        <h1>
-            <p class="text_list_update">
-                <i class="fa fa-font-awesome" aria-hidden="true"></i> Truyện <p id="theLoai"></p>
-            </p>
-        </h1>
-        <div class="clear"></div>
+    <div class="container mt-5 pt-3 bg-dark text-white p-3">
+        <div class="homepage_tags">
+            <h1>
+                <p class="text_list_update">
+                    <i class="fa fa-font-awesome" aria-hidden="true"></i> <p>Truyện <p id="theLoai"></p></p>
+                </p>
+            </h1>
+            <div class="clear"></div>
+        </div>
+
+        <div class="tags_detail">
+            Là một thể loại trong đó xxx...
+        </div>
+
+        <div class="filter-box">
+            <table>
+                <tr>
+                    <th>Thể loại</th>
+                    <td>
+                        <select id="genre-select">
+                            <option value="one shot">one shot</option>
+                            <option value="romcom">romcom</option>
+                            <option value="isekai">isekai</option>
+                            <option value="gender-bender">Gender Bender</option>
+                            <option value="manga" selected>Manga</option> <!-- Thêm manga làm mặc định -->
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Tình trạng</th>
+                    <td>
+                        <select id="status-select">
+                            <option value="ongoing">Đang tiến hành</option>
+                            <option value="completed">Đã hoàn thành</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Sắp xếp</th>
+                    <td>
+                        <select id="sort-select">
+                            <option value="date-desc">Ngày đăng giảm dần</option>
+                            <option value="date-asc">Ngày đăng tăng dần</option>
+                            <option value="views-desc">Lượt xem giảm dần</option>
+                            <option value="views-asc">Lượt xem tăng dần</option>
+                            <option value="az">Tên A-Z</option>
+                            <option value="za">Tên Z-A</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Khu vực hiển thị danh sách truyện -->
+        <div id="comic-list" class="row mt-4">
+            <!-- Danh sách truyện sẽ được thêm động bằng JavaScript -->
+        </div>
     </div>
-
-    <div class="tags_detail">
-        Là một thể loại trong đó xxx...
-    </div>
-
-    <div class="filter-box">
-        <table>
-            <tr>
-                <th>Thể loại</th>
-                <td>
-                    <select id="genre-select">
-                        <option value="action">Hành động</option>
-                        <option value="romance">Lãng mạn</option>
-                        <option value="comedy">Hài hước</option>
-                        <option value="gender-bender" selected>Gender Bender</option>
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Tình trạng</th>
-                <td>
-                    <select id="status-select">
-                        <option value="ongoing">Đang tiến hành</option>
-                        <option value="completed">Đã hoàn thành</option>
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Sắp xếp</th>
-                <td>
-                    <select id="sort-select">
-                        <option value="date-desc">Ngày đăng giảm dần</option>
-                        <option value="date-asc">Ngày đăng tăng dần</option>
-                        <option value="views-desc">Lượt xem giảm dần</option>
-                        <option value="views-asc">Lượt xem tăng dần</option>
-                        <option value="az">Tên A-Z</option>
-                        <option value="za">Tên Z-A</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
 </div>
 
 

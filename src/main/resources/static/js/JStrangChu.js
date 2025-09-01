@@ -1,4 +1,4 @@
-// JStrangChu.js
+
 $(document).ready(function() {
     const token = localStorage.getItem("token");
     const userInfo = $("#user-info");

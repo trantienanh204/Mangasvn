@@ -23,7 +23,7 @@ public class ViewController {
     }
     @GetMapping("theloai")
     public String theloai() {
-        return "tonghop";
+        return "Tloai";
     }
     @GetMapping("/view/test")
     public String test() {
