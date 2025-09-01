@@ -25,7 +25,6 @@ public class GenreController {
     GenreService genreService;
 
 
-
     @GetMapping("/search/{genre}")
     public ResponseEntity<?> searchGenre(@PathVariable String genre) {
         DanhMuc danhMuc = genreService.danhMucSearch(genre);
@@ -35,7 +34,7 @@ public class GenreController {
         }
         return ResponseEntity.ok(danhMuc);
     }
-    @GetMapping("{genre}")
+    @GetMapping("/translate/{genre}")
     public ResponseEntity<?> listGenre(@PathVariable String genre){
        return genreService.danhMuccomicsSearch(genre);
     }

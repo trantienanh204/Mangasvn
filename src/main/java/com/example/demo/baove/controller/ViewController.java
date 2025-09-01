@@ -21,7 +21,7 @@ public class ViewController {
     public String favourite() {
         return "wishlist";
     }
-    @GetMapping("theloai")
+    @GetMapping("theloai/{genre}")
     public String theloai() {
         return "Tloai";
     }
