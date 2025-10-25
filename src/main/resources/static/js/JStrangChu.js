@@ -255,6 +255,10 @@ $(document).ready(function() {
                     $("#chapter-title").text(chapters[0].tenChap || `Chapter ${chapters[0].id}`);
                 } else {
                     chapterList.append('<p>Không có chapter nào.</p>');
+                    const imageSection = document.getElementById('image-section');
+                    if (imageSection) {
+                        imageSection.hidden = true;
+                    }
                 }
             },
             error: function(xhr, status, error) {

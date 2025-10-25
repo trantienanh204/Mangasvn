@@ -21,10 +21,12 @@ public class ViewController {
     public String favourite() {
         return "wishlist";
     }
+    //bug
     @GetMapping("theloai/{genre}")
     public String theloai() {
         return "Tloai";
     }
+
     @GetMapping("/view/test")
     public String test() {
         return "test";
