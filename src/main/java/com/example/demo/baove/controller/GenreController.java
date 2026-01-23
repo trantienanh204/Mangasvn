@@ -26,7 +26,7 @@ public class GenreController {
 
 
     @GetMapping("/search/{genre}")
-    public ResponseEntity<?> searchGenre(@PathVariable String genre) {
+    public ResponseEntity<?> searchGenre(@PathVariable String genre,@PathVariable int Page) {
         DanhMuc danhMuc = genreService.danhMucSearch(genre);
         if (danhMuc == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -39,4 +39,8 @@ public class GenreController {
        return genreService.danhMuccomicsSearch(genre);
     }
 
+    @GetMapping("/fill/AllGenre")
+    public List<DanhMuc> fillGenre(){
+        return genreService.fillAllGenre();
+    }
 }

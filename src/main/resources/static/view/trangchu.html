@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ Manga World</title>
+    <title>Trang chủ Mangasvn </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="/css/CSStrangChu.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/CSSGenneNavbar.css">
     <style>
         .truyen-list {
             margin-top: 20px;
@@ -46,20 +48,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/view/trangchu.html">TRANG CHỦ</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/theloai">TÌM KIẾM</a>
-                        </li>
+<!--                        <li class="nav-item">-->
+<!--                            <a class="nav-link" href="/theloai">TÌM KIẾM</a>-->
+<!--                        </li>-->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 THỂ LOẠI
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Action</a></li>
-                                <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
-                            </ul>
+                            <div class="dropdown-menu p-3 genres-menu" aria-labelledby="navbarDropdown" id="genres-menu">
+                                <ul class="genres-list" id="genres-list">
+                                </ul>
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="/view/favourite" aria-current="page">YÊU THÍCH</a>
@@ -123,6 +123,12 @@
     <div class="truyen-section">
         <h5>Danh sách truyện</h5>
         <div class="truyen-list" id="truyen-list"></div>
+        <div class="pagination-wrapper">
+            <div id="pagination-container"></div>
+            <div id="page-info" class="page-info"></div>
+            <input type="number" id="jump-page" min="1" placeholder="Nhảy đến trang" style="width: 100px; margin-left: 10px;">
+            <button onclick="jumpToPage()">Go</button>
+        </div>
     </div>
 
     <!-- Danh sách truyện mới -->
@@ -133,74 +139,34 @@
     <!-- Thay thế nút hard-code bằng container -->
     <div id="admin-button-container"></div>
 </div>
+<footer id="footer">
+    <div><a class="navbar-brand fw-bold" href="/view/trangchu.html">MANGASVN</a></div>
+    <div class="footer_edit">
+        <div class="left">
+            <p>test 01
+        </p>
+        </div>
+        <div class="right">
+            <button type="button" class="btn btn-primary">Primary</button>
+            <button type="button" class="btn btn-secondary">Secondary</button>
+            <button type="button" class="btn btn-success">Success</button>
+            <button type="button" class="btn btn-danger">Danger</button>
+            <button type="button" class="btn btn-warning">Warning</button>
+            <button type="button" class="btn btn-info">Info</button>
+            <button type="button" class="btn btn-light">Light</button>
+            <button type="button" class="btn btn-dark">Dark</button>
+
+            <button type="button" class="btn btn-link">Link</button>
+        </div>
+    </div>
+
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 <script src="/js/JStrangChu.js"></script>
 <script src="/js/JSSearch.js"></script>
-<script>
-    // Hàm kiểm tra vai trò và hiển thị nút
-    async function checkAdminAccess() {
-        const token = localStorage.getItem("token");
-        const adminButtonContainer = document.getElementById("admin-button-container");
+<script src="/js/JSGenneNavbar.js"></script>
 
-        if (!token) {
-            // Không có token, không hiển thị nút
-            adminButtonContainer.innerHTML = "";
-            return;
-        }
-
-        try {
-            // Gọi API để lấy thông tin người dùng
-            const userInfoResponse = await fetch("http://localhost:8080/api/auth/user-info", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (!userInfoResponse.ok) {
-                throw new Error("Phiên đăng nhập hết hạn hoặc không hợp lệ.");
-            }
-
-            const userInfo = await userInfoResponse.json();
-            const userRole = userInfo.role; // Giả định API trả về { username, role }
-
-            // Chỉ hiển thị nút nếu vai trò là ADMIN hoặc CHUTUT
-            if (userRole === "ADMIN" || userRole === "CHUTUT") {
-                adminButtonContainer.innerHTML = `
-                    <button id="goToAdmin">Truy cập Admin</button>
-                `;
-
-                // Gắn sự kiện cho nút sau khi tạo
-                document.getElementById("goToAdmin").addEventListener("click", async function() {
-                    try {
-                        const response = await fetch("http://localhost:8080/api/admin", {
-                            method: "GET",
-                            headers: { "Authorization": `Bearer ${token}` }
-                        });
-
-                        if (!response.ok) {
-                            throw new Error("❌ Bạn không có quyền truy cập.");
-                        }
-
-                        window.location.href = "http://localhost:8080/api/admin";
-                    } catch (error) {
-                        alert(error.message);
-                    }
-                });
-            } else {
-                // Vai trò không hợp lệ, không hiển thị nút
-                adminButtonContainer.innerHTML = "";
-            }
-        } catch (error) {
-            console.error("Lỗi khi kiểm tra quyền truy cập:", error);
-            adminButtonContainer.innerHTML = ""; // Không hiển thị nút nếu có lỗi
-        }
-    }
-
-    // Gọi hàm khi trang tải
-    document.addEventListener("DOMContentLoaded", checkAdminAccess);
-</script>
 </body>
 </html>

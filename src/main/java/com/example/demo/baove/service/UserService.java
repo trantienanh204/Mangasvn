@@ -1,10 +1,12 @@
 package com.example.demo.baove.service;
 
+import com.example.demo.baove.controller.error.messageError;
 import com.example.demo.baove.entity.Role;
 import com.example.demo.baove.entity.User;
 import com.example.demo.baove.repository.RoleRepository;
 import com.example.demo.baove.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,15 +45,18 @@ public class UserService implements UserDetailsService {
     }
 
     public User registerUser(String userName, String password, String email) {
-        // Kiểm tra trùng userName
+
         if (userRepository.existsByUsername(userName)) {
             throw new IllegalArgumentException("Tên người dùng '" + userName + "' đã tồn tại!");
         }
 
-        // Kiểm tra trùng email
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email '" + email + "' đã được sử dụng!");
         }
+        if (!password.matches("^[a-zA-Z0-9]+$")){
+            throw new IllegalArgumentException("mật khẩu không được phép có ký tự đặc biệt");
+        }
+
 
         User user = new User();
         user.setUsername(userName);
@@ -59,7 +65,8 @@ public class UserService implements UserDetailsService {
         user.setTrangThai(true);
         user.setNgayTao(LocalDate.now());
 
-        Role role = roleRepository.findByRoleName("DOCGIA");
+       // Role role = roleRepository.findByRoleName("DOCGIA");
+        Role role = roleRepository.findById(2);
         if (role == null) {
             throw new RuntimeException("Role not found");
         }
@@ -84,4 +91,5 @@ public class UserService implements UserDetailsService {
         }
         return user;
     }
+
 }

@@ -37,8 +37,6 @@ $(document).ready(function() {
         const isHot = Math.random() > 0.5 ? "Hot" : "";
         const cardId = `${prefix}truyen-${truyen.id}`;
 
-        console.log(`Displaying truyen: ID=${truyen.id}, TenTruyen=${truyen.tenTruyen}, Prefix=${prefix}`);
-
         if (token) {
             $.ajax({
                 url: `${serverHost}/api/truyen/favorite/status/${truyen.id}`,
@@ -138,7 +136,7 @@ $(document).ready(function() {
         },
         error: function(xhr, status, error) {
             $("#hot-truyen-carousel").append('<div class="carousel-item active"><p>Lỗi khi tải truyện hot: ' + error + '</p></div>');
-            console.log("Lỗi API /api/truyen/hot: ", status, error);
+            console.log("Lỗi API truyen hot: ", status, error);
         }
     });
 
@@ -158,30 +156,89 @@ $(document).ready(function() {
         },
         error: function(xhr, status, error) {
             $("#truyen-list-hot").text("Lỗi khi tải danh sách truyen nổi bật: " + error);
-            console.log("Lỗi API /api/truyen/hot: ", status, error);
+            console.log("Lỗi API truyen hot: ", status, error);
         }
     });
 
-    $.ajax({
-        url: `${serverHost}/api/truyen/list`,
-        method: "GET",
-        success: function(data) {
-            const truyenList = $("#truyen-list");
-            if (Array.isArray(data)) {
+    let currentPage = 0;
+    let globalTotalPages = 0;
+
+    function loadTruyen(page = 0) {
+        currentPage = page;
+        const truyenList = $("#truyen-list");
+        truyenList.html('<div class="loading">Đang tải...</div>'); // Nếu có spinner
+
+        $.ajax({
+            url: `${serverHost}/api/truyen/list?page=${page}`,
+            method: "GET",
+            success: function(response) {
                 truyenList.empty();
-                data.forEach(truyen => {
-                    displayTruyen(truyenList, truyen, token, false, 'list-');
-                });
-            } else {
-                truyenList.text("Lỗi dữ liệu danh sách truyện");
+                if (response.content && Array.isArray(response.content)) {
+                    response.content.forEach(truyen => {
+                        displayTruyen(truyenList, truyen, token, false, 'list-');
+                    });
+                    globalTotalPages = response.totalPages; // Lưu totalPages global
+                    renderPagination(response.totalPages, response.number);
+                    window.scrollTo(0, 0);
+                }
+            },
+            error: function() {
+                truyenList.html('<p>Lỗi tải dữ liệu</p>');
             }
-        },
-        error: function(xhr, status, error) {
-            $("#truyen-list").text("Lỗi khi tải danh sách truyện: " + error);
-            console.log("Lỗi API /api/truyen/list: ", status, error);
-        }
-    });
+        });
+    }
 
+    function jumpToPage() {
+        const jumpInput = $("#jump-page").val();
+        if (!jumpInput || isNaN(jumpInput)) {
+            alert("Vui lòng nhập số trang hợp lệ!");
+            return;
+        }
+
+        const page = parseInt(jumpInput) - 1;
+        if (page >= 0 && page < globalTotalPages) {
+            loadTruyen(page);
+            $("#jump-page").val('');
+        } else {
+            alert(`Trang không hợp lệ! (Phải từ 1 đến ${globalTotalPages})`);
+        }
+    }
+
+    window.jumpToPage = jumpToPage;
+    loadTruyen(0);
+    function renderPagination(totalPages, activePage) {
+        const container = $("#pagination-container");
+        const pageInfo = $("#page-info");
+        container.empty();
+        pageInfo.empty();
+
+        if (totalPages <= 1) return;
+
+        pageInfo.text(`Trang ${activePage + 1} / ${totalPages}`);
+        container.append(`<button ${activePage === 0 ? 'disabled' : ''} onclick="loadTruyen(0)">Đầu</button>`);
+        const prevDisabled = activePage === 0 ? "disabled" : "";
+        container.append(`<button ${prevDisabled} onclick="loadTruyen(${activePage - 1})">Trước</button>`);
+        let startPage = Math.max(0, activePage - 2);
+        let endPage = Math.min(totalPages, activePage + 3);
+        if (startPage > 1) {
+            container.append(`<button onclick="loadTruyen(0)">1</button>`);
+            if (startPage > 2) container.append(`<span>...</span>`); // Ellipsis
+        }
+        for (let i = startPage; i < endPage; i++) {
+            const activeClass = i === activePage ? "active" : "";
+            container.append(`<button class="${activeClass}" onclick="loadTruyen(${i})">${i + 1}</button>`);
+        }
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) container.append(`<span>...</span>`); // Ellipsis
+            container.append(`<button onclick="loadTruyen(${totalPages - 1})">${totalPages}</button>`);
+        }
+        const nextDisabled = activePage === totalPages - 1 ? "disabled" : "";
+        container.append(`<button ${nextDisabled} onclick="loadTruyen(${activePage + 1})">Sau</button>`);
+        container.append(`<button ${activePage === totalPages - 1 ? 'disabled' : ''} onclick="loadTruyen(${totalPages - 1})">Cuối</button>`);
+    }
+
+
+    window.loadTruyen = loadTruyen;
     $.ajax({
         url: `${serverHost}/api/truyen/moi`,
         method: "GET",
@@ -243,7 +300,7 @@ $(document).ready(function() {
             success: function(chapters) {
                 const chapterList = $("#chapter-list");
                 chapterList.empty();
-                console.log("Phản hồi API /api/chapters:", chapters);
+
                 if (Array.isArray(chapters) && chapters.length > 0) {
                     chapters.forEach(chapter => {
                         chapterList.append(`
@@ -263,7 +320,6 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 $("#chapter-list").html('<p>Lỗi khi tải danh sách chapter: ' + (xhr.responseText || error) + '</p>');
-                console.log("Lỗi API /api/chapters: ", status, error, xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
                     Toastify({
                         text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!",
@@ -279,64 +335,61 @@ $(document).ready(function() {
         });
     }
 
-    async function checkAdminAccess() {
-        const token = localStorage.getItem("token");
-        const adminButtonContainer = document.getElementById("admin-button-container");
-
-        if (!token) {
-            adminButtonContainer.innerHTML = "";
-            return;
-        }
-
-        try {
-            const userInfoResponse = await fetch(`${serverHost}/api/auth/user-info`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (!userInfoResponse.ok) {
-                throw new Error("Phiên đăng nhập hết hạn hoặc không hợp lệ.");
-            }
-
-            const userInfo = await userInfoResponse.json();
-            const userRole = userInfo.role;
-
-            if (userRole === "ADMIN" || userRole === "CHUTUT") {
-                adminButtonContainer.innerHTML = `
-                    <button id="goToAdmin">Truy cập Admin</button>
-                `;
-
-                document.getElementById("goToAdmin").addEventListener("click", async function() {
-                    try {
-                        const response = await fetch(`${serverHost}/api/admin`, {
-                            method: "GET",
-                            headers: { "Authorization": `Bearer ${token}` }
-                        });
-
-                        if (!response.ok) {
-                            throw new Error("❌ Bạn không có quyền truy cập.");
-                        }
-
-                        window.location.href = `${serverHost}/api/admin`;
-                    } catch (error) {
-                        alert(error.message);
-                    }
-                });
-            } else {
-
-                adminButtonContainer.innerHTML = "";
-            }
-        } catch (error) {
-            console.error("Lỗi khi kiểm tra quyền truy cập:", error);
-            adminButtonContainer.innerHTML = "";
-        }
-    }
-    document.addEventListener("DOMContentLoaded", checkAdminAccess);
-
     window.logout = function() {
         localStorage.removeItem("token");
         window.location.href = "/view/trangchu.html";
     };
 });
+document.addEventListener("DOMContentLoaded", checkAdminAccess);
+async function checkAdminAccess() {
+    const token = localStorage.getItem("token");
+    const adminButtonContainer = document.getElementById("admin-button-container");
+
+    if (!token) {
+        adminButtonContainer.innerHTML = "";
+        return;
+    }
+
+    try {
+        const userInfoResponse = await fetch("http://localhost:8080/api/auth/user-info", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!userInfoResponse.ok) {
+            throw new Error("Phiên đăng nhập hết hạn hoặc không hợp lệ.");
+        }
+
+        const userInfo = await userInfoResponse.json();
+        const userRole = userInfo.role;
+
+        if (userRole === "ADMIN" || userRole === "CHUTUT") {
+            adminButtonContainer.innerHTML = `
+                    <button id="goToAdmin">Truy cập Admin</button>
+                `;
+            document.getElementById("goToAdmin").addEventListener("click", async function() {
+                try {
+                    const response = await fetch("http://localhost:8080/api/admin", {
+                        method: "GET",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("❌ Bạn không có quyền truy cập.");
+                    }
+
+                    window.location.href = "http://localhost:8080/api/admin";
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        } else {
+            adminButtonContainer.innerHTML = "";
+        }
+    } catch (error) {
+        console.error("Lỗi khi kiểm tra quyền truy cập:", error);
+        adminButtonContainer.innerHTML = "";
+    }
+}

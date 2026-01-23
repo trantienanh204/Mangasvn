@@ -1,0 +1,20 @@
+footer {
+    border: 10px solid white;
+}
+.footer_edit {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px;
+    gap: 40px; /* khoảng cách giữa các phần tử */
+    border: 2px solid white; /* border phải có kiểu và màu */
+}
+
+.footer_edit .left p {
+    color: black;
+}
+.right {
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+    gap: 8px;
+}

@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="/css/CSStrangChu.css">
     <link rel="stylesheet" href="/css/CSSread.css">
-
+    <link rel="stylesheet" href="/css/CSSGenneNavbar.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -28,20 +28,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/view/trangchu.html">TRANG CHỦ</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/theloai">TÌM KIẾM</a>
-                    </li>
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link" href="/theloai">TÌM KIẾM</a>-->
+<!--                    </li>-->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             THỂ LOẠI
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
+                        <div class="dropdown-menu p-3 genres-menu" aria-labelledby="navbarDropdown" id="genres-menu">
+                            <ul class="genres-list" id="genres-list">
+                            </ul>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="/view/favourite" aria-current="page">YÊU THÍCH</a>
@@ -123,6 +121,7 @@
 <script src="/js/JStrangChu.js"></script>
 <script src="/js/JSSearch.js"></script>
 <script src="/js/JSread.js"></script>
+<script src="/js/JSGenneNavbar.js"></script>
 <script>
     const toggleReadingModeBtn = document.getElementById('toggle-reading-mode');
     const readingModeDiv = document.getElementById('reading-mode');

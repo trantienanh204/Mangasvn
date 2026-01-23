@@ -25,4 +25,7 @@ public interface comicRepository extends JpaRepository<Comic,Integer> {
     @Query("SELECT DISTINCT c FROM Comic c JOIN c.comicDanhMucs cd WHERE cd.danhMuc.id IN :ids")
     Page<Comic> findByDanhMucIds(@Param("ids") List<Integer> ids, Pageable pageable);
 
+    @Query(value = "SELECT DISTINCT c FROM Comic c")
+    Page<Comic> findAllWithCollections(Pageable pageable);
+
 }

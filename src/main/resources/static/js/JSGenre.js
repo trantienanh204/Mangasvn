@@ -1,22 +1,16 @@
 $(document).ready(function () {
     const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
-
-    // Lấy genre từ URL
     const pathParts = window.location.pathname.split('/');
-    let currentGenre = pathParts[pathParts.length - 1] || $('#genre-select').val() || 'romcom'; // Mặc định là 'romcom'
-    console.log("Genre từ URL: " + currentGenre);
 
-    // Cập nhật và chọn genre-select
+    let currentGenre = pathParts[pathParts.length - 1] || $('#genre-select').val() || 'romcom';
     $('#genre-select').val(currentGenre);
-    console.log("Genre-select được đặt thành: " + $('#genre-select').val());
 
     function loadComics(genre, status = '', sort = '') {
         let url = `${serverHost}/theloai/translate/${genre}`;
         if (status || sort) {
             url += `?status=${status}&sort=${sort}`;
         }
-        console.log("Gọi API: " + url);
-
+        // console.log("url : " + url);
         $.ajax({
             url: url,
             method: "GET",
@@ -24,19 +18,31 @@ $(document).ready(function () {
                 "Content-Type": "application/json"
             },
             success: function (data) {
-                console.log("Dữ liệu nhận được:", data);
                 if (data && data.length > 0) {
-                    $('#theLoai').text(genre.charAt(0).toUpperCase() + genre.slice(1));
+                    $.ajax({
+                        url : `${serverHost}/theloai/search/${genre}`,
+                        method: "GET",
+                        headers: {
+                            "Content_Type": "application/json"
+                        },
+                        success : function (data){
+                            if(data && data.noiDung){
+                                $('#summary_genre').text(data.noiDung);
+                                $('#theLoai').text(data.tenDanhMuc.toUpperCase());
+                            }else {
+                                $('#theLoai').text("Không tìm thấy truyện");
+                                $('#summary_genre').html('<p>lỗi không có danh mục</p>');
+                            }
+                        }
+                    });
+
                     displayComics(data);
-                    console.log("Danh sách truyện đã được hiển thị.");
                 } else {
                     $('#theLoai').text("Không tìm thấy truyện");
                     $('#comic-list').html('<p>Không có truyện nào trong danh mục này.</p>');
-                    console.log("Không có dữ liệu để hiển thị.");
                 }
             },
             error: function (xhr, status, error) {
-                console.log("Lỗi API - Status:", status, "Error:", error, "Response:", xhr.responseText);
                 $('#theLoai').text("Lỗi tải dữ liệu");
                 $('#comic-list').html('<p>Lỗi khi tải truyện, vui lòng thử lại!</p>');
                 Toastify({
@@ -52,14 +58,10 @@ $(document).ready(function () {
 
     function displayComics(comics) {
         const comicList = $('#comic-list');
-        console.log("Bắt đầu hiển thị danh sách, comicList tồn tại:", comicList.length > 0);
         comicList.empty();
-
         if (!comicList.length) {
-            console.error("Phần tử #comic-list không được tìm thấy trong DOM!");
             return;
         }
-
         comics.forEach(comic => {
             const comicCard = `
                 <div class="col-md-4 mb-3">
@@ -71,7 +73,7 @@ $(document).ready(function () {
                         </a>
                         <div class="card-body">
                             <h5 class="card-title">${comic.tenTruyen.substring(0, 40)}${comic.tenTruyen.length > 40 ? '...' : ''}</h5>
-                            <p class="card-text">${comic.moTa.substring(0, 100)}${comic.moTa.length > 100 ? '...' : ''}</p>
+                            <p class="card-text">${comic.moTa.substring(0, 100)}${comic.moTa.length > 60 ? '...' : ''}</p>
                             <p>Lượt xem: ${comic.luotXem}</p>
                             <p>Lượt thích: ${comic.luotThich}</p>
                         </div>
@@ -80,13 +82,10 @@ $(document).ready(function () {
             `;
             comicList.append(comicCard);
         });
-        console.log("Hoàn thành hiển thị danh sách.");
     }
 
-    // Tải dữ liệu ngay khi trang load
     loadComics(currentGenre);
 
-    // Xử lý sự kiện thay đổi bộ lọc
     $('#genre-select, #status-select, #sort-select').on('change', function () {
         const genre = $('#genre-select').val();
         const status = $('#status-select').val();

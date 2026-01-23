@@ -87,7 +87,6 @@ $(document).ready(function() {
                 }
             });
         } else {
-            // Khi chưa đăng nhập: lưu vào localStorage
             let localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]');
             const existingIndex = localHistory.findIndex(item => item.comicId === comicId);
             if (existingIndex !== -1) {
@@ -96,7 +95,7 @@ $(document).ready(function() {
                 localHistory.push({ comicId, tenTruyen, imageComic, lastRead: new Date() });
             }
             localStorage.setItem('localHistory', JSON.stringify(localHistory));
-            console.log("Lưu lịch sử vào localStorage thành công:", localHistory);
+
         }
     }
     // Hàm tải lịch sử
@@ -105,13 +104,11 @@ $(document).ready(function() {
         const isLoggedIn = !!token;
 
         if (isLoggedIn) {
-            // Khi đã đăng nhập: lấy từ server
             $.ajax({
                 url: `${serverHost}/api/history`,
                 method: 'GET',
                 headers: { "Authorization": "Bearer " + token },
                 success: function(history) {
-                    console.log("Tải lịch sử user từ server thành công:", history);
                     callback(history);
                 },
                 error: function(xhr, status, error) {
@@ -135,9 +132,7 @@ $(document).ready(function() {
                 }
             });
         } else {
-            // Khi chưa đăng nhập: lấy từ localStorage
             const localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]');
-            console.log("Tải lịch sử từ localStorage:", localHistory);
             callback(localHistory);
         }
     }
@@ -515,7 +510,6 @@ $(document).ready(function() {
 
     window.logout = function() {
         localStorage.removeItem("token");
-        console.log("Đăng xuất thành công, token đã xóa");
         window.location.href = "/view/trangchu.html";
     }
 

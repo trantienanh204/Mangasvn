@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -421,37 +423,14 @@ public class comicController {
     }
 
     @GetMapping("/list")
-    @Transactional(readOnly = true)
-    public ResponseEntity<List<ComicDTO>> getAllTruyen() {
+    public ResponseEntity<Page<ComicDTO>> getAllTruyen(
+            @RequestParam(defaultValue = "0") int page)
+           {
         try {
-            List<Comic> truyenList = comicRepository.findAll();
-            List<ComicDTO> comicDTOs = truyenList.stream().map(comic -> {
-                ComicDTO dto = new ComicDTO();
-                dto.setId(comic.getId());
-                dto.setTenTruyen(comic.getTenTruyen());
-                dto.setMoTa(comic.getMoTa());
-                dto.setGhiChu(comic.getGhiChu());
-                dto.setImageComic(comic.getImageComic());
-                dto.setLuotXem(comic.getLuotXem());
-                dto.setLuotThich(comic.getLuotThich());
-                dto.setNgayTao(comic.getNgayTao());
-                dto.setNgaySua(comic.getNgaySua());
-                // Lấy danh sách categoryIds
-                List<Integer> categoryIds = comic.getComicDanhMucs().stream()
-                        .map(comicDanhMuc -> comicDanhMuc.getDanhMuc().getId())
-                        .collect(Collectors.toList());
-                dto.setCategoryIds(categoryIds);
-                // Lấy danh sách authorIds
-                List<Integer> authorIds = comic.getComicTacGias().stream()
-                        .map(comicTacGia -> comicTacGia.getTacGia().getId())
-                        .collect(Collectors.toList());
-                dto.setAuthorIds(authorIds);
-                return dto;
-            }).collect(Collectors.toList());
-            return ResponseEntity.ok(comicDTOs);
+            Page<ComicDTO> result = truyenService.fillListAll(page);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            logger.error("Lỗi khi lấy danh sách truyện: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     @GetMapping("/listloc")
