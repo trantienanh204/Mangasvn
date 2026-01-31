@@ -4,7 +4,7 @@ $(document).ready(function() {
     let images = [];
     let displayedCount = 0;
     let currentChapterId = null;
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.32:8080";
     function loadAuthors(resolve) {
         const token = localStorage.getItem("token");
         $.ajax({
@@ -59,7 +59,7 @@ $(document).ready(function() {
         if (isLoggedIn) {
             // Khi đã đăng nhập: lưu lên server
             $.ajax({
-                url: 'http://localhost:8080/api/history',
+                url: `${serverHost}/api/history`,
                 method: 'POST',
                 headers: { "Authorization": "Bearer " + token },
                 data: JSON.stringify({ comicId }),
@@ -153,7 +153,7 @@ $(document).ready(function() {
                 history.forEach(item => {
                     historyContainer.append(`
                         <div class="history-item">
-                            <a href="/read/${item.comicId}">
+                            <a href="${serverHost}/read/${item.comicId}">
                                 <img src="${item.imageComic}" alt="${item.tenTruyen}" style="width: 50px; height: 70px; object-fit: cover; margin-right: 10px;">
                             </a>
                             <span>${item.tenTruyen}</span>
@@ -337,7 +337,7 @@ $(document).ready(function() {
                             ? truyen.categoryIds.map(id => categoriesMap[id] || `ID ${id} không xác định`)
                             : ['Chưa cập nhật'];
                         $('#comic-categories').empty();
-                        categoriesList.forEach(category => $('#comic-categories').append(`<span class="category-item">${category}</span>`));
+                        categoriesList.forEach(category => $('#comic-categories').append(`<span class="category-item"><a href="http://localhost:8080/theloai/${category}">${category}</a></span>`));
 
                         const tenTruyen = truyen.tenTruyen || "Không có tiêu đề";
                         const imageComic = truyen.imageComic || 'https://via.placeholder.com/50x70.png?text=No+Image';
@@ -361,19 +361,16 @@ $(document).ready(function() {
                                 }
                             });
                         }
-
-                        // Hiển thị lịch sử trên trang đọc
+                        
                         loadHistory(function(history) {
                             displayHistory(history, "#guest-history");
                         });
                     },
                     error: function(xhr, status, error) {
                         $("#comic-title").text("Lỗi khi tải thông tin truyện: " + error);
-                        console.log("Lỗi API /api/truyen/{id}: ", { status, error, response: xhr.responseText });
                         if (xhr.status === 401 || xhr.status === 403) {
                             console.log("Token không hợp lệ khi tải truyện, không chuyển hướng ngay");
                             Toastify({ text: "Phiên đăng nhập có vấn đề. Vui lòng thử lại hoặc đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
-                            // Không xóa token ngay, chỉ báo lỗi
                         }
                         saveToHistory(truyenId, "Không có tiêu đề", 'https://via.placeholder.com/50x70.png?text=No+Image');
                     }
@@ -387,9 +384,7 @@ $(document).ready(function() {
     }
     $('#toggle-reading-mode').click(function(e) {
         e.stopPropagation();
-        console.log("Nút Chuyển sang chế độ đọc sách đã được nhấn!");
         if (images.length === 0) {
-            console.log("Không có ảnh trong mảng images!");
             alert('Vui lòng tải chapter trước khi chuyển sang chế độ đọc sách!');
             return;
         }
@@ -402,12 +397,9 @@ $(document).ready(function() {
                     $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
                 })
                 .on('load', function() {
-                    console.log("Ảnh tải thành công:", images[currentImageIndex]);
                     const width = $('#reading-image').width();
                     const height = $('#reading-image').height();
-                    console.log("Kích thước ảnh:", width + "x" + height);
                     if (width <= 0 || height <= 0) {
-                        console.log("Ảnh không hiển thị do kích thước không hợp lệ, thay bằng placeholder");
                         $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
                     }
                 });
@@ -419,7 +411,7 @@ $(document).ready(function() {
     });
 
     window.changePage = function(delta) {
-        console.log("Chuyển trang, delta:", delta);
+
         currentImageIndex += delta;
         if (currentImageIndex < 0) currentImageIndex = 0;
         if (currentImageIndex >= images.length) currentImageIndex = images.length - 1;
@@ -430,12 +422,9 @@ $(document).ready(function() {
                 $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
             })
             .on('load', function() {
-                console.log("Ảnh tải thành công:", images[currentImageIndex]);
                 const width = $('#reading-image').width();
                 const height = $('#reading-image').height();
-                console.log("Kích thước ảnh:", width + "x" + height);
                 if (width <= 0 || height <= 0) {
-                    console.log("Ảnh không hiển thị do kích thước không hợp lệ, thay bằng placeholder");
                     $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
                 }
             });

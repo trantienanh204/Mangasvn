@@ -1,6 +1,8 @@
+const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.32:8080";
 $(document).ready(function () {
+
     $.ajax({
-        url: "http://localhost:8080/theloai/fill/AllGenre",
+        url: `${serverHost}/theloai/fill/AllGenre`,
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -16,10 +18,10 @@ $(document).ready(function () {
     function renderGenres(listGenres) {
         const genresList = document.getElementById('genres-list');
 
-        // Kiểm tra nếu tìm thấy element
+
         if (!genresList) return;
 
-        genresList.innerHTML = ''; // Xóa nội dung cũ
+        genresList.innerHTML = '';
 
         listGenres.forEach(item => {
             const rawName = item.tenDanhMuc;

@@ -1,6 +1,4 @@
-/* ĐÃ RÚT GỌN, XÓA PHẦN CSS LẶP LẠI */
 
-/* Thanh navbar */
 .navbar {
     background-color: #f8f9fa;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -241,7 +239,7 @@
 }
 .close-btn:hover { background: #c0392b; transform: scale(1.1); }
 
-/* Thanh phân trang */
+
 .pagination {
     position: fixed;
     bottom: 40px;
@@ -295,6 +293,10 @@
     font-size: 13px;
     transition: background 0.2s;
     display: inline-block;
+}
+.category-item a{
+    color: #1976d2;
+    text-decoration: none;
 }
 #comic-categories .category-item:hover {
     background: #1976d2;
