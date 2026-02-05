@@ -1,6 +1,6 @@
 document.getElementById("login-form").addEventListener("submit", async function (event) {
     event.preventDefault();
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.32:8080";
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.19:8080";
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 

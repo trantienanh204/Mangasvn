@@ -4,7 +4,7 @@ $(document).ready(function() {
     let images = [];
     let displayedCount = 0;
     let currentChapterId = null;
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.32:8080";
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.19:8080";
     function loadAuthors(resolve) {
         const token = localStorage.getItem("token");
         $.ajax({
@@ -337,7 +337,7 @@ $(document).ready(function() {
                             ? truyen.categoryIds.map(id => categoriesMap[id] || `ID ${id} không xác định`)
                             : ['Chưa cập nhật'];
                         $('#comic-categories').empty();
-                        categoriesList.forEach(category => $('#comic-categories').append(`<span class="category-item"><a href="http://localhost:8080/theloai/${category}">${category}</a></span>`));
+                        categoriesList.forEach(category => $('#comic-categories').append(`<span class="category-item"><a href="${serverHost}/theloai/${category}">${category}</a></span>`));
 
                         const tenTruyen = truyen.tenTruyen || "Không có tiêu đề";
                         const imageComic = truyen.imageComic || 'https://via.placeholder.com/50x70.png?text=No+Image';
@@ -508,4 +508,18 @@ $(document).ready(function() {
             window.clearLocalHistory();
         }
     });
+});
+
+
+const toggleReadingModeBtn = document.getElementById('toggle-reading-mode');
+const readingModeDiv = document.getElementById('reading-mode');
+const closeReadingModeBtn = document.getElementById('close-reading-mode');
+
+    toggleReadingModeBtn.addEventListener('click', () => {
+    readingModeDiv.classList.add('active');
+});
+
+     closeReadingModeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    readingModeDiv.classList.remove('active');
 });

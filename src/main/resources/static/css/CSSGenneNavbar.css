@@ -17,6 +17,9 @@
     max-height: 75vh !important;
     overflow-y: auto !important;
     display: none;
+    z-index: 9999 !important; /* Đảm bảo đè lên mọi thứ */
+    -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+
 }
 
 .genres-menu.show {
@@ -32,7 +35,6 @@
     margin: 0;
     list-style: none;
 }
-
 
 .genres-list a {
     text-decoration: none !important;
@@ -59,4 +61,35 @@
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive cho genres menu */
+/* For large tablets/laptops small (max-width: 992px) */
+@media (max-width: 992px) {
+    .genres-list {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Giảm size items */
+        gap: 10px;
+    }
+    .genres-menu {
+        top: 70px !important; /* Dịch xuống 1 chút so với navbar để ngón tay không chạm nhầm */
+    }
+}
+/* For tablets/mobile large (max-width: 768px) */
+@media (max-width: 768px) {
+    .genres-list {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+}
+
+/* For small mobiles (max-width: 576px) */
+@media (max-width: 576px) {
+    .genres-list {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Nhỏ hơn nữa */
+        gap: 8px;
+    }
+
+    .genres-menu {
+        padding: 15px 3%;
+        max-height: 70vh;
+    }
 }

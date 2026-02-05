@@ -122,20 +122,5 @@
 <script src="/js/JSSearch.js"></script>
 <script src="/js/JSread.js"></script>
 <script src="/js/JSGenneNavbar.js"></script>
-<script>
-    const toggleReadingModeBtn = document.getElementById('toggle-reading-mode');
-    const readingModeDiv = document.getElementById('reading-mode');
-    const closeReadingModeBtn = document.getElementById('close-reading-mode');
-
-    toggleReadingModeBtn.addEventListener('click', () => {
-        readingModeDiv.classList.add('active');
-    });
-
-    closeReadingModeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        readingModeDiv.classList.remove('active');
-    });
-</script>
-
 </body>
 </html>

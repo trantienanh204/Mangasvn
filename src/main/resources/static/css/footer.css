@@ -1,6 +1,7 @@
 footer {
     border: 10px solid white;
 }
+
 .footer_edit {
     display: flex;
     justify-content: space-evenly;
@@ -13,8 +14,47 @@ footer {
 .footer_edit .left p {
     color: black;
 }
+
 .right {
     display: grid;
     grid-template-columns: repeat(5, auto);
     gap: 8px;
+}
+
+/* Responsive cho footer */
+/* For large tablets/laptops small (max-width: 992px) */
+@media (max-width: 992px) {
+    .footer_edit {
+        flex-direction: column; /* Stack footer parts dọc */
+    }
+
+    .right {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* For tablets/mobile large (max-width: 768px) */
+@media (max-width: 768px) {
+    .footer_edit {
+        gap: 20px; /* Giảm gap */
+    }
+
+    .right {
+        grid-template-columns: repeat(3, auto); /* Giảm xuống 3 columns cho footer buttons */
+        gap: 5px;
+    }
+}
+
+/* For small mobiles (max-width: 576px) */
+@media (max-width: 576px) {
+    .footer_edit .right button {
+        width: 100%; /* Full width buttons trong footer */
+        margin: 5px 0;
+    }
+
+    .right {
+        grid-template-columns: repeat(2, auto); /* Giảm xuống 2 columns cho footer buttons */
+    }
 }

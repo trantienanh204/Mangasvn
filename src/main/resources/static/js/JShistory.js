@@ -1,5 +1,6 @@
 
-const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.32:8080";    function logout() {
+const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.19:8080";
+function logout() {
         localStorage.removeItem('token');
         $('#login-link').show();
         $('#logout-link').hide();

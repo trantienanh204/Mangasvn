@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.32:8080";
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.19:8080";
     const pathParts = window.location.pathname.split('/');
 
     let currentGenre = pathParts[pathParts.length - 1] || $('#genre-select').val() || 'romcom';
