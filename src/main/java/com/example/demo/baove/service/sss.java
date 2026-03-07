@@ -22,7 +22,7 @@ public class sss{
 //        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 //
 //        String encodedPassword = passwordEncoder.encode("123456");
-//        System.out.println(encodedPassword); // In ra mật khẩu đã mã hóa
+//        System.out.println(encodedPassword);
 //
 //
 //   }

@@ -173,80 +173,80 @@ $(document).ready(function() {
         }
     });
 
-    window.displayTruyen = function(container, truyen, token, isScrollable = false, prefix = '') {
-        const timeAgo = Math.floor(Math.random() * 10) + 1 + " Phút Trước";
-        const isHot = Math.random() > 0.5 ? "Hot" : "";
-        const cardId = `${prefix}truyen-${truyen.id || truyen.comicId}`;
-
-        console.log(`Displaying truyen: ID=${truyen.id || truyen.comicId}, TenTruyen=${truyen.tenTruyen}, Prefix=${prefix}`);
-
-        if (token) {
-            $.ajax({
-                url: `${serverHost}/api/truyen/favorite/status/${truyen.id || truyen.comicId}`,
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + token
-                },
-                success: function(isFavorited) {
-                    const buttonHtml = isFavorited
-                        ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyen.id || truyen.comicId}">Xóa khỏi yêu thích</button>`
-                        : '';
-                    container.append(`
-                    <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
-                        <div class="card-content">
-                            <div class="image-title-container">
-                                <a href="/read/${truyen.id || truyen.comicId}">
-                                    <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                         alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                         class="card-img">
-                                </a>
-                                <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
-                            </div>
-                            ${buttonHtml ? `<div class="card-actions">${buttonHtml}</div>` : ''} <!-- Tách nút ra -->
-                        </div>
-                        ${isHot ? '<span class="hot-label">Hot</span>' : ''}
-                        <span class="time-label">${timeAgo}</span>
-                    </div>
-                `);
-                },
-                error: function(xhr, status, error) {
-                    console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyen.id || truyen.comicId}: ${status} - ${error}`);
-                    container.append(`
-                    <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
-                        <div class="card-content">
-                            <div class="image-title-container">
-                                <a href="/read/${truyen.id || truyen.comicId}">
-                                    <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                         alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                         class="card-img">
-                                </a>
-                                <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
-                            </div>
-                        </div>
-                        ${isHot ? '<span class="hot-label">Hot</span>' : ''}
-                        <span class="time-label">${timeAgo}</span>
-                    </div>
-                `);
-                }
-            });
-        } else {
-            container.append(`
-            <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
-                <div class="card-content">
-                    <div class="image-title-container">
-                        <a href="/read/${truyen.id || truyen.comicId}">
-                            <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                 alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                 class="card-img">
-                        </a>
-                        <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
-                    </div>
-                </div>
-                ${isHot ? '<span class="hot-label">Hot</span>' : ''}
-                <span class="time-label">${timeAgo}</span>
-            </div>
-        `);
-        }
-    };
+    // window.displayTruyen = function(container, truyen, token, isScrollable = false, prefix = '') {
+    //     const timeAgo = Math.floor(Math.random() * 10) + 1 + " Phút Trước";
+    //     const isHot = Math.random() > 0.5 ? "Hot" : "";
+    //     const cardId = `${prefix}truyen-${truyen.id || truyen.comicId}`;
+    //
+    //     console.log(`Displaying truyen: ID=${truyen.id || truyen.comicId}, TenTruyen=${truyen.tenTruyen}, Prefix=${prefix}`);
+    //
+    //     if (token) {
+    //         $.ajax({
+    //             url: `${serverHost}/api/truyen/favorite/status/${truyen.id || truyen.comicId}`,
+    //             method: "GET",
+    //             headers: {
+    //                 "Authorization": "Bearer " + token
+    //             },
+    //             success: function(isFavorited) {
+    //                 const buttonHtml = isFavorited
+    //                     ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyen.id || truyen.comicId}">Xóa khỏi yêu thích</button>`
+    //                     : '';
+    //                 container.append(`
+    //                 <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
+    //                     <div class="card-content">
+    //                         <div class="image-title-container">
+    //                             <a href="/read/${truyen.id || truyen.comicId}">
+    //                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
+    //                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
+    //                                      class="card-img">
+    //                             </a>
+    //                             <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
+    //                         </div>
+    //                         ${buttonHtml ? `<div class="card-actions">${buttonHtml}</div>` : ''} <!-- Tách nút ra -->
+    //                     </div>
+    //                     ${isHot ? '<span class="hot-label">Hot</span>' : ''}
+    //                     <span class="time-label">${timeAgo}</span>
+    //                 </div>
+    //             `);
+    //             },
+    //             error: function(xhr, status, error) {
+    //                 console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyen.id || truyen.comicId}: ${status} - ${error}`);
+    //                 container.append(`
+    //                 <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
+    //                     <div class="card-content">
+    //                         <div class="image-title-container">
+    //                             <a href="/read/${truyen.id || truyen.comicId}">
+    //                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
+    //                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
+    //                                      class="card-img">
+    //                             </a>
+    //                             <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
+    //                         </div>
+    //                     </div>
+    //                     ${isHot ? '<span class="hot-label">Hot</span>' : ''}
+    //                     <span class="time-label">${timeAgo}</span>
+    //                 </div>
+    //             `);
+    //             }
+    //         });
+    //     } else {
+    //         container.append(`
+    //         <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
+    //             <div class="card-content">
+    //                 <div class="image-title-container">
+    //                     <a href="/read/${truyen.id || truyen.comicId}">
+    //                         <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
+    //                              alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
+    //                              class="card-img">
+    //                     </a>
+    //                     <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
+    //                 </div>
+    //             </div>
+    //             ${isHot ? '<span class="hot-label">Hot</span>' : ''}
+    //             <span class="time-label">${timeAgo}</span>
+    //         </div>
+    //     `);
+    //     }
+    // };
 
 });
