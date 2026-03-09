@@ -1,6 +1,8 @@
 
+
 const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080"; // Hàm logout
     function logout() {
+
         localStorage.removeItem('token');
         $('#login-link').show();
         $('#logout-link').hide();
@@ -97,7 +99,7 @@ const serverHost = window.location.hostname === "localhost" ? "http://localhost:
                 headers: { "Authorization": "Bearer " + token },
                 success: function() {
                     console.log(`Xóa lịch sử truyện ${id} trên server thành công`);
-                    Toastify({ text: "Đã xóa truyện khỏi lịch sử!", duration: 3000, gravity: "top", position: "right", style: { background: "#28a745" } }).showToast();
+                    Toastify({ text: "Đã xóa truyện khỏi lịch sử!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                     loadHistory();
                 },
                 error: function(xhr, status, error) {

@@ -2,6 +2,7 @@
 $(document).ready(function() {
     const token = localStorage.getItem("token");
     const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080";
+
     function toggleFavorite(truyenId, isAdding) {
         if (!token) {
             Toastify({

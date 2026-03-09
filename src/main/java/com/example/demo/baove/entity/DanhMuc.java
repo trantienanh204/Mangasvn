@@ -25,6 +25,9 @@ public class DanhMuc {
     @Column(name = "TRANG_THAI")
     private boolean trangThai;
 
+    @Column(name = "NOI_DUNG")
+    private String noiDung;
+
     @Column(name = "NGAY_TAO")
     private LocalDate ngayTao;
 
