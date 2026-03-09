@@ -4,7 +4,7 @@ $(document).ready(function() {
     let images = [];
     let displayedCount = 0;
     let currentChapterId = null;
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.238.147:8080";
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080";
     function loadAuthors(resolve) {
         const token = localStorage.getItem("token");
         $.ajax({
