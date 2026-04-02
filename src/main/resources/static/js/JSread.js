@@ -155,7 +155,7 @@ $(document).ready(function() {
                 history.forEach(item => {
                     historyContainer.append(`
                         <div class="history-item">
-                            <a href="${serverHost}/read/${item.comicId}">
+                            <a href="${serverHost}/truyen/${item.comicId}">
                                 <img src="${item.imageComic}" alt="${item.tenTruyen}" style="width: 50px; height: 70px; object-fit: cover; margin-right: 10px;">
                             </a>
                             <span>${item.tenTruyen}</span>
@@ -245,7 +245,7 @@ $(document).ready(function() {
                 if (xhr.status === 401 || xhr.status === 403) {
                     console.log("Token không hợp lệ khi tải ảnh, không chuyển hướng ngay");
                     Toastify({ text: "Phiên đăng nhập có vấn đề. Vui lòng thử lại hoặc đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
-                    // Không xóa token ngay, chỉ báo lỗi
+
                 }
             }
         });
@@ -306,7 +306,7 @@ $(document).ready(function() {
         }
     });
 
-    if (window.location.pathname.startsWith("/read")) {
+    if (window.location.pathname.startsWith("/truyen")) {
         const truyenId = window.location.pathname.split("/").pop();
         const token = localStorage.getItem("token");
 

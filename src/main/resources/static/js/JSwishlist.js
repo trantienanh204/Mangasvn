@@ -64,7 +64,7 @@ $(document).ready(function() {
         container.append(html);
     }
     window.loadComicFromHistory = function(comicId) {
-        window.location.href = `/read/${comicId}`;
+        window.location.href = `/truyen/${comicId}`;
     };
     function wishlist() {
         if (!token) {

@@ -164,7 +164,7 @@ $(document).ready(function() {
     $(document).on("click", ".suggestion-item", function() {
         const truyenId = $(this).data("truyen-id");
         if (truyenId) {
-            window.location.href = `/read/${truyenId}`;
+            window.location.href = `/truyen/${truyenId}`;
         }
     });
 
@@ -196,7 +196,7 @@ $(document).ready(function() {
     //                 <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
     //                     <div class="card-content">
     //                         <div class="image-title-container">
-    //                             <a href="/read/${truyen.id || truyen.comicId}">
+    //                             <a href="/truyen/${truyen.id || truyen.comicId}">
     //                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
     //                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
     //                                      class="card-img">
@@ -216,7 +216,7 @@ $(document).ready(function() {
     //                 <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
     //                     <div class="card-content">
     //                         <div class="image-title-container">
-    //                             <a href="/read/${truyen.id || truyen.comicId}">
+    //                             <a href="/truyen/${truyen.id || truyen.comicId}">
     //                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
     //                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
     //                                      class="card-img">
@@ -235,7 +235,7 @@ $(document).ready(function() {
     //         <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
     //             <div class="card-content">
     //                 <div class="image-title-container">
-    //                     <a href="/read/${truyen.id || truyen.comicId}">
+    //                     <a href="/truyen/${truyen.id || truyen.comicId}">
     //                         <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
     //                              alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
     //                              class="card-img">

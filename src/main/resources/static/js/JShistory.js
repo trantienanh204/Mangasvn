@@ -87,7 +87,7 @@ const serverHost = window.location.hostname === "localhost" ? "http://localhost:
     }
 
     window.loadComicFromHistory = function(comicId) {
-    window.location.href = `/read/${comicId}`;
+    window.location.href = `/truyen/${comicId}`;
 };
 
     window.deleteHistoryItem = function(id, isLoggedIn) {

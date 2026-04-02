@@ -53,7 +53,7 @@ $(document).ready(function() {
                     container.append(`
                         <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
                             <div style="position: relative;">
-                                <a href="/read/${truyen.id}">
+                                <a href="/truyen/${truyen.id}">
                                     <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                          alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                          style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
@@ -74,7 +74,7 @@ $(document).ready(function() {
                     container.append(`
                         <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
                             <div style="position: relative;">
-                                <a href="/read/${truyen.id}">
+                                <a href="/truyen/${truyen.id}">
                                     <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                          alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                          style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
@@ -94,7 +94,7 @@ $(document).ready(function() {
             container.append(`
                 <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
                     <div style="position: relative;">
-                        <a href="/read/${truyen.id}">
+                        <a href="/truyen/${truyen.id}">
                             <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                  alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
                                  style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
@@ -126,7 +126,7 @@ $(document).ready(function() {
                                 <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
                                     <h5 class="text-title">${truyen.tenTruyen}</h5>
                                     <p class="text-content">${truyen.moTa || "Không có mô tả"}</p>
-                                    <a href="/read/${truyen.id}" class="btn btn-primary">Đọc ngay</a>
+                                    <a href="/truyen/${truyen.id}" class="btn btn-primary">Đọc ngay</a>
                                 </div>
                             </div>
                         </div>
@@ -290,7 +290,7 @@ $(document).ready(function() {
         }
     };
 
-    if (window.location.pathname.startsWith("/read")) {
+    if (window.location.pathname.startsWith("/truyen")) {
         const truyenId = window.location.pathname.split("/").pop();
 
         $.ajax({

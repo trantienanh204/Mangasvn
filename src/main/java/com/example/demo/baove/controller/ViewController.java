@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class ViewController {
 
-    @GetMapping("/read/{id}")
+    @GetMapping("/truyen/{id}")
     public String readPage(@PathVariable("id") int id) {
         return "read";
     }

@@ -57,7 +57,7 @@ public class GenreService {
         return ResponseEntity.ok(danhSachDTO);
     }
 
-    // rieng
+
 
     public List<DanhMuc> fillAllGenre (){
         return danhMucRepository.findAll();
