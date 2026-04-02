@@ -30,7 +30,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
 
         if (response.ok) {
             localStorage.setItem("token", data.token);
-            window.location.href = "/view/trangchu.html";
+            window.location.href = "/";
         } else {
 
             errorElement.innerText = data.message || "Tài khoản hoặc mật khẩu không chính xác";

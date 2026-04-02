@@ -6,7 +6,7 @@ $(document).ready(function() {
         placeholder: "Chọn tác giả",
         allowClear: true,
         width: '100%',
-        tags: true, // Cho phép thêm tag mới
+        tags: true,
         createTag: function(params) {
             var term = $.trim(params.term);
 
@@ -38,7 +38,7 @@ $(document).ready(function() {
             window.location.href = '/api/auth/login';
             return;
         }
-        // Kiểm tra vai trò để hiển thị menu admin
+
         $.ajax({
             url: "${serverHost}/api/auth/user-info",
             method: "GET",
@@ -95,7 +95,7 @@ $(document).ready(function() {
     function loadAuthors() {
         const token = localStorage.getItem('token');
         $.ajax({
-            url: `${serverHost}/api/truyen/authors`, // Cập nhật endpoint
+            url: `${serverHost}/api/truyen/authors`,
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(authors) {
@@ -150,7 +150,7 @@ $(document).ready(function() {
                 error: function(xhr, status, error) {
                     console.log('Lỗi thêm tác giả:', error);
                     Toastify({ text: 'Lỗi thêm tác giả: ' + (xhr.responseText || error), duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
-                    $('#author-select').val(null).trigger('change'); // Xóa tag nếu thêm thất bại
+                    $('#author-select').val(null).trigger('change');
                 }
             });
         }

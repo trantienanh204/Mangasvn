@@ -1,6 +1,6 @@
-const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080";
-$(document).ready(function () {
 
+$(document).ready(function () {
+    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080";
     $.ajax({
         url: `${serverHost}/theloai/fill/AllGenre`,
         method: "GET",
@@ -36,7 +36,7 @@ $(document).ready(function () {
 
     if (dropdownNavItem) {
         const dropdownMenu = dropdownNavItem.querySelector('.genres-menu');
-        const dropdownToggle = dropdownNavItem.querySelector('a.nav-link'); // Lấy cái nút "Thể loại"
+        const dropdownToggle = dropdownNavItem.querySelector('a.nav-link');
 
         if (dropdownMenu && dropdownToggle) {
 

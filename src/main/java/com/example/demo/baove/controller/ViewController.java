@@ -32,8 +32,11 @@ public class ViewController {
         return "test";
     }
     @GetMapping("/api/admin")
-    //@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CHUTUT')")
     public String noideadminORchututlamviec(){
         return "admin";
+    }
+    @GetMapping("/")
+    public String home() {
+        return "forward:/view/trangchu.html";
     }
 }

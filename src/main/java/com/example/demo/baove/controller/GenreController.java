@@ -34,11 +34,14 @@ public class GenreController {
         }
         return ResponseEntity.ok(danhMuc);
     }
-    @GetMapping("/translate/{genre}")
-    public ResponseEntity<?> listGenre(@PathVariable String genre){
-       return genreService.danhMuccomicsSearch(genre);
-    }
 
+    @GetMapping("/translate/{genre}")
+    public ResponseEntity<?> listGenre(
+            @PathVariable String genre,
+            @RequestParam(name = "page", defaultValue = "1") int pageNO
+    ){
+        return genreService.danhMuccomicsSearch(genre, pageNO);
+    }
     @GetMapping("/fill/AllGenre")
     public List<DanhMuc> fillGenre(){
         return genreService.fillAllGenre();

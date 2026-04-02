@@ -8,16 +8,20 @@ import com.example.demo.baove.repository.ComicDanhMucRepository;
 import com.example.demo.baove.repository.DanhMucRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import java.util.*;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class GenreService {
+    private final int size = 20;
     @Autowired
     DanhMucRepository danhMucRepository;
     @Autowired
@@ -29,20 +33,25 @@ public class GenreService {
         return danhMucRepository.findByTenDanhMuc(genre);
     }
 
-    public ResponseEntity<List<theloaiDTO>> danhMuccomicsSearch(String genre) {
+    public ResponseEntity<?> danhMuccomicsSearch(String genre, int pageNO) {
         DanhMuc danhMuc = danhMucRepository.findByTenDanhMuc(genre);
         if (danhMuc == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        List<ComicDanhMuc> danhSachComic = comicDanhMucRepository.findByDanhMucId(danhMuc.getId());
-        if (danhSachComic == null || danhSachComic.isEmpty()) {
-            return ResponseEntity.ok(List.of());
+        Pageable pageable = PageRequest.of(pageNO - 1, size, Sort.by("id").ascending());
+
+        Page<ComicDanhMuc> pageComic = comicDanhMucRepository.findByDanhMucId(danhMuc.getId(), pageable);
+
+        if (pageComic == null || pageComic.isEmpty()) {
+            Map<String, Object> emptyResponse = new HashMap<>();
+            emptyResponse.put("content", List.of());
+            emptyResponse.put("currentPage", pageNO);
+            emptyResponse.put("totalPages", 0);
+            return ResponseEntity.ok(emptyResponse);
         }
 
-        List<theloaiDTO> danhSachDTO = danhSachComic.stream()
-                .sorted(Comparator.comparing(ComicDanhMuc::getId))
+        List<theloaiDTO> danhSachDTO = pageComic.getContent().stream()
                 .map(comicDanhMuc -> {
                     try {
                         return mapperComicDanhmuc.danhmuc_comicgigidoDto(comicDanhMuc);
@@ -51,12 +60,18 @@ public class GenreService {
                         return null;
                     }
                 })
-                .filter(dto -> dto != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(danhSachDTO);
-    }
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", danhSachDTO);
+        response.put("currentPage", pageNO);
+        response.put("totalPages", pageComic.getTotalPages());
+        response.put("totalElements", pageComic.getTotalElements());
+
+        return ResponseEntity.ok(response);
+    }
 
 
     public List<DanhMuc> fillAllGenre (){
