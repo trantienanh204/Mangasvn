@@ -46,6 +46,9 @@ public class Comic {
  @Column(name = "NGAY_SUA")
  private LocalDate ngaySua;
 
+ @Column(name = "TRANG_THAI")
+ private byte TrangThai;
+
  @ManyToOne
  @JoinColumn(name = "id_translator")
  private User translator;

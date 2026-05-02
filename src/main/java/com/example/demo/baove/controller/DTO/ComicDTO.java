@@ -3,10 +3,17 @@ package com.example.demo.baove.controller.DTO;
 import com.example.demo.baove.entity.User;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ComicDTO {
     private Integer id;
     private String tenTruyen;
@@ -20,7 +27,7 @@ public class ComicDTO {
     private List<Integer> categoryIds;
     private List<Integer> authorIds;
     private User user;
-
+    private byte TrangThai;
 
 
     public void setLuotThich(Integer luotThich) {
@@ -118,4 +125,5 @@ public class ComicDTO {
     public void setAuthorIds(List<Integer> authorIds) {
         this.authorIds = authorIds;
     }
+
 }

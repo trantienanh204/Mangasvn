@@ -18,8 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +51,7 @@ public class comicController {
     private comicService truyenService;
 
     @Autowired
-    private comicRepository comicRepository;
+    private ComicRepository comicRepository;
 
     @Autowired
     private UserService userService;
@@ -437,8 +435,12 @@ public class comicController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<ComicDTO>> getAllTruyendaloc(Principal principal) {
         try {
-            List<Comic> truyenList = comicRepository.findAll();
-            List<ComicDTO> comicDTOs = truyenList.stream().filter(comic -> comic.getTranslator().getUsername().equals(principal.getName())).map(comic -> {
+            List<Comic> truyenList = comicRepository.findAll().stream()
+                    .filter(comic -> comic.getTrangThai() == 1)
+                    .filter(comic -> comic.getTranslator().getUsername().equals(principal.getName()))
+                    .collect(Collectors.toList());
+
+            List<ComicDTO> comicDTOs = truyenList.stream().map(comic -> {
                 ComicDTO dto = new ComicDTO();
                 dto.setId(comic.getId());
                 dto.setTenTruyen(comic.getTenTruyen());
@@ -449,22 +451,25 @@ public class comicController {
                 dto.setLuotThich(comic.getLuotThich());
                 dto.setNgayTao(comic.getNgayTao());
                 dto.setNgaySua(comic.getNgaySua());
+
                 // Lấy danh sách categoryIds
                 List<Integer> categoryIds = comic.getComicDanhMucs().stream()
                         .map(comicDanhMuc -> comicDanhMuc.getDanhMuc().getId())
                         .collect(Collectors.toList());
                 dto.setCategoryIds(categoryIds);
+
                 // Lấy danh sách authorIds
                 List<Integer> authorIds = comic.getComicTacGias().stream()
                         .map(comicTacGia -> comicTacGia.getTacGia().getId())
                         .collect(Collectors.toList());
                 dto.setAuthorIds(authorIds);
+
                 return dto;
             }).collect(Collectors.toList());
+
             return ResponseEntity.ok(comicDTOs);
         } catch (Exception e) {
-            logger.error("Lỗi khi lấy danh sách truyện: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -539,7 +544,7 @@ public class comicController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<ComicDTO>> getHotTruyen() {
         try {
-            List<Comic> hotTruyen = comicRepository.findTop6ByOrderByLuotXemDesc();
+            List<Comic> hotTruyen = comicRepository.findTop6ByOrderByLuotXemDesc().stream().filter(comic -> comic.getTrangThai()==1).toList();
             List<ComicDTO> comicDTOs = hotTruyen.stream().map(comic -> {
                 ComicDTO dto = new ComicDTO();
                 dto.setId(comic.getId());
@@ -573,7 +578,7 @@ public class comicController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<ComicDTO>> getMoiTruyen() {
         try {
-            List<Comic> moiTruyen = comicRepository.findTop5ByOrderByNgayTaoDesc();
+            List<Comic> moiTruyen = comicRepository.findTop5ByOrderByNgayTaoDesc().stream().filter(comic -> comic.getTrangThai()==1).toList();
             List<ComicDTO> comicDTOs = moiTruyen.stream().map(comic -> {
                 ComicDTO dto = new ComicDTO();
                 dto.setId(comic.getId());
@@ -602,6 +607,8 @@ public class comicController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    //!!!
     @GetMapping("/favorite/list")
     public ResponseEntity<List<FavoriteResponse>> getFavoriteList(@RequestHeader("Authorization") String authorizationHeader) {
         try {
@@ -613,7 +620,7 @@ public class comicController {
                 return ResponseEntity.status(404).body(null);
             }
 
-            List<Wishlist> favorites = wishlistRepository.findByUsers(user);
+            List<Wishlist> favorites = wishlistRepository.findByUsers(user).stream().filter(wishlist -> wishlist.getComics().getTrangThai()==1).toList();
             List<FavoriteResponse> response = favorites.stream().map(favorite -> {
                 FavoriteResponse fr = new FavoriteResponse();
                 fr.setComicId((long) favorite.getComics().getId());
@@ -721,7 +728,7 @@ public class comicController {
             Wishlist favorite = wishlistRepository.findByUsersAndComics(user, truyen)
                     .orElseThrow(() -> new RuntimeException("Truyện không có trong danh sách yêu thích!"));
 
-            // Giảm luotThich trước khi xóa
+            // Giảm luotThich  khi xóa
             truyen.setLuotThich(truyen.getLuotThich() > 0 ? truyen.getLuotThich() - 1 : 0);
             comicRepository.save(truyen);
 
@@ -740,7 +747,7 @@ public class comicController {
     public ResponseEntity<List<ComicDTO>> searchComics(@RequestParam("query") String query) {
         try {
             List<Comic> comics = comicRepository.findByTenTruyenContainingIgnoreCase(query);
-            List<ComicDTO> comicDTOs = comics.stream().map(comic -> {
+            List<ComicDTO> comicDTOs = comics.stream().filter(comic -> comic.getTrangThai()==1).map(comic -> {
                 ComicDTO dto = new ComicDTO();
                 dto.setId(comic.getId());
                 dto.setTenTruyen(comic.getTenTruyen());
@@ -796,7 +803,7 @@ public class comicController {
                     .map(comicDanhMuc -> comicDanhMuc.getDanhMuc().getId())
                     .collect(Collectors.toList());
             dto.setCategoryIds(categoryIds);
-            // Lấy danh sách authorIds
+
             List<Integer> authorIds = comic.getComicTacGias().stream()
                     .map(comicTacGia -> comicTacGia.getTacGia().getId())
                     .collect(Collectors.toList());
@@ -805,7 +812,9 @@ public class comicController {
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             logger.error("Lỗi khi lấy truyện với ID {}: {}", id, e.getMessage(), e);
+
             return ResponseEntity.status(404).body(null);
+
         }
     }
 

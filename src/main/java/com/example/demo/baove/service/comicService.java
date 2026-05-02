@@ -2,14 +2,13 @@ package com.example.demo.baove.service;
 
 import com.example.demo.baove.controller.DTO.ComicDTO;
 import com.example.demo.baove.entity.Comic;
-import com.example.demo.baove.repository.comicRepository;
+import com.example.demo.baove.repository.ComicRepository;
 import com.example.demo.baove.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +20,10 @@ import java.util.stream.Collectors;
 @Service
 public class comicService {
     @Autowired
-    private comicRepository comicRepository;
+    private ComicRepository comicRepository;
 
     @Autowired
     private UserRepository userRepository;
-
     private final Integer sizetruyennoibat = 12;
     private final Integer sizedanhsachchuyen = 30;
 

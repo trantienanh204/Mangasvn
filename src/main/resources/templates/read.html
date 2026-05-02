@@ -104,10 +104,26 @@
         <button id="load-all" class="load-more">Hiển thị tất cả</button>
         <button id="load-15" class="load-more">Hiển thị 15 trang nữa</button>
     </div>
+
+
+    <div class="chat mt-5 border p-3 rounded">
+        <h4>Bình luận</h4>
+        <div id="comment-list" class="mb-3" style="max-height: 400px; overflow-y: auto;">
+        </div>
+        <div class="input-group">
+            <input type="text" id="comment-input" class="form-control" placeholder="Nhập bình luận của bạn...">
+            <button class="btn btn-primary" id="btn-submit-comment">Gửi</button>
+        </div>
+    </div>
+</div>
+
 </div>
 
 <!-- Chế độ đọc sách -->
 <div class="reading-mode" id="reading-mode">
+    <div id="reading-progress-container">
+        <div id="reading-progress-bar"></div>
+    </div>
     <button class="close-btn" id="close-reading-mode">×</button>
     <img class="reading-image" id="reading-image" src="" alt="Trang truyện">
     <div class="pagination" id="pagination"></div>

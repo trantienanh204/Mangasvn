@@ -379,3 +379,43 @@
     height: auto;
     margin: 0 auto;
 }
+
+#reading-progress-container {
+    position: fixed;
+    top: 0; /* Đổi thành 'bottom: 0' nếu bạn muốn thanh này nằm ở dưới cùng */
+    left: 0;
+    width: 100%;
+    height: 4px; /* Chiều cao mỏng, tinh tế */
+    background-color: rgba(0, 0, 0, 0.3); /* Nền xám mờ */
+    z-index: 9999; /* Đảm bảo nó luôn nằm trên cùng */
+    display: none; /* Ẩn đi khi chưa vào chế độ đọc */
+}
+
+#reading-progress-bar {
+    height: 100%;
+    width: 0%; /* Ban đầu là 0% */
+    background-color: #ff4444; /* Màu đỏ nổi bật, bạn có thể đổi theo tone màu web của bạn */
+    transition: width 0.3s ease-out; /* Hiệu ứng chạy mượt mà khi chuyển trang */
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+/* Hiển thị thanh tiến trình khi #reading-mode có class active */
+#reading-mode.active ~ #reading-progress-container,
+#reading-mode.active #reading-progress-container {
+    display: block;
+}
+.modern-page-counter {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    backdrop-filter: blur(5px); /* Làm mờ phông nền phía sau giống iOS */
+    z-index: 9999;
+    pointer-events: none; /* Không cản trở click chuột vào truyện */
+}

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface comicRepository extends JpaRepository<Comic,Integer> {
+public interface ComicRepository extends JpaRepository<Comic,Integer> {
     List<Comic> findTop5ByOrderByNgayTaoDesc();
     List<Comic> findTop6ByOrderByLuotXemDesc();
     List<Comic> findByTenTruyenContainingIgnoreCase(String tenTruyen);
@@ -25,7 +25,7 @@ public interface comicRepository extends JpaRepository<Comic,Integer> {
     @Query("SELECT DISTINCT c FROM Comic c JOIN c.comicDanhMucs cd WHERE cd.danhMuc.id IN :ids")
     Page<Comic> findByDanhMucIds(@Param("ids") List<Integer> ids, Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT c FROM Comic c")
+    @Query(value = "SELECT DISTINCT c FROM Comic c where c.TrangThai = 1")
     Page<Comic> findAllWithCollections(Pageable pageable);
 
 }

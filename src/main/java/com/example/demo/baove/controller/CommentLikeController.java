@@ -1,4 +1,4 @@
 package com.example.demo.baove.controller;
 
-public class QuanLyMangasvn {
+public class CommentLikeController {
 }

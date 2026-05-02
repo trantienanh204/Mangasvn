@@ -34,6 +34,7 @@ public class ImageController {
                 .getResultList();
 
         List<ImageDTO> imageDTOs = images.stream()
+                .filter(imageChapter -> imageChapter.getChapter().getComic().getTrangThai()==1)
                 .map(img -> new ImageDTO(img.getImageUrl(), img.getPageNumber()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(imageDTOs);

@@ -39,4 +39,5 @@ public class ViewController {
     public String home() {
         return "forward:/view/trangchu.html";
     }
+
 }

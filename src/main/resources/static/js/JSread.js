@@ -249,6 +249,7 @@ $(document).ready(function() {
                 }
             }
         });
+        window.loadComments(chapterId);
     };
 
     $('#load-all').click(function() {
@@ -367,12 +368,18 @@ $(document).ready(function() {
                         loadHistory(function(history) {
                             displayHistory(history, "#guest-history");
                         });
+                        window.loadComments(truyenId);
+                        window.loadComments(null);
                     },
                     error: function(xhr, status, error) {
                         $("#comic-title").text("Lỗi khi tải thông tin truyện: " + error);
-                        if (xhr.status === 401 || xhr.status === 403) {
-                            console.log("Token không hợp lệ khi tải truyện, không chuyển hướng ngay");
-                            Toastify({ text: "Phiên đăng nhập có vấn đề. Vui lòng thử lại hoặc đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+                        if (xhr.status === 401 || xhr.status === 403 || xhr.status === 404 ) {
+                         //   tạm thời
+                            window.location.href="/"
+                         //    console.log("Token không hợp lệ khi tải truyện, không chuyển hướng ngay check point");
+
+                         //
+                         //    Toastify({ text: "Phiên đăng nhập có vấn đề. Vui lòng thử lại hoặc đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                         }
                         saveToHistory(truyenId, "Không có tiêu đề", 'https://via.placeholder.com/50x70.png?text=No+Image');
                     }
@@ -385,34 +392,63 @@ $(document).ready(function() {
             });
     }
     $('#toggle-reading-mode').click(function(e) {
+        // Ngăn chặn hành vi mặc định
+        e.preventDefault();
         e.stopPropagation();
-        if (images.length === 0) {
+
+        const hasValidImages = images && images.length > 0 && images.some(img => img && img.trim() !== '');
+
+        if (!hasValidImages) {
             alert('Vui lòng tải chapter trước khi chuyển sang chế độ đọc sách!');
+
+            $('#reading-mode').removeClass('active').hide();
+
             return;
         }
-        if (images.length > 0) {
-            currentImageIndex = 0;
-            $('#reading-image')
-                .attr('src', images[currentImageIndex])
-                .on('error', function() {
-                    console.log("Lỗi tải ảnh:", images[currentImageIndex]);
-                    $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
-                })
-                .on('load', function() {
-                    const width = $('#reading-image').width();
-                    const height = $('#reading-image').height();
-                    if (width <= 0 || height <= 0) {
-                        $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
-                    }
-                });
-            $('#reading-mode').addClass('active');
+
+
+        currentImageIndex = 0;
+
+        $('#reading-mode').show();
+
+        $('#reading-image')
+            .attr('src', images[currentImageIndex])
+            .css({
+                'max-width': '100%',
+                'max-height': '100vh',
+                'object-fit': 'contain',
+                'display': 'block',
+                'margin': '0 auto'
+            })
+            .off('error').on('error', function() {
+            console.log("Lỗi tải ảnh:", images[currentImageIndex]);
+            $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+        })
+            .off('load').on('load', function() {
+            const width = this.naturalWidth;
+            const height = this.naturalHeight;
+            if (width <= 0 || height <= 0) {
+                $(this).attr('src', 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+            }
+        });
+
+        $('#reading-mode').addClass('active').css({
+            'position': 'fixed',
+            'top': 0,
+            'left': 0,
+            'width': '100vw',
+            'height': '100vh',
+            'overflow': 'hidden',
+            'background-color': 'rgba(0,0,0,0.9)',
+            'z-index': 9999
+        });
+        if (typeof updatePagination === "function") {
             updatePagination();
-        } else {
-            console.log("Không có ảnh nào được tải vào mảng images!");
         }
     });
 
     window.changePage = function(delta) {
+
 
         currentImageIndex += delta;
         if (currentImageIndex < 0) currentImageIndex = 0;
@@ -435,15 +471,11 @@ $(document).ready(function() {
     };
 
     function updatePagination() {
-        const pagination = $('#pagination');
-        pagination.empty();
-        for (let i = 0; i < images.length; i++) {
-            pagination.append(`<button class="page-btn${i === currentImageIndex ? ' active' : ''}" data-page="${i}">${i + 1}</button>`);
-        }
-        const activeBtn = pagination.find('.active');
-        if (activeBtn.length) {
-            pagination.scrollLeft(activeBtn.position().left - pagination.width() / 2 + activeBtn.width() / 2);
-        }
+
+        if (!images || images.length === 0) return;
+        const progressPercentage = ((currentImageIndex + 1) / images.length) * 100;
+
+        $('#reading-progress-bar').css('width', progressPercentage + '%');
     }
 
     $(document).on('click', '.page-btn', function() {
@@ -503,6 +535,231 @@ $(document).ready(function() {
         localStorage.removeItem("token");
         window.location.href = "/view/trangchu.html";
     }
+//
+
+    window.loadComments = function(chapterId) {
+        const comicId = window.location.pathname.split("/").pop();
+        const apiUrl = chapterId
+            ? `${serverHost}/api/comments/chapter/${chapterId}`
+            : `${serverHost}/api/comments/comic/${comicId}`;
+
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            success: function(data) {
+                const commentListDiv = $('#comment-list');
+                commentListDiv.empty();
+
+                if (data.length === 0) {
+                    const msg = chapterId ? 'Chưa có bình luận nào cho chapter này.' : 'Chưa có bình luận chung cho truyện này.';
+                    commentListDiv.append(`<p class="text-muted">${msg}</p>`);
+                    return;
+                }
+
+                // Hàm con để render HTML của 1 comment (dùng chung cho cả cha và con)
+                function buildCommentHtml(cmt, isReply = false) {
+                    const userName = (cmt.users && cmt.users.username) ? cmt.users.username : 'Ẩn danh';
+                    const displayLike = (cmt.like && cmt.like > 0) ? cmt.like : '';
+                    const marginClass = isReply ? 'ms-5 border-start ps-3 mt-2' : 'mb-3 border-bottom pb-2';
+                    // Bình luận con sẽ lùi vào (ms-5), có viền trái (border-start)
+
+                    return `
+                        <div class="comment-item ${marginClass}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>${userName}</strong> 
+                                <small class="text-muted" style="font-size: 0.8rem;">${cmt.ngayTao}</small>
+                            </div>
+                            <p class="mb-1 mt-1">${cmt.comment}</p>
+                            <div class="comment-actions mt-1" style="font-size: 0.85rem; user-select: none;">
+                                <span class="btn-like-comment text-muted" data-comment-id="${cmt.id}" style="cursor: pointer; font-weight: 600;">
+                                    Thích <span class="like-count ms-1">${displayLike}</span>
+                                </span>
+                                <!-- Chỉ hiện nút Phản hồi ở bình luận cha (tránh trả lời phân tầng quá sâu) -->
+                                ${!isReply ? `<span class="btn-reply-comment text-muted ms-3" data-comment-id="${cmt.id}" style="cursor: pointer; font-weight: 600;">Phản hồi</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+
+                data.forEach(comment => {
+                    commentListDiv.append(buildCommentHtml(comment, false));
+
+                    if (comment.replies && comment.replies.length > 0) {
+                        comment.replies.forEach(reply => {
+                            commentListDiv.append(buildCommentHtml(reply, true));
+                        });
+                    }
+                });
+            },
+            error: function(xhr) {
+                $('#comment-list').html('<p class="text-danger">Không thể tải bình luận lúc này.</p>');
+            }
+        });
+    };
+
+    $(document).on('click', '.btn-reply-comment', function() {
+        $('.reply-box').remove();
+
+        const commentId = $(this).data('comment-id');
+        const replyHtml = `
+            <div class="reply-box mt-2 ms-4">
+                <div class="input-group input-group-sm w-75">
+                    <input type="text" class="form-control reply-input" placeholder="Viết phản hồi...">
+                    <button class="btn btn-secondary btn-submit-reply" data-parent-id="${commentId}">Gửi</button>
+                    <button class="btn btn-outline-danger btn-cancel-reply">Hủy</button>
+                </div>
+            </div>
+        `;
+        $(this).closest('.comment-item').append(replyHtml);
+    });
+
+
+    $(document).on('click', '.btn-cancel-reply', function() {
+        $(this).closest('.reply-box').remove();
+    });
+
+    $(document).on('click', '.btn-submit-reply', function() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            Toastify({ text: "Bạn cần đăng nhập để phản hồi!", duration: 3000, style: { background: "#ff4444" } }).showToast();
+            return;
+        }
+
+        const btn = $(this);
+        const parentId = btn.data('parent-id');
+        const inputField = btn.siblings('.reply-input');
+        const content = inputField.val().trim();
+        const comicId = window.location.pathname.split("/").pop();
+        const activeChapterId = $('#chapter-title').data('current-chapter-id') || null;
+
+        if (!content) return;
+
+        const payload = {
+            comicId: parseInt(comicId),
+            chapterId: activeChapterId,
+            parentId: parentId,
+            content: content
+        };
+
+        $.ajax({
+            url: `${serverHost}/api/comments/add`,
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(payload),
+            success: function() {
+                window.loadComments(activeChapterId); // Load lại danh sách
+                Toastify({ text: "Phản hồi thành công!", duration: 3000, style: { background: "#4caf50" } }).showToast();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi gửi phản hồi!", duration: 3000, style: { background: "#ff4444" } }).showToast();
+            }
+        });
+    });
+
+    $(document).on("click", "#chapter-list button", function(e) {
+        e.stopPropagation();
+        const chapterId = $(this).data("chapter-id");
+        const chapterTitle = $(this).text();
+
+        if (chapterId !== currentChapterId) {
+            $("#chapter-title").text(chapterTitle).data("current-chapter-id", chapterId);
+            currentChapterId = chapterId;
+            window.loadChapterImages(chapterId);
+
+
+            window.loadComments(chapterId);
+        } else {
+            console.log("Chapter này đã được tải, không gọi lại loadChapterImages.");
+        }
+    });
+
+    $(document).on('click', '#btn-submit-comment', function() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            Toastify({ text: "Bạn cần đăng nhập để bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+            return;
+        }
+
+        const inputField = $('#comment-input');
+        const content = inputField.val().trim();
+        const comicId = window.location.pathname.split("/").pop();
+
+        if (!content) {
+            Toastify({ text: "Vui lòng nhập nội dung bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ffc107" } }).showToast();
+            return;
+        }
+
+        const activeChapterId = $('#chapter-title').data('current-chapter-id') || null;
+
+        const payload = {
+            comicId: parseInt(comicId),
+            chapterId: activeChapterId,
+            content: content
+        };
+
+        $.ajax({
+            url: `${serverHost}/api/comments/add`,
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(payload),
+            success: function() {
+                inputField.val('');
+                window.loadComments(activeChapterId);
+                Toastify({ text: "Gửi bình luận thành công!", duration: 3000, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+            },
+            error: function(xhr) {
+                console.log('Lỗi gửi bình luận:', xhr);
+                Toastify({ text: "Lỗi khi gửi bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+            }
+        });
+    });
+
+
+    $(document).on('click', '.btn-like-comment', function() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            Toastify({ text: "Bạn cần đăng nhập để thích bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ffc107" } }).showToast();
+            return;
+        }
+
+        const btn = $(this);
+        const commentId = btn.data('comment-id');
+        const countSpan = btn.find('.like-count');
+        let currentCount = parseInt(countSpan.text()) || 0;
+
+        $.ajax({
+            url: `${serverHost}/api/comments/${commentId}/like`,
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            success: function(response) {
+                if (response === "LIKED") {
+                    countSpan.text(currentCount + 1);
+                    btn.removeClass('text-muted').addClass('text-primary');
+                } else {
+                    const newCount = currentCount - 1;
+                    countSpan.text(newCount > 0 ? newCount : '');
+                    btn.removeClass('text-primary').addClass('text-muted');
+                }
+            },
+            error: function(xhr) {
+                console.log('Lỗi gửi like:', xhr);
+                Toastify({ text: "Có lỗi xảy ra khi xử lý like!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+            }
+        });
+    });
+
+
 
 
     $(document).on("click", "#clear-history", function() {

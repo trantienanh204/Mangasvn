@@ -1,7 +1,6 @@
 package com.example.demo.baove.controller;
 
 import com.example.demo.baove.entity.Comic;
-import com.example.demo.baove.repository.comicRepository;
 import com.example.demo.baove.service.comicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
