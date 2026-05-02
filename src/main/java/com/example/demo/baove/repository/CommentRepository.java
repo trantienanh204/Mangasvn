@@ -11,6 +11,8 @@ public interface CommentRepository extends JpaRepository<Comment,Integer> {
     List<Comment> findByChapters_IdOrderByNgayTaoDesc(int chapterId);
     List<Comment> findByComics_IdAndChaptersIsNullOrderByNgayTaoDesc(int comicId);
 
+
     List<Comment> findByChapters_IdAndParentCommentIsNullOrderByNgayTaoDesc(int chapterId);
+
     List<Comment> findByComics_IdAndChaptersIsNullAndParentCommentIsNullOrderByNgayTaoDesc(int comicId);
 }

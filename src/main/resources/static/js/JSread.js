@@ -297,13 +297,14 @@ $(document).ready(function() {
         e.stopPropagation();
         const chapterId = $(this).data("chapter-id");
         const chapterTitle = $(this).text();
+        if (chapterId !== window.ACTIVE_CHAPTER_ID) {
+            $("#chapter-title").text(chapterTitle);
+            window.ACTIVE_CHAPTER_ID = chapterId;
 
-        if (chapterId !== currentChapterId) {
-            $("#chapter-title").text(chapterTitle).data("current-chapter-id", chapterId);
-            currentChapterId = chapterId;
             window.loadChapterImages(chapterId);
+            window.loadComments(chapterId);
         } else {
-            console.log("Chapter này đã được tải, không gọi lại loadChapterImages.");
+            console.log("Chapter này đã được tải.");
         }
     });
 
@@ -598,131 +599,7 @@ $(document).ready(function() {
         });
     };
 
-    $(document).on('click', '.btn-reply-comment', function() {
-        $('.reply-box').remove();
-
-        const commentId = $(this).data('comment-id');
-        const replyHtml = `
-            <div class="reply-box mt-2 ms-4">
-                <div class="input-group input-group-sm w-75">
-                    <input type="text" class="form-control reply-input" placeholder="Viết phản hồi...">
-                    <button class="btn btn-secondary btn-submit-reply" data-parent-id="${commentId}">Gửi</button>
-                    <button class="btn btn-outline-danger btn-cancel-reply">Hủy</button>
-                </div>
-            </div>
-        `;
-        $(this).closest('.comment-item').append(replyHtml);
-    });
-
-
-    $(document).on('click', '.btn-cancel-reply', function() {
-        $(this).closest('.reply-box').remove();
-    });
-
-    $(document).on('click', '.btn-submit-reply', function() {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            Toastify({ text: "Bạn cần đăng nhập để phản hồi!", duration: 3000, style: { background: "#ff4444" } }).showToast();
-            return;
-        }
-
-        const btn = $(this);
-        const parentId = btn.data('parent-id');
-        const inputField = btn.siblings('.reply-input');
-        const content = inputField.val().trim();
-        const comicId = window.location.pathname.split("/").pop();
-        const activeChapterId = $('#chapter-title').data('current-chapter-id') || null;
-
-        if (!content) return;
-
-        const payload = {
-            comicId: parseInt(comicId),
-            chapterId: activeChapterId,
-            parentId: parentId,
-            content: content
-        };
-
-        $.ajax({
-            url: `${serverHost}/api/comments/add`,
-            method: 'POST',
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            },
-            data: JSON.stringify(payload),
-            success: function() {
-                window.loadComments(activeChapterId); // Load lại danh sách
-                Toastify({ text: "Phản hồi thành công!", duration: 3000, style: { background: "#4caf50" } }).showToast();
-            },
-            error: function(xhr) {
-                Toastify({ text: "Lỗi gửi phản hồi!", duration: 3000, style: { background: "#ff4444" } }).showToast();
-            }
-        });
-    });
-
-    $(document).on("click", "#chapter-list button", function(e) {
-        e.stopPropagation();
-        const chapterId = $(this).data("chapter-id");
-        const chapterTitle = $(this).text();
-
-        if (chapterId !== currentChapterId) {
-            $("#chapter-title").text(chapterTitle).data("current-chapter-id", chapterId);
-            currentChapterId = chapterId;
-            window.loadChapterImages(chapterId);
-
-
-            window.loadComments(chapterId);
-        } else {
-            console.log("Chapter này đã được tải, không gọi lại loadChapterImages.");
-        }
-    });
-
-    $(document).on('click', '#btn-submit-comment', function() {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            Toastify({ text: "Bạn cần đăng nhập để bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
-            return;
-        }
-
-        const inputField = $('#comment-input');
-        const content = inputField.val().trim();
-        const comicId = window.location.pathname.split("/").pop();
-
-        if (!content) {
-            Toastify({ text: "Vui lòng nhập nội dung bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ffc107" } }).showToast();
-            return;
-        }
-
-        const activeChapterId = $('#chapter-title').data('current-chapter-id') || null;
-
-        const payload = {
-            comicId: parseInt(comicId),
-            chapterId: activeChapterId,
-            content: content
-        };
-
-        $.ajax({
-            url: `${serverHost}/api/comments/add`,
-            method: 'POST',
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            },
-            data: JSON.stringify(payload),
-            success: function() {
-                inputField.val('');
-                window.loadComments(activeChapterId);
-                Toastify({ text: "Gửi bình luận thành công!", duration: 3000, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
-            },
-            error: function(xhr) {
-                console.log('Lỗi gửi bình luận:', xhr);
-                Toastify({ text: "Lỗi khi gửi bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
-            }
-        });
-    });
-
-
+   
     $(document).on('click', '.btn-like-comment', function() {
         const token = localStorage.getItem("token");
 
@@ -759,8 +636,111 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.btn-reply-comment', function() {
+        $('.reply-box').remove();
+
+        const commentId = $(this).data('comment-id');
+        const replyHtml = `
+            <div class="reply-box mt-2 ms-4">
+                <div class="input-group input-group-sm w-75">
+                    <input type="text" class="form-control reply-input" placeholder="Viết phản hồi...">
+                    <button class="btn btn-secondary btn-submit-reply" data-parent-id="${commentId}">Gửi</button>
+                    <button class="btn btn-outline-danger btn-cancel-reply">Hủy</button>
+                </div>
+            </div>
+        `;
+        $(this).closest('.comment-item').append(replyHtml);
+    });
 
 
+    $(document).on('click', '.btn-cancel-reply', function() {
+        $(this).closest('.reply-box').remove();
+    });
+
+    $(document).on('click', '.btn-submit-reply', function() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            Toastify({ text: "Bạn cần đăng nhập để phản hồi!", duration: 3000, style: { background: "#ff4444" } }).showToast();
+            return;
+        }
+
+        const btn = $(this);
+        const parentId = btn.data('parent-id');
+        const inputField = btn.siblings('.reply-input');
+        const content = inputField.val().trim();
+        const comicId = window.location.pathname.split("/").pop();
+
+        if (!content) return;
+
+        const payload = {
+            comicId: parseInt(comicId),
+            // 🔥 LẤY TỪ WINDOW RA DÙNG
+            chapterId: window.ACTIVE_CHAPTER_ID || null,
+            parentId: parentId,
+            content: content
+        };
+
+        $.ajax({
+            url: `${serverHost}/api/comments/add`,
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(payload),
+            success: function() {
+                window.loadComments(window.ACTIVE_CHAPTER_ID || null);
+                Toastify({ text: "Phản hồi thành công!", duration: 3000, style: { background: "#4caf50" } }).showToast();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi gửi phản hồi!", duration: 3000, style: { background: "#ff4444" } }).showToast();
+            }
+        });
+    });
+
+
+    $(document).on('click', '#btn-submit-comment', function() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            Toastify({ text: "Bạn cần đăng nhập để bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+            return;
+        }
+
+        const inputField = $('#comment-input');
+        const content = inputField.val().trim();
+        const comicId = window.location.pathname.split("/").pop();
+
+        if (!content) {
+            Toastify({ text: "Vui lòng nhập nội dung!", duration: 3000, gravity: "top", position: "right", style: { background: "#ffc107" } }).showToast();
+            return;
+        }
+
+        const payload = {
+            comicId: parseInt(comicId),
+            // 🔥 LẤY TỪ WINDOW RA DÙNG (Nếu không có chap nào thì tự hiểu là null)
+            chapterId: window.ACTIVE_CHAPTER_ID || null,
+            content: content
+        };
+
+        $.ajax({
+            url: `${serverHost}/api/comments/add`,
+            method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify(payload),
+            success: function() {
+                inputField.val('');
+                window.loadComments(window.ACTIVE_CHAPTER_ID || null);
+                Toastify({ text: "Gửi bình luận thành công!", duration: 3000, gravity: "top", position: "right", style: { background: "#4caf50" } }).showToast();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi khi gửi bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+            }
+        });
+    });
 
     $(document).on("click", "#clear-history", function() {
         if (!localStorage.getItem("token")) {

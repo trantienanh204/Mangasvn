@@ -29,7 +29,7 @@ public class CommentController {
 
     @GetMapping("/chapter/{chapterId}")
     public ResponseEntity<List<Comment>> getCommentsByChapter(@PathVariable int chapterId) {
-        return ResponseEntity.ok(commentRepository.findByChapters_IdOrderByNgayTaoDesc(chapterId));
+        return ResponseEntity.ok(commentRepository.findByChapters_IdAndParentCommentIsNullOrderByNgayTaoDesc(chapterId));
     }
 
     @PostMapping("/add")
@@ -39,12 +39,13 @@ public class CommentController {
             return ResponseEntity.status(401).body("Chưa xác thực Token");
         }
         String username = principal.getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username); // Nhớ bắt Optional nếu có
         Comic comic = comicRepository.findById(request.getComicId()).orElse(null);
 
         if (user == null || comic == null) {
             return ResponseEntity.badRequest().body("Người dùng hoặc truyện không tồn tại");
         }
+
         Comment comment = new Comment();
         comment.setUsers(user);
         comment.setComics(comic);
@@ -53,6 +54,11 @@ public class CommentController {
         comment.setTrangThai(1);
         comment.setNgayTao(LocalDate.now());
 
+        if (request.getChapterId() != null && request.getChapterId() > 0) {
+            Chapter chapter = chapterRepository.findById(request.getChapterId()).orElse(null);
+            comment.setChapters(chapter);
+        }
+
         if (request.getParentId() != null && request.getParentId() > 0) {
             Comment parent = commentRepository.findById(request.getParentId()).orElse(null);
             comment.setParentComment(parent);
@@ -60,12 +66,11 @@ public class CommentController {
 
         Comment savedComment = commentRepository.save(comment);
         return ResponseEntity.ok(savedComment);
-
-
     }
     @GetMapping("/comic/{comicId}")
     public ResponseEntity<List<Comment>> getCommentsByComic(@PathVariable int comicId) {
-        return ResponseEntity.ok(commentRepository.findByComics_IdAndChaptersIsNullOrderByNgayTaoDesc(comicId));
+
+        return ResponseEntity.ok(commentRepository.findByComics_IdAndChaptersIsNullAndParentCommentIsNullOrderByNgayTaoDesc(comicId));
     }
     @PostMapping("/{commentId}/like")
     public ResponseEntity<?> toggleLikeComment(@PathVariable int commentId, Principal principal) {
@@ -102,4 +107,6 @@ public class CommentController {
             return ResponseEntity.ok("LIKED");
         }
     }
+
+
 }
