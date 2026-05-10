@@ -375,7 +375,7 @@ $(document).ready(function() {
                     error: function(xhr, status, error) {
                         $("#comic-title").text("Lỗi khi tải thông tin truyện: " + error);
                         if (xhr.status === 401 || xhr.status === 403 || xhr.status === 404 ) {
-                         //   tạm thời
+
                             window.location.href="/"
                          //    console.log("Token không hợp lệ khi tải truyện, không chuyển hướng ngay check point");
 
@@ -534,7 +534,7 @@ $(document).ready(function() {
 
     window.logout = function() {
         localStorage.removeItem("token");
-        window.location.href = "/view/trangchu.html";
+        window.location.href = "/";
     }
 //
 
@@ -557,12 +557,11 @@ $(document).ready(function() {
                     return;
                 }
 
-                // Hàm con để render HTML của 1 comment (dùng chung cho cả cha và con)
+
                 function buildCommentHtml(cmt, isReply = false) {
                     const userName = (cmt.users && cmt.users.username) ? cmt.users.username : 'Ẩn danh';
                     const displayLike = (cmt.like && cmt.like > 0) ? cmt.like : '';
                     const marginClass = isReply ? 'ms-5 border-start ps-3 mt-2' : 'mb-3 border-bottom pb-2';
-                    // Bình luận con sẽ lùi vào (ms-5), có viền trái (border-start)
 
                     return `
                         <div class="comment-item ${marginClass}">
@@ -575,7 +574,7 @@ $(document).ready(function() {
                                 <span class="btn-like-comment text-muted" data-comment-id="${cmt.id}" style="cursor: pointer; font-weight: 600;">
                                     Thích <span class="like-count ms-1">${displayLike}</span>
                                 </span>
-                                <!-- Chỉ hiện nút Phản hồi ở bình luận cha (tránh trả lời phân tầng quá sâu) -->
+                               
                                 ${!isReply ? `<span class="btn-reply-comment text-muted ms-3" data-comment-id="${cmt.id}" style="cursor: pointer; font-weight: 600;">Phản hồi</span>` : ''}
                             </div>
                         </div>
@@ -599,12 +598,13 @@ $(document).ready(function() {
         });
     };
 
-   
+
     $(document).on('click', '.btn-like-comment', function() {
         const token = localStorage.getItem("token");
 
         if (!token) {
             Toastify({ text: "Bạn cần đăng nhập để thích bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ffc107" } }).showToast();
+            window.location.href = serverHost + "/api/auth/login";
             return;
         }
 
@@ -674,7 +674,6 @@ $(document).ready(function() {
 
         const payload = {
             comicId: parseInt(comicId),
-            // 🔥 LẤY TỪ WINDOW RA DÙNG
             chapterId: window.ACTIVE_CHAPTER_ID || null,
             parentId: parentId,
             content: content
@@ -704,6 +703,7 @@ $(document).ready(function() {
 
         if (!token) {
             Toastify({ text: "Bạn cần đăng nhập để bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
+            window.location.href=serverHost+"/api/auth/login";
             return;
         }
 
@@ -718,7 +718,6 @@ $(document).ready(function() {
 
         const payload = {
             comicId: parseInt(comicId),
-            // 🔥 LẤY TỪ WINDOW RA DÙNG (Nếu không có chap nào thì tự hiểu là null)
             chapterId: window.ACTIVE_CHAPTER_ID || null,
             content: content
         };
