@@ -2,7 +2,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
     event.preventDefault();
 
 
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080";
+    const serverHost = window.location.origin;
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;

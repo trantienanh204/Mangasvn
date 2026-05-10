@@ -5,7 +5,7 @@ $(document).ready(function() {
     const loginLink = $("#login-link");
     const logoutLink = $("#logout-link");
 
-    const serverHost = window.location.hostname === "localhost" ? "http://localhost:8080" : "http://192.168.1.14:8080";
+    const serverHost = window.location.origin;
 
     if (token) {
         $.ajax({

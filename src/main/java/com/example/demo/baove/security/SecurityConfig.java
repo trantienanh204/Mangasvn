@@ -3,6 +3,7 @@ package com.example.demo.baove.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
@@ -34,7 +40,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(java.util.Arrays.asList("http://localhost:3000", "http://localhost:8080", "http://192.168.x.x"));
+                    corsConfiguration.setAllowedOrigins(java.util.Arrays.asList(
+                            "http://localhost:3000",
+                            "http://localhost:8080",
+                            "https://mangasvn.click",
+                            "https://www.mangasvn.click",
+                            "https://mangasvn.onrender.com"
+                    ));
                     corsConfiguration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(java.util.Arrays.asList("*"));
                     corsConfiguration.setAllowCredentials(true);
@@ -43,9 +55,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-//                        .requestMatchers("/api/auth/**", "/api/**","/theloai/**","/view/**","/search/**", "/view/history", "/view/favourite", "/read/**", "/css/**", "/js/**", "/login.html", "/view/trangchu.html", "/api/truyen/search", "/api/truyen/list", "/api/truyen/hot","/api/truyen/authors", "/api/truyen/moi", "/api/truyen/favorite/list").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/**","/theloai/**","/truyen/**","/view/**","/search/**","/fill/**","/", "/read/**", "/css/**", "/js/**", "/login.html", "/api/truyen/search", "/api/truyen/list", "/api/truyen/hot","/api/truyen/authors", "/api/truyen/moi", "/api/truyen/favorite/list").permitAll()
-                        .requestMatchers("/api/truyen/list").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/**", "/theloai/**", "/truyen/**", "/view/**", "/search/**", "/fill/**", "/", "/read/**", "/css/**", "/js/**", "/login.html", "/api/truyen/search", "/api/truyen/list", "/api/truyen/hot", "/api/truyen/authors", "/api/truyen/moi", "/api/truyen/favorite/list").permitAll()
                         .requestMatchers("/api/truyen/**").hasAnyRole("translator", "admin")
                         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "CHUTUT")
                         .anyRequest().authenticated()
@@ -53,5 +63,17 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("https://mangasvn.click", "https://mangasvn.onrender.com", "http://localhost:8080"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
