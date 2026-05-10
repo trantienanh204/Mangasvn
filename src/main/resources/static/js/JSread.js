@@ -22,7 +22,7 @@ $(document).ready(function() {
                 if (xhr.status === 401 || xhr.status === 403) {
                     Toastify({ text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/login.html";
+                    window.location.href = "/api/auth/login";
                 }
                 if (resolve) resolve();
             }
@@ -45,7 +45,7 @@ $(document).ready(function() {
                 if (xhr.status === 401 || xhr.status === 403) {
                     Toastify({ text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/login.html";
+                    window.location.href = "/api/auth/login";
                 }
                 if (resolve) resolve();
             }
@@ -129,7 +129,7 @@ $(document).ready(function() {
                             style: { background: "#ff4444" }
                         }).showToast();
                         localStorage.removeItem("token");
-                        window.location.href = "/login.html";
+                        window.location.href = "/api/auth/login";
                     }
                 }
             });

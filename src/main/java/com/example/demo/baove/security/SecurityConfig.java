@@ -38,38 +38,49 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(request -> {
-                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(java.util.Arrays.asList(
-                            "http://localhost:3000",
-                            "http://localhost:8080",
-                            "https://mangasvn.click",
-                            "https://www.mangasvn.click",
-                            "https://mangasvn.onrender.com"
-                    ));
-                    corsConfiguration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    corsConfiguration.setAllowedHeaders(java.util.Arrays.asList("*"));
-                    corsConfiguration.setAllowCredentials(true);
-                    return corsConfiguration;
-                }))
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
+                )
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/**", "/theloai/**", "/truyen/**", "/view/**", "/search/**", "/fill/**", "/", "/read/**", "/css/**", "/js/**", "/login.html", "/api/truyen/search", "/api/truyen/list", "/api/truyen/hot", "/api/truyen/authors", "/api/truyen/moi", "/api/truyen/favorite/list").permitAll()
-                        .requestMatchers("/api/truyen/**").hasAnyRole("translator", "admin")
+
+
+                        .requestMatchers("/", "/*.html", "/login", "/register", "/css/**", "/js/**", "/view/**", "/favicon.ico", "/error", "/truyen/**", "/trangchu/**").permitAll()
+
+                        .requestMatchers("/api/auth/**", "/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
+                        .requestMatchers("/api/truyen/list", "/api/truyen/hot", "/api/truyen/moi", "/api/truyen/search", "/api/truyen/authors").permitAll()
+                        .requestMatchers("/api/truyen/**","/api/truyen/list/**", "/api/truyen/hot/**", "/api/truyen/moi/**", "/api/truyen/search/**", "/api/truyen/authors/**").permitAll()
+
+//                        .requestMatchers("/api/truyen/**").hasAnyRole("TRANSLATOR", "ADMIN", "CHUTUT")
                         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "CHUTUT")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://mangasvn.click", "https://mangasvn.onrender.com", "http://localhost:8080"));
+
+        configuration.setAllowedOrigins(Arrays.asList(
+                "https://mangasvn.click",
+                "https://www.mangasvn.click",
+                "https://mangasvn.onrender.com",
+                "http://localhost:8080"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
