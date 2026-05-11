@@ -13,7 +13,7 @@ public class trangchuController {
 
     @GetMapping("login")
     public String login(){
-        return "login";
+        return "login_dangnhap";
     }
     @GetMapping("register")
     public String register(){

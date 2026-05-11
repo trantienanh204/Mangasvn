@@ -24,7 +24,7 @@ public class ViewController {
     //bug
     @GetMapping("theloai/{genre}")
     public String theloai() {
-        return "Tloai";
+        return "theloai";
     }
 
     @GetMapping("/view/test")

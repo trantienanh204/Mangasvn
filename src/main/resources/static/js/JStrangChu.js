@@ -331,7 +331,7 @@ $(document).ready(function() {
                         style: { background: "#ff4444" }
                     }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/login.html";
+                    window.location.href = "/login_dangnhap.html";
                 }
             }
         });
