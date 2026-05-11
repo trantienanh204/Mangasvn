@@ -50,15 +50,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-
-
-                        .requestMatchers("/", "/*.html", "/login", "/register", "/css/**", "/js/**", "/view/**", "/favicon.ico", "/error", "/truyen/**", "/trangchu/**").permitAll()
-
-                        .requestMatchers("/api/auth/**", "/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
-                        .requestMatchers("/api/truyen/list", "/api/truyen/hot", "/api/truyen/moi", "/api/truyen/search", "/api/truyen/authors").permitAll()
-                        .requestMatchers("/api/truyen/**","/api/truyen/list/**", "/api/truyen/hot/**", "/api/truyen/moi/**", "/api/truyen/search/**", "/api/truyen/authors/**").permitAll()
-
-//                        .requestMatchers("/api/truyen/**").hasAnyRole("TRANSLATOR", "ADMIN", "CHUTUT")
+                        .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/view/**", "/favicon.ico", "/error", "/truyen/**", "/trangchu/**").permitAll()
+                        .requestMatchers("/api/**", "/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
                         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "CHUTUT")
 
                         .anyRequest().authenticated()
@@ -67,7 +60,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
