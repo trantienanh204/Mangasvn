@@ -508,6 +508,7 @@ public class comicController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
     @PostMapping("/authors")
     public ResponseEntity<TacGia> addAuthorNew(@org.springframework.web.bind.annotation.RequestBody TacGia author, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -870,6 +871,8 @@ public class comicController {
     private List<ImageChapter> processZipAndUpload(MultipartFile zipFile, Integer chapterId) throws IOException {
         List<ImageChapter> images = new ArrayList<>();
         Map<String, byte[]> fileDataMap = new HashMap<>();
+        long totalUncompressedBytes = 0;
+        final long maxUncompressedBytes = 100L * 1024 * 1024;
 
         try (ZipInputStream zis = new ZipInputStream(zipFile.getInputStream())) {
             ZipEntry entry;
@@ -879,6 +882,10 @@ public class comicController {
                     byte[] buffer = new byte[1024];
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
+                        totalUncompressedBytes += len;
+                        if (totalUncompressedBytes > maxUncompressedBytes) {
+                            throw new IOException("ZIP giải nén vượt quá giới hạn 100 MB");
+                        }
                         baos.write(buffer, 0, len);
                     }
                     fileDataMap.put(entry.getName(), baos.toByteArray());

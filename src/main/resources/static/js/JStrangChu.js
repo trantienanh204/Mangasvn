@@ -34,80 +34,46 @@ $(document).ready(function() {
         logoutLink.hide();
     }
 
-    function displayTruyen(container, truyen, token, isScrollable = false, prefix = '') {
-        const timeAgo = Math.floor(Math.random() * 10) + 1 + " Phút Trước";
-        const isHot = Math.random() > 0.5 ? "Hot" : "";
-        const cardId = `${prefix}truyen-${truyen.id}`;
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[character]);
+    }
 
-        if (token) {
-            $.ajax({
-                url: `${serverHost}/api/truyen/favorite/status/${truyen.id}`,
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + token
-                },
-                success: function(isFavorited) {
-                    const buttonHtml = isFavorited
-                        ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyen.id}">Xóa khỏi yêu thích</button>`
-                        : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyen.id}">Thêm vào yêu thích</button>`;
-                    container.append(`
-                        <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
-                            <div style="position: relative;">
-                                <a href="/truyen/${truyen.id}">
-                                    <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                         alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                         style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
-                                </a>
-                                <span style="position: absolute; top: 5px; left: 5px; background-color: ${isHot ? '#ff4444' : 'transparent'}; color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 12px;">${isHot}</span>
-                                <span style="position: absolute; top: 5px; right: 5px; background-color: #00bcd4; color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 12px;">${timeAgo}</span>
-                            </div>
-                            <div style="padding: 10px; color: #fff;">
-                                <h6 style="margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${truyen.tenTruyen || 'Không có tiêu đề'}</h6>
-                                ${buttonHtml}
-                            </div>
-                        </div>
-                    `);
-                },
-                error: function(xhr, status, error) {
-                    console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyen.id}: ${status} - ${error}`);
-                    const buttonHtml = `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyen.id}">Thêm vào yêu thích</button>`;
-                    container.append(`
-                        <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
-                            <div style="position: relative;">
-                                <a href="/truyen/${truyen.id}">
-                                    <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                         alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                         style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
-                                </a>
-                                <span style="position: absolute; top: 5px; left: 5px; background-color: ${isHot ? '#ff4444' : 'transparent'}; color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 12px;">${isHot}</span>
-                                <span style="position: absolute; top: 5px; right: 5px; background-color: #00bcd4; color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 12px;">${timeAgo}</span>
-                            </div>
-                            <div style="padding: 10px; color: #fff;">
-                                <h6 style="margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${truyen.tenTruyen || 'Không có tiêu đề'}</h6>
-                                ${buttonHtml}
-                            </div>
-                        </div>
-                    `);
-                }
-            });
-        } else {
-            container.append(`
-                <div class="card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : ''}">
-                    <div style="position: relative;">
-                        <a href="/truyen/${truyen.id}">
-                            <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                 alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                 style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
-                        </a>
-                        <span style="position: absolute; top: 5px; left: 5px; background-color: ${isHot ? '#ff4444' : 'transparent'}; color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 12px;">${isHot}</span>
-                        <span style="position: absolute; top: 5px; right: 5px; background-color: #00bcd4; color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 12px;">${timeAgo}</span>
-                    </div>
-                    <div style="padding: 10px; color: #fff;">
-                        <h6 style="margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${truyen.tenTruyen || 'Không có tiêu đề'}</h6>
-                    </div>
+    function displayTruyen(container, truyen, token, isScrollable = false, prefix = '') {
+        const cardId = `${prefix}truyen-${truyen.id}`;
+        const title = escapeHtml(truyen.tenTruyen || "Chưa có tên truyện");
+        const cover = escapeHtml(truyen.imageComic || "https://i.postimg.cc/zBZ7k81R/cass.jpg");
+        const badge = isScrollable ? '<span class="comic-badge">ĐANG ĐƯỢC QUAN TÂM</span>' : '';
+        const favoriteButton = token
+            ? `<button class="favorite-btn" type="button" data-truyen-id="${Number(truyen.id)}" aria-label="Thêm truyện vào yêu thích">♡</button>`
+            : '';
+
+        container.append(`
+            <article class="comic-card ${isScrollable ? 'comic-card-featured' : ''}" id="${cardId}">
+                <a class="comic-cover-link" href="/truyen/${Number(truyen.id)}" aria-label="Đọc ${title}">
+                    <img class="comic-cover" src="${cover}" alt="Bìa truyện ${title}" loading="lazy">
+                    ${badge}
+                </a>
+                <div class="comic-card-info">
+                    <a class="comic-title" href="/truyen/${Number(truyen.id)}">${title}</a>
+                    <span class="comic-meta">MangaSVN · Truyện tranh</span>
+                    ${favoriteButton}
                 </div>
-            `);
-        }
+            </article>
+        `);
+
+        if (!token) return;
+        $.ajax({
+            url: `${serverHost}/api/truyen/favorite/status/${Number(truyen.id)}`,
+            method: "GET",
+            headers: { "Authorization": "Bearer " + token },
+            success: function(isFavorited) {
+                const button = $(`#${cardId} .favorite-btn`);
+                button.toggleClass("is-favorite", Boolean(isFavorited));
+                button.attr("aria-label", isFavorited ? "Đã thêm vào yêu thích" : "Thêm truyện vào yêu thích");
+            }
+        });
     }
 
     $.ajax({
@@ -118,15 +84,20 @@ $(document).ready(function() {
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach((truyen, index) => {
                     const isActive = index === 0 ? "active" : "";
+                    const title = escapeHtml(truyen.tenTruyen || "Truyện nổi bật");
+                    const description = escapeHtml(truyen.moTa || "Khám phá chương mới và tiếp tục hành trình của bạn.");
+                    const cover = escapeHtml(truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+                    const comicId = Number(truyen.id);
                     carouselInner.append(`
                         <div class="carousel-item ${isActive}">
-                            <div class="d-flex align-items-center" style="width: 100%; height: 300px; overflow: hidden;">
-                                <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
-                                     class="img-shadow img-fluid img-carousel" alt="${truyen.tenTruyen}">
-                                <div class="text-container" style="width: 85%; padding: 1rem; background-color: rgba(248, 249, 250, 0.7);">
-                                    <h5 class="text-title">${truyen.tenTruyen}</h5>
-                                    <p class="text-content">${truyen.moTa || "Không có mô tả"}</p>
-                                    <a href="/truyen/${truyen.id}" class="btn btn-primary">Đọc ngay</a>
+                            <div class="hot-slide">
+                                <img src="${cover}"
+                                     class="hot-cover" alt="Bìa truyện ${title}">
+                                <div class="hot-copy">
+                                    <span class="eyebrow">MANGASVN · TRUYỆN NỔI BẬT</span>
+                                    <h2 class="text-title">${title}</h2>
+                                    <p class="text-content">${description}</p>
+                                    <a href="/truyen/${comicId}" class="btn btn-primary">Đọc ngay <span aria-hidden="true">→</span></a>
                                 </div>
                             </div>
                         </div>
@@ -353,7 +324,7 @@ async function checkAdminAccess() {
     }
 
     try {
-        const userInfoResponse = await fetch("http://localhost:8080/api/auth/user-info", {
+        const userInfoResponse = await fetch(`${window.location.origin}/api/auth/user-info`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -371,21 +342,8 @@ async function checkAdminAccess() {
             adminButtonContainer.innerHTML = `
                     <button id="goToAdmin">Truy cập Admin</button>
                 `;
-            document.getElementById("goToAdmin").addEventListener("click", async function() {
-                try {
-                    const response = await fetch("http://localhost:8080/api/admin", {
-                        method: "GET",
-                        headers: { "Authorization": `Bearer ${token}` }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("❌ Bạn không có quyền truy cập.");
-                    }
-
-                    window.location.href = "http://localhost:8080/api/admin";
-                } catch (error) {
-                    alert(error.message);
-                }
+            document.getElementById("goToAdmin").addEventListener("click", function() {
+                window.location.href = "/view/admin";
             });
         } else {
             adminButtonContainer.innerHTML = "";

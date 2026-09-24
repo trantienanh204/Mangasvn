@@ -380,6 +380,90 @@
     margin: 0 auto;
 }
 
+/* Read page theme and layout overrides */
+.content { max-width: 1280px; padding-top: 22px; color: #eef0f4; }
+.comic-info {
+    align-items: flex-start;
+    gap: clamp(22px, 4vw, 42px);
+    padding: clamp(18px, 3vw, 34px);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px;
+    background: linear-gradient(135deg,#20232b,#191c22 72%);
+    color: #eef0f4;
+    box-shadow: 0 18px 50px rgba(0,0,0,.22);
+}
+.cover-image { flex: 0 0 220px; max-width: 220px; }
+.cover-image img { display: block; aspect-ratio: 2 / 3; object-fit: cover; border: 1px solid rgba(255,255,255,.12); }
+.details { color: #d9dce3; }
+.details h2 { margin: 0 0 20px; color: #fff; font-size: clamp(1.65rem,3vw,2.5rem); font-weight: 800; letter-spacing: -.035em; }
+.details p { margin: 0 0 11px; color: #c5c9d2; line-height: 1.55; }
+.details p strong { display: inline-block; min-width: 108px; color: #f0bd67; font-weight: 700; }
+#comic-description { color: #eceef2; }
+#comic-authors .info-item, #comic-translator .info-item, #comic-categories .category-item {
+    margin: 2px 5px 2px 0;
+    padding: 5px 10px;
+    border: 1px solid rgba(232,170,69,.28);
+    border-radius: 999px;
+    background: rgba(232,170,69,.1);
+    color: #f4cf91;
+}
+#comic-categories .category-item a { color: inherit; }
+#comic-authors .info-item:hover, #comic-translator .info-item:hover, #comic-categories .category-item:hover { background: rgba(232,170,69,.22); color: #fff; }
+#favorite-button-container { margin-top: 18px; }
+#favorite-button-container .favorite-btn { border-radius: 9px; padding: 9px 14px; }
+.chapter-section { margin: 30px 0; }
+.chapter-section > h4, .image-section > h4, .chat > h4 { margin-bottom: 14px; color: #f4f5f7; font-size: 1.25rem; font-weight: 750; }
+.chapter-controls { display: block; }
+.chapter-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+    max-height: none;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 14px;
+    background: #191c22;
+    box-shadow: none;
+}
+.chapter-list button {
+    min-width: 110px;
+    padding: 9px 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 9px;
+    background: #252a33;
+    color: #e3e6ec;
+    font-weight: 650;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.chapter-list button:hover, .chapter-list button.active { border-color: var(--accent); background: var(--accent); color: #1a1a1a; }
+.image-section { margin: 28px 0; }
+#chapter-title { color: #f5f5f7; }
+#chapter-images:empty { display: none; }
+.image-container { margin: 14px auto; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: #0b0d11; box-shadow: 0 8px 26px rgba(0,0,0,.2); }
+.image-container img { display: block; width: auto; max-width: 100%; max-height: none; margin: 0 auto; border-radius: 0; }
+.image-container img:hover { transform: none; }
+#toggle-reading-mode { margin: 6px 0 16px; padding: 10px 16px; border: 1px solid rgba(232,170,69,.36); border-radius: 9px; background: rgba(232,170,69,.13); color: #f2c77f; font-weight: 700; }
+#toggle-reading-mode:hover { background: var(--accent); color: #171717; }
+.chat { border: 1px solid rgba(255,255,255,.12) !important; border-radius: 14px !important; background: #191c22; color: #eceef2; }
+.chat .form-control { border-color: rgba(255,255,255,.13); background: #252a33; color: #f3f4f6; }
+.chat .form-control::placeholder { color: #9da3ae; }
+.chat .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 .2rem rgba(232,170,69,.16); }
+.chat #comment-list { color: #d8dbe1; }
+.chapter-controls .scroll-btn { display: none; }
+
+@media (max-width: 900px) {
+    .comic-info { flex-direction: row; align-items: flex-start; }
+}
+@media (max-width: 600px) {
+    .comic-info { flex-direction: column; align-items: stretch; padding: 18px; }
+    .cover-image { flex: 0 0 auto; width: min(160px, 45vw); max-width: 160px; margin: 0 auto; }
+    .details h2 { text-align: center; }
+    .details p strong { min-width: 92px; }
+    .chapter-list { gap: 8px; padding: 10px; }
+    .chapter-list button { min-width: 0; padding: 8px 11px; font-size: .9rem; }
+}
+
 #reading-progress-container {
     position: fixed;
     top: 0; /* Đổi thành 'bottom: 0' nếu bạn muốn thanh này nằm ở dưới cùng */

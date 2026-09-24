@@ -43,7 +43,6 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
 
-        System.out.println("Decoded Claims: " + claims);
         return claims;
     }
 
@@ -65,7 +64,6 @@ public class JwtUtil {
                     .getBody();
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
-            System.out.println("Validate token failed: " + e.getMessage());
             return false;
         }
     }

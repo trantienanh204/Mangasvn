@@ -34,9 +34,8 @@ document.getElementById("login-form").addEventListener("submit", async function 
         return;
     }
 
-    const passwordRegex = /^[a-zA-Z0-9@!_-]+$/;
-    if (!passwordRegex.test(password) || !passwordRegex.test(password1)) {
-        errorElement.innerText = "Mật khẩu chỉ được chứa chữ cái, số và ký tự @, !, -, _!";
+    if (password.length < 10 || password.length > 72) {
+        errorElement.innerText = "Mật khẩu phải có độ dài từ 10 đến 72 ký tự";
         errorElement.style.display = "block";
         setTimeout(() => {
             errorElement.style.display = "none";

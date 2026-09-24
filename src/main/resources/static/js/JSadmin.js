@@ -35,12 +35,12 @@ $(document).ready(function() {
         const token = localStorage.getItem('token');
         if (!token) {
             $('#admin-menu').hide();
-            window.location.href = '/api/auth/login';
-            return;
+            window.location.replace('/login_dangnhap.html');
+            return Promise.resolve(false);
         }
 
-        $.ajax({
-            url: "${serverHost}/api/auth/user-info",
+        return $.ajax({
+            url: `${serverHost}/api/auth/user-info`,
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + token
@@ -55,8 +55,16 @@ $(document).ready(function() {
             error: function(xhr) {
                 if (xhr.status === 401 || xhr.status === 403) {
                     $('#admin-menu').hide();
+                    localStorage.removeItem('token');
                 }
             }
+        }).then(function(data) {
+            if (data.role === "ADMIN" || data.role === "CHUTUT") return true;
+            window.location.replace('/');
+            return false;
+        }, function(xhr) {
+            window.location.replace(xhr.status === 401 || xhr.status === 403 ? '/login_dangnhap.html' : '/');
+            return false;
         });
     }
 
@@ -401,10 +409,12 @@ $(document).ready(function() {
         }
     });
 
-    checkAdmin();
-    loadComics();
-    loadAuthors();
-    loadCategories();
+    checkAdmin().then(function(isAdmin) {
+        if (!isAdmin) return;
+        loadComics();
+        loadAuthors();
+        loadCategories();
+    });
 });
 
 const token = localStorage.getItem("token");

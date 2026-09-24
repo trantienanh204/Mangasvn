@@ -1,4 +1,7 @@
 const serverHost = window.location.origin;
+function escapeHistoryHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+}
     function logout() {
 
         localStorage.removeItem('token');
@@ -28,14 +31,16 @@ const serverHost = window.location.origin;
                     if (Array.isArray(history) && history.length > 0) {
                         history.forEach(item => {
                             if (item.comicId) {
-                                const imageUrl = item.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg';
-                                const tenTruyen = item.tenTruyen || 'Không có tiêu đề';
+                                const imageUrl = escapeHistoryHtml(item.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+                                const tenTruyen = escapeHistoryHtml(item.tenTruyen || 'Không có tiêu đề');
+                                const comicId = Number(item.comicId);
+                                const lastRead = escapeHistoryHtml(new Date(item.ngayTao).toLocaleString());
                                 historyList.append(`
-                                <div class="history-item">
+                                <article class="library-item">
                                     <img src="${imageUrl}" alt="${tenTruyen}" onerror="this.src='https://i.postimg.cc/zBZ7k81R/cass.jpg';">
-                                    <span onclick="loadComicFromHistory(${item.comicId})">${tenTruyen} (Xem lần cuối: ${new Date(item.ngayTao).toLocaleString()})</span>
-                                    <button class="delete-btn" onclick="deleteHistoryItem(${item.comicId}, true)">✖</button>
-                                </div>
+                                    <div class="library-copy"><a class="library-title" href="/truyen/${comicId}">${tenTruyen}</a><span class="library-meta">Đọc gần đây · ${lastRead}</span></div>
+                                    <button class="library-remove" aria-label="Xóa ${tenTruyen} khỏi lịch sử" title="Xóa khỏi lịch sử" onclick="deleteHistoryItem(${comicId}, true)">×</button>
+                                </article>
                             `);
                             }
                         });
@@ -68,14 +73,16 @@ const serverHost = window.location.origin;
         if (localHistory.length > 0) {
             localHistory.forEach((item, index) => {
                 if (item.comicId) {
-                    const imageUrl = item.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg';
-                    const tenTruyen = item.tenTruyen || 'Không có tiêu đề';
+                    const imageUrl = escapeHistoryHtml(item.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+                    const tenTruyen = escapeHistoryHtml(item.tenTruyen || 'Không có tiêu đề');
+                    const comicId = Number(item.comicId);
+                    const lastRead = escapeHistoryHtml(new Date(item.lastRead).toLocaleString());
                     historyList.append(`
-                    <div class="history-item">
+                    <article class="library-item">
                         <img src="${imageUrl}" alt="${tenTruyen}" onerror="this.src='https://i.postimg.cc/zBZ7k81R/cass.jpg';">
-                        <span onclick="loadComicFromHistory(${item.comicId})">${tenTruyen} (Xem lần cuối: ${new Date(item.lastRead).toLocaleString()})</span>
-                        <button class="delete-btn" onclick="deleteHistoryItem(${index}, false)">✖</button>
-                    </div>
+                        <div class="library-copy"><a class="library-title" href="/truyen/${comicId}">${tenTruyen}</a><span class="library-meta">Đọc gần đây · ${lastRead}</span></div>
+                        <button class="library-remove" aria-label="Xóa ${tenTruyen} khỏi lịch sử" title="Xóa khỏi lịch sử" onclick="deleteHistoryItem(${index}, false)">×</button>
+                    </article>
                 `);
                 }
             });

@@ -53,11 +53,9 @@ public class AuthController {
 
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (BadCredentialsException e) {
-            System.out.println("Đăng nhập thất bại: Sai tên người dùng hoặc mật khẩu");
             return ResponseEntity.status(401).body("Đăng nhập thất bại: Sai tên người dùng hoặc mật khẩu");
         } catch (Exception e) {
-            System.out.println("Đăng nhập thất bại: " + e.getMessage());
-            return ResponseEntity.status(500).body("Đăng nhập thất bại: " + e.getMessage());
+            return ResponseEntity.status(500).body("Không thể xử lý yêu cầu đăng nhập");
         }
     }
 }

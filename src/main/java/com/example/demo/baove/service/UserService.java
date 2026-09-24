@@ -53,8 +53,8 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email '" + email + "' đã được sử dụng!");
         }
-        if (!password.matches("^[a-zA-Z0-9]+$")){
-            throw new IllegalArgumentException("mật khẩu không được phép có ký tự đặc biệt");
+        if (password.length() < 10 || password.length() > 72){
+            throw new IllegalArgumentException("Mật khẩu phải có độ dài từ 10 đến 72 ký tự");
         }
 
 
@@ -71,8 +71,6 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Role not found");
         }
         user.setRole(role);
-
-        System.out.println("Tên mới tạo: " + user.getUsername() + " email: " + user.getEmail());
 
         return userRepository.save(user);
     }

@@ -46,22 +46,23 @@ $(document).ready(function() {
 
     function displayTruyen(container, truyen, token, isOtherPage, prefixId) {
         const cardId = `${prefixId}truyen-${truyen.comicId}`;
-        const imageUrl = truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg';
-        const tenTruyen = truyen.tenTruyen || 'Không có tiêu đề';
+        const imageUrl = escapeWishlistHtml(truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg');
+        const tenTruyen = escapeWishlistHtml(truyen.tenTruyen || 'Không có tiêu đề');
+        const comicId = Number(truyen.comicId);
         const html = `
-        <div class="history-item" id="${cardId}">
+        <article class="library-item" id="${cardId}">
             <img src="${imageUrl}" 
                  alt="${tenTruyen}" 
                  onerror="this.src='https://i.postimg.cc/zBZ7k81R/cass.jpg';">
-            <div class="item-content">
-                  <span onclick="loadComicFromHistory(${truyen.comicId})">${tenTruyen})</span>
-          
-            </div>
-           <button class="delete-btn" onclick="toggleFavorite(${truyen.comicId}, false)">✖</button>
-        </div>
+            <div class="library-copy"><a class="library-title" href="/truyen/${comicId}">${tenTruyen}</a><span class="library-meta">Đã lưu trong danh sách yêu thích</span></div>
+            <button class="library-remove" aria-label="Xóa ${tenTruyen} khỏi yêu thích" title="Xóa khỏi yêu thích" onclick="toggleFavorite(${comicId}, false)">×</button>
+        </article>
         `;
 
         container.append(html);
+    }
+    function escapeWishlistHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
     }
     window.loadComicFromHistory = function(comicId) {
         window.location.href = `/truyen/${comicId}`;
@@ -143,7 +144,7 @@ $(document).ready(function() {
 
                 if (!isAdding) {
                     $(`#${cardId}`).remove();
-                    if ($('#favourite-list .history-item').length === 0) {
+                    if ($('#favourite-list .library-item').length === 0) {
                         $('#favourite-list').html('<p style="color: #ff4444; padding: 10px;">Bạn chưa có truyện yêu thích nào.</p>');
                     }
                 }

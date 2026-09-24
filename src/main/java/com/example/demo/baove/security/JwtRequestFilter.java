@@ -40,7 +40,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-        System.out.println("Authorization Header hiện tại là : " + authorizationHeader);
         String username = null;
         String jwt = null;
 
@@ -48,40 +47,24 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.getUsernameFromToken(jwt);
-                System.out.println("Received JWT: " + jwt);
-                System.out.println("Extracted Username: " + username);
-                String role = jwtUtil.getRoleFromToken(jwt);
-                System.out.println("Extracted Role: " + role);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Không thể lấy JWT Token: " + e.getMessage());
-            } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token đã hết hạn: " + e.getMessage());
-            } catch (MalformedJwtException | SignatureException e) {
-                System.out.println("JWT Token không hợp lệ: " + e.getMessage());
+            } catch (IllegalArgumentException | ExpiredJwtException | MalformedJwtException | SignatureException e) {
+                // Invalid tokens remain unauthenticated and are handled by Spring Security.
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwt)) {
-                String role = jwtUtil.getRoleFromToken(jwt);
-                System.out.println("Validated Role from Token: " + role);
-
-                // Sử dụng vai trò từ token thay vì từ UserDetailsService
-                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
-                System.out.println("Authorities set: " + authorities);
+                List<SimpleGrantedAuthority> authorities = userDetails.getAuthorities().stream()
+                        .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
+                        .toList();
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                System.out.println("✅ Authentication sau khi đặt: " + SecurityContextHolder.getContext().getAuthentication());
-            } else {
-                System.out.println("❌ Token không hợp lệ, không đặt Authentication");
             }
-        } else {
-            System.out.println("❌ Không thể đặt Authentication: username=" + username + ", existing auth=" + SecurityContextHolder.getContext().getAuthentication());
         }
 
         chain.doFilter(request, response);

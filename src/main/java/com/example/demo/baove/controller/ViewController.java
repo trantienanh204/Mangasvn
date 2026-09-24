@@ -31,7 +31,7 @@ public class ViewController {
     public String test() {
         return "test";
     }
-    @GetMapping("/api/admin")
+    @GetMapping("/view/admin")
     public String noideadminORchututlamviec(){
         return "admin";
     }

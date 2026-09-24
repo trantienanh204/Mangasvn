@@ -37,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
@@ -51,8 +51,24 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/view/**", "/favicon.ico", "/error", "/truyen/**", "/trangchu/**").permitAll()
-                        .requestMatchers("/api/**", "/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/user-info").permitAll()
+                        .requestMatchers("/api/categories", "/api/authors", "/api/chapters", "/api/images", "/api/comments/chapter/**", "/api/comments/comic/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/truyen/favorite/list", "/api/truyen/favorite/status/**").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/truyen/favorite/**").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/truyen/favorite/**").authenticated()
+                        .requestMatchers("/api/truyen/authors").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers("/api/truyen").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers("/api/truyen/*/chapters").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/truyen/authors").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/truyen/**").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/truyen/**").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/truyen/**").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/truyen/hot", "/api/truyen/moi", "/api/truyen/list", "/api/truyen/listloc", "/api/truyen/search", "/api/truyen/*").permitAll()
+                        .requestMatchers("/api/admin/**", "/admin/**").hasAnyRole("ADMIN", "CHUTUT")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/comments/add", "/api/comments/*/like").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/comments/**").permitAll()
+                        .requestMatchers("/api/truyen/**", "/api/comments/**", "/api/history/**", "/api/auth/**").authenticated()
+                        .requestMatchers("/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
@@ -72,7 +88,7 @@ public class SecurityConfig {
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
