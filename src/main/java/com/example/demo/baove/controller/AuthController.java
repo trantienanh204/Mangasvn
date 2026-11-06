@@ -3,7 +3,10 @@ package com.example.demo.baove.controller;
 import com.example.demo.baove.controller.DTO.LoginDTO;
 import com.example.demo.baove.entity.User;
 import com.example.demo.baove.security.JwtUtil;
+import com.example.demo.baove.security.RateLimiterService;
 import com.example.demo.baove.service.UserService;
+import io.github.bucket4j.Bucket;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,9 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RateLimiterService rateLimiterService;
+
     @GetMapping("/user-info")
     public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
         try {
@@ -38,10 +44,17 @@ public class AuthController {
         }
     }
 
-
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO request) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO request, HttpServletRequest httpRequest) {
+        // Lấy IP thực của client (hỗ trợ cả trường hợp đứng sau reverse proxy)
+        String clientIp = getClientIp(httpRequest);
+
+        // Kiểm tra rate limit: tối đa 10 lần login / phút mỗi IP
+        Bucket bucket = rateLimiterService.resolveBucket(clientIp);
+        if (!bucket.tryConsume(1)) {
+            return ResponseEntity.status(429).body("Quá nhiều yêu cầu đăng nhập. Vui lòng thử lại sau 1 phút.");
+        }
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
@@ -58,12 +71,19 @@ public class AuthController {
             return ResponseEntity.status(500).body("Không thể xử lý yêu cầu đăng nhập");
         }
     }
+
+    /**
+     * Lấy IP thực của client, hỗ trợ cả trường hợp đứng sau Nginx/Cloudflare.
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isBlank()) {
+            // X-Forwarded-For có thể chứa nhiều IP cách nhau bằng dấu phẩy, lấy IP đầu tiên
+            return xForwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
+    }
 }
-
-
-
-
-
 
 class LoginResponse {
     private String token;
@@ -75,6 +95,7 @@ class LoginResponse {
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
 }
+
 class UserInfoResponse {
     private String username;
     private String role;

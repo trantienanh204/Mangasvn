@@ -558,8 +558,20 @@ $(document).ready(function() {
                 }
 
 
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                }
+
                 function buildCommentHtml(cmt, isReply = false) {
-                    const userName = (cmt.users && cmt.users.username) ? cmt.users.username : 'Ẩn danh';
+                    const rawUserName = (cmt.users && cmt.users.username) ? cmt.users.username : 'Ẩn danh';
+                    const userName = escapeHtml(rawUserName);
+                    const commentContent = escapeHtml(cmt.comment);
                     const displayLike = (cmt.like && cmt.like > 0) ? cmt.like : '';
                     const marginClass = isReply ? 'ms-5 border-start ps-3 mt-2' : 'mb-3 border-bottom pb-2';
 
@@ -569,7 +581,7 @@ $(document).ready(function() {
                                 <strong>${userName}</strong> 
                                 <small class="text-muted" style="font-size: 0.8rem;">${cmt.ngayTao}</small>
                             </div>
-                            <p class="mb-1 mt-1">${cmt.comment}</p>
+                            <p class="mb-1 mt-1">${commentContent}</p>
                             <div class="comment-actions mt-1" style="font-size: 0.85rem; user-select: none;">
                                 <span class="btn-like-comment text-muted" data-comment-id="${cmt.id}" style="cursor: pointer; font-weight: 600;">
                                     Thích <span class="like-count ms-1">${displayLike}</span>

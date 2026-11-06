@@ -18,14 +18,26 @@ function loadComments() {
                 return;
             }
 
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             data.forEach(comment => {
-                const userName = comment.users ? comment.users.name : 'Ẩn danh';
-                const date = comment.ngayTao;
+                const rawUserName = comment.users ? (comment.users.name || comment.users.username) : 'Ẩn danh';
+                const userName = escapeHtml(rawUserName);
+                const date = escapeHtml(comment.ngayTao);
+                const commentContent = escapeHtml(comment.comment);
 
                 const commentHtml = `
                     <div class="comment-item mb-2 border-bottom pb-2">
                         <strong>${userName}</strong> <small class="text-muted">(${date})</small>
-                        <p class="mb-0">${comment.comment}</p>
+                        <p class="mb-0">${commentContent}</p>
                     </div>
                 `;
                 commentListDiv.insertAdjacentHTML('beforeend', commentHtml);

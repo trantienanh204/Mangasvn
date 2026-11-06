@@ -19,10 +19,7 @@ public class DangkyController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody LoginDTO request) {
         if (request.getUserName() == null || request.getPassword() == null || request.getEmail() == null) {
-            return ResponseEntity.status(401).body(new messageError("Không được để trống: " +
-                    (request.getUserName() != null ? request.getUserName() : "") + " " +
-                    (request.getPassword() != null ? request.getPassword() : "") + " " +
-                    (request.getEmail() != null ? request.getEmail() : "")));
+            return ResponseEntity.status(400).body(new messageError("Vui lòng điền đầy đủ thông tin: tên người dùng, mật khẩu và email"));
         }
         try {
             userService.registerUser(request.getUserName(), request.getPassword(), request.getEmail());
@@ -31,10 +28,4 @@ public class DangkyController {
             return ResponseEntity.status(400).body(new messageError(e.getMessage()));
         }
     }
-
-
-
-
-
 }
-

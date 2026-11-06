@@ -9,7 +9,8 @@ services:
       MYSQL_DATABASE: mangasvn
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the environment}
     ports:
-      - "3306:3306"
+      # Chi mo port tren localhost (DBeaver ket noi qua SSH Tunnel an toan, khong lo ra Internet)
+      - "127.0.0.1:3306:3306"
     volumes:
         - ./init:/docker-entrypoint-initdb.d
         - mysql-data:/var/lib/mysql
@@ -28,6 +29,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mangasvn
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the environment}

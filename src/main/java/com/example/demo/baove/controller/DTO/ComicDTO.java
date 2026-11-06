@@ -27,6 +27,7 @@ public class ComicDTO {
     private List<Integer> categoryIds;
     private List<Integer> authorIds;
     private User user;
+    private String avatar;
     private byte TrangThai;
 
 

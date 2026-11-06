@@ -125,6 +125,7 @@ public class comicController {
             return ResponseEntity.status(401).body("Authorization header không hợp lệ hoặc thiếu Bearer");
         }
 
+
         String token = authHeader.substring(7);
         String username;
         try {
@@ -162,7 +163,16 @@ public class comicController {
         comic.setNgaySua(LocalDate.now());
         comic.setTranslator(user);
 
-        String coverKey = "covers/" + UUID.randomUUID() + "-" + cover.getOriginalFilename();
+        // Validate file type của ảnh bìa
+        String originalCoverName = cover.getOriginalFilename() != null ? cover.getOriginalFilename().toLowerCase() : "";
+        String coverExt = originalCoverName.contains(".") ? originalCoverName.substring(originalCoverName.lastIndexOf('.') + 1) : "";
+        if (!List.of("jpg", "jpeg", "png", "webp").contains(coverExt)) {
+            logger.warn("Định dạng ảnh bìa không hợp lệ: {}", originalCoverName);
+            return ResponseEntity.status(400).body("Chỉ cho phép ảnh bìa định dạng JPG, PNG hoặc WEBP");
+        }
+        // Sanitize tên file ảnh bìa (chỉ giữ ký tự an toàn)
+        String safeCoverName = UUID.randomUUID() + "." + coverExt;
+        String coverKey = "covers/" + safeCoverName;
         String coverUrl;
         try {
             coverUrl = uploadToR2(cover.getBytes(), coverKey);
@@ -273,6 +283,19 @@ public class comicController {
         Comic comic = comicRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Truyện với ID " + id + " không tồn tại"));
 
+        String role = jwtUtil.getRoleFromToken(token);
+        if (!(role.equals("ROLE_ADMIN") || role.equals("ROLE_CHUTUT"))) {
+            logger.warn("Nguoi dung khong co quyen cap nhat chapter: role={}", role);
+            return ResponseEntity.status(403).body("Bạn không có quyền cập nhật chapter!");
+        }
+
+        if (!role.equals("ROLE_ADMIN")) {
+            if (comic.getTranslator() == null || comic.getTranslator().getId() != user.getId()) {
+                logger.warn("User {} co gang cap nhat chapter cho truyen cua nguoi khac: ID {}", username, id);
+                return ResponseEntity.status(403).body("Bạn chỉ có quyền cập nhật chapter cho truyện do chính bạn tạo!");
+            }
+        }
+
         if (chapterZips == null || chapterNames == null || chapterZips.isEmpty() || chapterNames.isEmpty()) {
             logger.warn("Không có chapter được cung cấp: chapterZips={}, chapterNames={}", chapterZips, chapterNames);
             return ResponseEntity.status(400).body("Danh sách chapter trống");
@@ -364,6 +387,14 @@ public class comicController {
             if (!(role.equals("ROLE_ADMIN") || role.equals("ROLE_CHUTUT"))){
                 logger.warn("Nguoi dung khong co quyen cap nhat truyen: role={}", role);
                 return ResponseEntity.status(403).body("Ban khong co quyen cap nhat truyen!");
+            }
+
+            // Kiem tra quyen so huu (IDOR): Neu khong phai ADMIN thi phai la nguoi tao truyen
+            if (!role.equals("ROLE_ADMIN")) {
+                if (comic.getTranslator() == null || comic.getTranslator().getId() != user.getId()) {
+                    logger.warn("User {} co gang cap nhat truyen cua nguoi khac: ID {}", username, id);
+                    return ResponseEntity.status(403).body("Bạn chỉ có quyền chỉnh sửa truyện do chính bạn tạo!");
+                }
             }
 
             if (request.getMoTa() != null) {
@@ -800,6 +831,9 @@ public class comicController {
             dto.setLuotThich(comic.getLuotThich());
             dto.setNgaySua(comic.getNgaySua());
             dto.setUser(comic.getTranslator());
+            if (comic.getTranslator() != null) {
+                dto.setAvatar(comic.getTranslator().getAvatar());
+            }
             List<Integer> categoryIds = comic.getComicDanhMucs().stream()
                     .map(comicDanhMuc -> comicDanhMuc.getDanhMuc().getId())
                     .collect(Collectors.toList());

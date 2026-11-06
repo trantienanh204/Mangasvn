@@ -65,8 +65,7 @@ public class UserService implements UserDetailsService {
         user.setTrangThai(true);
         user.setNgayTao(LocalDate.now());
 
-       // Role role = roleRepository.findByRoleName("DOCGIA");
-        Role role = roleRepository.findById(2);
+        Role role = roleRepository.findById(3);
         if (role == null) {
             throw new RuntimeException("Role not found");
         }
