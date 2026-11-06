@@ -27,6 +27,12 @@ public class Report {
     @JoinColumn(name = "ID_COMIC", referencedColumnName = "id")
     private Comic comics;
 
+    @Column(name = "LY_DO", columnDefinition = "TEXT")
+    private String lyDo;
+
+    @Column(name = "TRANG_THAI")
+    private String trangThai;
+
     @Column(name = "NGAY_TAO")
     private LocalDate ngayTao;
 }

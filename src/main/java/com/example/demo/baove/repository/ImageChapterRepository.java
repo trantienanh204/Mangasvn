@@ -10,4 +10,5 @@ import java.util.List;
 public interface ImageChapterRepository extends JpaRepository<ImageChapter, Integer> {
     List<ImageChapter> findByChapterIdOrderByPageNumberAsc(int chapterId);
     List<ImageChapter> findByChapterId(int chapterId);
+    void deleteByChapterId(int chapterId);
 }

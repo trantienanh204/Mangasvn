@@ -1,7 +1,16 @@
-
 const serverHost = window.location.origin;
-$(document).ready(function() {
 
+let authorsMap = {};
+let categoriesMap = {};
+let currentUserRole = "";
+
+window.logout = function() {
+    localStorage.removeItem('token');
+    window.location.replace('/login_dangnhap.html');
+};
+
+$(document).ready(function() {
+    // Khởi tạo Select2
     $('#author-select').select2({
         placeholder: "Chọn tác giả",
         allowClear: true,
@@ -9,16 +18,8 @@ $(document).ready(function() {
         tags: true,
         createTag: function(params) {
             var term = $.trim(params.term);
-
-            if (term === '') {
-                return null;
-            }
-
-            return {
-                id: term,
-                text: term,
-                newOption: true
-            };
+            if (term === '') return null;
+            return { id: term, text: term, newOption: true };
         }
     });
 
@@ -28,13 +29,9 @@ $(document).ready(function() {
         width: '100%'
     });
 
-    let authorsMap = {};
-    let categoriesMap = {};
-
     function checkAdmin() {
         const token = localStorage.getItem('token');
         if (!token) {
-            $('#admin-menu').hide();
             window.location.replace('/login_dangnhap.html');
             return Promise.resolve(false);
         }
@@ -42,39 +39,523 @@ $(document).ready(function() {
         return $.ajax({
             url: `${serverHost}/api/auth/user-info`,
             method: "GET",
-            headers: {
-                "Authorization": "Bearer " + token
-            },
+            headers: { "Authorization": "Bearer " + token },
             success: function(data) {
-                if (data.role === "ADMIN" || data.role === "CHUTUT") {
-                    $('#admin-menu').show();
+                currentUserRole = data.role;
+                if (data.role === "ADMIN") {
+                    $('#role-badge').text("QUẢN TRỊ VIÊN (ADMIN)").removeClass('bg-secondary bg-warning').addClass('bg-danger');
+                    $('.admin-only').show();
+                } else if (data.role === "CHUTUT") {
+                    $('#role-badge').text("CHỦ THỚT (CHUTUT)").removeClass('bg-secondary bg-danger').addClass('bg-warning text-dark');
+                    $('.admin-only').hide();
                 } else {
-                    $('#admin-menu').hide();
+                    window.location.replace('/');
                 }
             },
             error: function(xhr) {
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $('#admin-menu').hide();
-                    localStorage.removeItem('token');
-                }
+                localStorage.removeItem('token');
+                window.location.replace('/login_dangnhap.html');
             }
         }).then(function(data) {
-            if (data.role === "ADMIN" || data.role === "CHUTUT") return true;
-            window.location.replace('/');
-            return false;
-        }, function(xhr) {
-            window.location.replace(xhr.status === 401 || xhr.status === 403 ? '/login_dangnhap.html' : '/');
+            return (data.role === "ADMIN" || data.role === "CHUTUT");
+        }, function() {
             return false;
         });
     }
 
-    function loadComics() {
+    // ==========================================
+    // 1. DASHBOARD STATS
+    // ==========================================
+    window.loadDashboardStats = function() {
         const token = localStorage.getItem('token');
-        if (!token) {
-            Toastify({ text: 'Vui lòng đăng nhập để tiếp tục!', duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
-            window.location.href = '/api/auth/login';
+        $.ajax({
+            url: `${serverHost}/api/admin/stats`,
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(stats) {
+                $('#stat-comics').text(stats.totalComics.toLocaleString());
+                $('#stat-chapters').text(stats.totalChapters.toLocaleString());
+                $('#stat-users').text(stats.totalUsers.toLocaleString());
+                $('#stat-views').text(stats.totalViews.toLocaleString());
+                $('#stat-comments').text(stats.totalComments.toLocaleString());
+                $('#stat-reports').text(stats.totalReports.toLocaleString());
+            },
+            error: function(err) {
+                console.log("Lỗi tải thống kê:", err);
+            }
+        });
+    };
+
+    // ==========================================
+    // 2. QUẢN LÝ TRUYỆN (COMICS LIST & ACTIONS)
+    // ==========================================
+    window.loadAdminComics = function(page = 0) {
+        const token = localStorage.getItem('token');
+        const keyword = $('#comic-search-input').val().trim();
+        const trangThai = $('#comic-status-filter').val();
+        const categoryId = $('#comic-category-filter').val();
+        const authorId = $('#comic-author-filter').val();
+
+        let url = `${serverHost}/api/admin/comics?page=${page}&size=10`;
+        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+        if (trangThai !== '') url += `&trangThai=${trangThai}`;
+        if (categoryId) url += `&categoryId=${categoryId}`;
+        if (authorId) url += `&authorId=${authorId}`;
+
+        if (currentUserRole === "CHUTUT") {
+            $('#comics-table-title').html('<i class="fa-solid fa-book me-1"></i> Danh Sách Truyện Của Bạn');
+        } else {
+            $('#comics-table-title').html('<i class="fa-solid fa-list me-1"></i> Danh Sách Toàn Bộ Truyện Hệ Thống');
+        }
+
+        const tbody = $('#admin-comics-tbody');
+        tbody.html('<tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>');
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(response) {
+                tbody.empty();
+                $('#comics-count-badge').text(`Tổng: ${response.totalElements || 0} truyện`);
+                const comics = response.content || [];
+                if (comics.length === 0) {
+                    tbody.html('<tr><td colspan="9" class="text-center py-4 text-muted"><i class="fa-solid fa-magnifying-glass me-1"></i> Không tìm thấy truyện nào phù hợp với bộ lọc.</td></tr>');
+                    $('#comic-pagination').empty();
+                    return;
+                }
+
+                comics.forEach(c => {
+                    let statusBadge = '';
+                    if (c.trangThai === 1) {
+                        statusBadge = '<span class="badge bg-success"><i class="fa-solid fa-eye me-1"></i>Hiển thị</span>';
+                    } else if (c.trangThai === 0) {
+                        statusBadge = '<span class="badge bg-secondary"><i class="fa-solid fa-eye-slash me-1"></i>Đang ẩn</span>';
+                    } else if (c.trangThai === -1) {
+                        statusBadge = '<span class="badge bg-dark"><i class="fa-solid fa-trash me-1"></i>Đã xóa mềm</span>';
+                    } else {
+                        statusBadge = `<span class="badge bg-info">${c.trangThai}</span>`;
+                    }
+
+                    const coverImg = c.imageComic ? `<img src="${c.imageComic}" alt="cover" style="width: 45px; height: 60px; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">` : '<span class="text-muted small">Không có</span>';
+
+                    // Categories badges
+                    let catBadges = (c.categories && c.categories.length > 0)
+                        ? c.categories.map(cat => `<span class="badge bg-light text-primary border me-1">${cat}</span>`).join('')
+                        : '<span class="text-muted small">Chưa có</span>';
+
+                    // Authors list
+                    let authorNames = (c.authors && c.authors.length > 0)
+                        ? c.authors.join(', ')
+                        : 'Chưa rõ';
+
+                    // Translator badge
+                    let translatorBadge = `<span class="badge bg-light text-dark border"><i class="fa-solid fa-user-pen me-1 text-primary"></i>${c.translatorUsername || 'Chưa rõ'}</span>`;
+
+                    let actionsHtml = '';
+                    if (c.canEdit) {
+                        actionsHtml += `
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editComicInForm(${c.id})" title="Chỉnh sửa / Thêm chapter">
+                                <i class="fa-solid fa-pen-to-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm ${c.trangThai === 1 ? 'btn-outline-warning' : 'btn-outline-success'} me-1" onclick="toggleComicStatus(${c.id})" title="Ẩn hoặc hiện">
+                                <i class="fa-solid ${c.trangThai === 1 ? 'fa-eye-slash' : 'fa-eye'}"></i> ${c.trangThai === 1 ? 'Ẩn' : 'Hiện'}
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="softDeleteComic(${c.id})" title="Xóa mềm">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        `;
+                    } else {
+                        actionsHtml = '<span class="text-muted small italic">Không có quyền can thiệp</span>';
+                    }
+
+                    const row = `
+                        <tr>
+                            <td><strong>#${c.id}</strong></td>
+                            <td>${coverImg}</td>
+                            <td>
+                                <a href="/truyen/${c.id}" target="_blank" class="text-decoration-none fw-bold text-dark d-block mb-1">${c.tenTruyen}</a>
+                            </td>
+                            <td>
+                                <div class="small fw-semibold text-secondary mb-1"><i class="fa-solid fa-pen-nib me-1"></i>${authorNames}</div>
+                                <div>${catBadges}</div>
+                            </td>
+                            <td>${translatorBadge}</td>
+                            <td>
+                                <div class="small"><strong>${c.chapterCount}</strong> chap</div>
+                                <div class="small text-muted"><i class="fa-solid fa-eye me-1"></i>${c.luotXem.toLocaleString()} | <i class="fa-solid fa-heart text-danger me-1"></i>${c.luotThich.toLocaleString()}</div>
+                            </td>
+                            <td>${statusBadge}</td>
+                            <td class="small text-muted">${c.ngayTao || ''}</td>
+                            <td class="text-center">${actionsHtml}</td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+
+                renderPagination('#comic-pagination', response, 'loadAdminComics');
+            },
+            error: function(xhr) {
+                tbody.html(`<tr><td colspan="9" class="text-center text-danger py-4">Lỗi tải dữ liệu: ${xhr.responseText || 'Không xác định'}</td></tr>`);
+            }
+        });
+    };
+
+    window.resetComicFilters = function() {
+        $('#comic-search-input').val('');
+        $('#comic-category-filter').val('');
+        $('#comic-author-filter').val('');
+        $('#comic-status-filter').val('');
+        loadAdminComics(0);
+    };
+
+    // Lắng nghe sự kiện gõ Enter và thay đổi bộ lọc
+    $('#comic-search-input').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            loadAdminComics(0);
+        }
+    });
+
+    $('#comic-category-filter, #comic-author-filter, #comic-status-filter').on('change', function() {
+        loadAdminComics(0);
+    });
+
+    window.toggleComicStatus = function(comicId) {
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/comics/${comicId}/toggle-status`,
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() {
+                Toastify({ text: "Đã thay đổi trạng thái truyện!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminComics();
+                loadComics();
+            },
+            error: function(xhr) {
+                let err = "Không thể đổi trạng thái!";
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) err = parsed.message;
+                } catch(e) { err = xhr.responseText || err; }
+                Toastify({ text: "Lỗi: " + err, duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    window.softDeleteComic = function(comicId) {
+        if (!confirm("Bạn có chắc chắn muốn xóa mềm truyện này? Truyện sẽ bị ẩn khỏi toàn bộ trang web!")) return;
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/comics/${comicId}`,
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() {
+                Toastify({ text: "Đã xóa mềm truyện thành công!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminComics();
+                loadComics();
+            },
+            error: function(xhr) {
+                let err = "Không thể xóa truyện!";
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) err = parsed.message;
+                } catch(e) { err = xhr.responseText || err; }
+                Toastify({ text: "Lỗi: " + err, duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    window.editComicInForm = function(comicId) {
+        // Chuyển sang tab Đăng / Cập nhật
+        const triggerEl = document.querySelector('#tab-upload-btn');
+        bootstrap.Tab.getInstance(triggerEl) ? bootstrap.Tab.getInstance(triggerEl).show() : new bootstrap.Tab(triggerEl).show();
+        $('#comic-select').val(comicId).trigger('change');
+    };
+
+    // ==========================================
+    // 3. QUẢN LÝ THÀNH VIÊN (ADMIN ONLY)
+    // ==========================================
+    window.loadAdminUsers = function(page = 0) {
+        if (currentUserRole !== "ADMIN") return;
+        const token = localStorage.getItem('token');
+        const keyword = $('#user-search-input').val().trim();
+        const roleId = $('#user-role-filter').val();
+        const trangThai = $('#user-status-filter').val();
+
+        let url = `${serverHost}/api/admin/users?page=${page}&size=10`;
+        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+        if (roleId) url += `&roleId=${roleId}`;
+        if (trangThai !== '') url += `&trangThai=${trangThai}`;
+
+        const tbody = $('#admin-users-tbody');
+        tbody.html('<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>');
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(response) {
+                tbody.empty();
+                const users = response.content || [];
+                if (users.length === 0) {
+                    tbody.html('<tr><td colspan="7" class="text-center py-4 text-muted">Không tìm thấy thành viên nào.</td></tr>');
+                    $('#user-pagination').empty();
+                    return;
+                }
+
+                users.forEach(u => {
+                    let roleBadgeClass = 'badge-role-docgia';
+                    if (u.roleName === 'ADMIN') roleBadgeClass = 'badge-role-admin';
+                    else if (u.roleName === 'CHUTUT') roleBadgeClass = 'badge-role-chutut';
+
+                    const roleBadge = `<span class="badge ${roleBadgeClass}">${u.roleName || 'CHƯA CÓ'}</span>`;
+                    const statusBadge = u.trangThai
+                        ? '<span class="badge bg-success">Hoạt động</span>'
+                        : '<span class="badge bg-danger">Đã bị khóa</span>';
+
+                    const banBtn = u.trangThai
+                        ? `<button class="btn btn-sm btn-outline-danger me-1" onclick="toggleUserBan(${u.id}, '${u.username}')" title="Khóa tài khoản"><i class="fa-solid fa-ban"></i> Khóa</button>`
+                        : `<button class="btn btn-sm btn-outline-success me-1" onclick="toggleUserBan(${u.id}, '${u.username}')" title="Mở khóa tài khoản"><i class="fa-solid fa-unlock"></i> Mở</button>`;
+
+                    const roleBtn = `<button class="btn btn-sm btn-outline-primary" onclick="openRoleModal(${u.id}, '${u.username}', ${u.roleId})"><i class="fa-solid fa-user-shield"></i> Quyền</button>`;
+
+                    const row = `
+                        <tr>
+                            <td>#${u.id}</td>
+                            <td><strong>${u.username}</strong></td>
+                            <td>${u.email || '<span class="text-muted">Chưa có</span>'}</td>
+                            <td>${roleBadge}</td>
+                            <td>${statusBadge}</td>
+                            <td>${u.ngayTao || ''}</td>
+                            <td class="text-center">${banBtn} ${roleBtn}</td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+
+                renderPagination('#user-pagination', response, 'loadAdminUsers');
+            },
+            error: function(xhr) {
+                tbody.html(`<tr><td colspan="7" class="text-center text-danger py-4">Lỗi: ${xhr.responseText || 'Không xác định'}</td></tr>`);
+            }
+        });
+    };
+
+    window.toggleUserBan = function(userId, username) {
+        if (!confirm(`Bạn có chắc chắn muốn thay đổi trạng thái khóa/mở cho người dùng "${username}"?`)) return;
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/users/${userId}/toggle-ban`,
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(updated) {
+                const msg = updated.trangThai ? "Đã mở khóa tài khoản!" : "Đã khóa tài khoản thành công!";
+                Toastify({ text: msg, duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminUsers();
+            },
+            error: function(xhr) {
+                let err = "Không thể thực hiện!";
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) err = parsed.message;
+                } catch(e) { err = xhr.responseText || err; }
+                Toastify({ text: "Lỗi: " + err, duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    window.openRoleModal = function(userId, username, currentRoleId) {
+        $('#modal-user-id').val(userId);
+        $('#modal-username').text(username);
+        $('#modal-role-select').val(currentRoleId || 3);
+        const modal = new bootstrap.Modal(document.getElementById('roleModal'));
+        modal.show();
+    };
+
+    window.submitChangeRole = function() {
+        const userId = $('#modal-user-id').val();
+        const roleId = parseInt($('#modal-role-select').val());
+        const token = localStorage.getItem('token');
+
+        $.ajax({
+            url: `${serverHost}/api/admin/users/${userId}/role`,
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            data: JSON.stringify({ roleId: roleId }),
+            success: function() {
+                Toastify({ text: "Đã cập nhật vai trò thành công!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                bootstrap.Modal.getInstance(document.getElementById('roleModal')).hide();
+                loadAdminUsers();
+            },
+            error: function(xhr) {
+                let err = "Không thể cập nhật!";
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) err = parsed.message;
+                } catch(e) { err = xhr.responseText || err; }
+                Toastify({ text: "Lỗi: " + err, duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    // ==========================================
+    // 4. QUẢN LÝ BÁO CÁO LỖI (ADMIN ONLY)
+    // ==========================================
+    window.loadAdminReports = function(page = 0) {
+        if (currentUserRole !== "ADMIN") return;
+        const token = localStorage.getItem('token');
+        const tbody = $('#admin-reports-tbody');
+        tbody.html('<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>');
+
+        $.ajax({
+            url: `${serverHost}/api/admin/reports?page=${page}&size=10`,
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(response) {
+                tbody.empty();
+                const reports = response.content || [];
+                if (reports.length === 0) {
+                    tbody.html('<tr><td colspan="7" class="text-center py-4 text-muted">Không có báo cáo lỗi nào.</td></tr>');
+                    $('#report-pagination').empty();
+                    return;
+                }
+
+                reports.forEach(r => {
+                    let statusBadge = '<span class="badge bg-warning text-dark">Chưa xử lý</span>';
+                    if (r.trangThai === 'DA_XU_LY') statusBadge = '<span class="badge bg-success">Đã xử lý</span>';
+                    else if (r.trangThai === 'DA_HUY') statusBadge = '<span class="badge bg-secondary">Đã hủy</span>';
+
+                    const actions = `
+                        <button class="btn btn-sm btn-outline-success me-1" onclick="updateReportStatus(${r.id}, 'DA_XU_LY')" title="Đánh dấu đã sửa xong"><i class="fa-solid fa-check"></i> Xong</button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="updateReportStatus(${r.id}, 'DA_HUY')" title="Hủy báo cáo"><i class="fa-solid fa-xmark"></i> Hủy</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteReportAction(${r.id})" title="Xóa báo cáo"><i class="fa-solid fa-trash"></i></button>
+                    `;
+
+                    const row = `
+                        <tr>
+                            <td>#${r.id}</td>
+                            <td>${r.comicTitle ? `<a href="/truyen/${r.comicId}" target="_blank" class="fw-bold">${r.comicTitle}</a>` : 'Không xác định'}</td>
+                            <td>${r.username || '<span class="text-muted">Ẩn danh</span>'}</td>
+                            <td class="text-break" style="max-width: 300px;">${r.lyDo || ''}</td>
+                            <td>${r.ngayTao || ''}</td>
+                            <td>${statusBadge}</td>
+                            <td class="text-center">${actions}</td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+
+                renderPagination('#report-pagination', response, 'loadAdminReports');
+            },
+            error: function(xhr) {
+                tbody.html(`<tr><td colspan="7" class="text-center text-danger py-4">Lỗi: ${xhr.responseText || 'Không xác định'}</td></tr>`);
+            }
+        });
+    };
+
+    window.updateReportStatus = function(reportId, status) {
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/reports/${reportId}/status`,
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            data: JSON.stringify({ status: status }),
+            success: function() {
+                Toastify({ text: "Đã cập nhật trạng thái báo cáo!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminReports();
+                loadDashboardStats();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi cập nhật: " + (xhr.responseText || ''), duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    window.deleteReportAction = function(reportId) {
+        if (!confirm("Bạn có chắc muốn xóa báo cáo này?")) return;
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/reports/${reportId}`,
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() {
+                Toastify({ text: "Đã xóa báo cáo!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminReports();
+                loadDashboardStats();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi xóa báo cáo: " + (xhr.responseText || ''), duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    // ==========================================
+    // 5. XÓA BÌNH LUẬN (ADMIN ONLY)
+    // ==========================================
+    window.deleteCommentAction = function() {
+        const commentId = $('#delete-comment-id').val().trim();
+        if (!commentId) {
+            Toastify({ text: "Vui lòng nhập ID bình luận cần xóa!", duration: 3000, style: { background: "#dc3545" } }).showToast();
             return;
         }
+
+        if (!confirm(`Bạn có chắc chắn muốn xóa bình luận ID #${commentId}?`)) return;
+
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/comments/${commentId}`,
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() {
+                Toastify({ text: `Đã xóa bình luận #${commentId} thành công!`, duration: 3000, style: { background: "#28a745" } }).showToast();
+                $('#delete-comment-id').val('');
+                loadDashboardStats();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi: " + (xhr.responseText || "Không tìm thấy hoặc không thể xóa"), duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    // Helper: Render Pagination UI
+    function renderPagination(containerId, pageData, callbackFnName) {
+        const container = $(containerId);
+        container.empty();
+        if (!pageData || pageData.totalPages <= 1) return;
+
+        const currentPage = pageData.number;
+        const totalPages = pageData.totalPages;
+
+        let html = `<span class="small text-muted">Trang ${currentPage + 1} / ${totalPages} (Tổng ${pageData.totalElements} mục)</span>`;
+        html += '<ul class="pagination pagination-sm mb-0">';
+
+        if (currentPage > 0) {
+            html += `<li class="page-item"><button class="page-link" onclick="${callbackFnName}(${currentPage - 1})">Trước</button></li>`;
+        }
+
+        for (let i = 0; i < totalPages; i++) {
+            if (i === currentPage) {
+                html += `<li class="page-item active"><span class="page-link">${i + 1}</span></li>`;
+            } else if (i === 0 || i === totalPages - 1 || Math.abs(i - currentPage) <= 2) {
+                html += `<li class="page-item"><button class="page-link" onclick="${callbackFnName}(${i})">${i + 1}</button></li>`;
+            }
+        }
+
+        if (currentPage < totalPages - 1) {
+            html += `<li class="page-item"><button class="page-link" onclick="${callbackFnName}(${currentPage + 1})">Sau</button></li>`;
+        }
+        html += '</ul>';
+
+        container.html(html);
+    }
+
+    // ==========================================
+    // 6. GIỮ NGUYÊN CODE TẢI DỮ LIỆU CŨ CHO FORM
+    // ==========================================
+    function loadComics() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
 
         $.ajax({
             url: `${serverHost}/api/truyen/listloc`,
@@ -90,12 +571,11 @@ $(document).ready(function() {
                 comics.forEach(comic => {
                     const categories = comic.categoryIds ? `Danh mục: ${comic.categoryIds.map(id => categoriesMap[id] || id).join(', ')}` : 'Chưa có danh mục';
                     const authors = comic.authorIds ? `Tác giả: ${comic.authorIds.map(id => authorsMap[id] || id).join(', ')}` : 'Chưa có tác giả';
-                    comicList.append(`<li class="list-group-item">${comic.tenTruyen} (${categories} | ${authors})</li>`);
+                    comicList.append(`<li class="list-group-item d-flex justify-content-between align-items-center"><span>${comic.tenTruyen} <small class="text-muted">(${categories} | ${authors})</small></span><button class="btn btn-sm btn-outline-primary" onclick="editComicInForm(${comic.id})">Sửa</button></li>`);
                 });
             },
             error: function(xhr, status, error) {
                 console.log('Lỗi tải danh sách truyện:', error);
-                Toastify({ text: 'Lỗi tải danh sách truyện: ' + (xhr.responseText || error), duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
             }
         });
     }
@@ -108,16 +588,18 @@ $(document).ready(function() {
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(authors) {
                 const authorSelect = $('#author-select');
+                const authorFilter = $('#comic-author-filter');
                 authorSelect.empty();
+                authorFilter.empty().append('<option value="">Tất cả tác giả</option>');
                 authors.forEach(author => {
                     authorsMap[author.id] = author.tenTacGia;
                     authorSelect.append(`<option value="${author.id}">${author.tenTacGia}</option>`);
+                    authorFilter.append(`<option value="${author.id}">${author.tenTacGia}</option>`);
                 });
                 authorSelect.trigger('change');
             },
             error: function(xhr, status, error) {
-                console.log('Lỗi tải danh sách tác giả:', error, 'Status:', status, 'Response:', xhr.responseText);
-                Toastify({ text: 'Lỗi tải danh sách tác giả: ' + (xhr.responseText || error), duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
+                console.log('Lỗi tải danh sách tác giả:', error);
             }
         });
     }
@@ -130,8 +612,14 @@ $(document).ready(function() {
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(categories) {
                 const categorySelect = $('#category-select');
+                const catFilter = $('#comic-category-filter');
                 categorySelect.empty();
-                categories.forEach(category => { categoriesMap[category.id] = category.tenDanhMuc; categorySelect.append(`<option value="${category.id}">${category.tenDanhMuc}</option>`); });
+                catFilter.empty().append('<option value="">Tất cả thể loại (Danh mục)</option>');
+                categories.forEach(category => {
+                    categoriesMap[category.id] = category.tenDanhMuc;
+                    categorySelect.append(`<option value="${category.id}">${category.tenDanhMuc}</option>`);
+                    catFilter.append(`<option value="${category.id}">${category.tenDanhMuc}</option>`);
+                });
                 categorySelect.trigger('change');
             },
             error: function(xhr, status, error) {
@@ -153,11 +641,10 @@ $(document).ready(function() {
                 success: function(response) {
                     authorsMap[response.id] = newAuthorName;
                     $('#author-select').append(`<option value="${response.id}" selected>${newAuthorName}</option>`).trigger('change');
-                    Toastify({ text: 'Thêm tác giả mới thành công!', duration: 3000, gravity: 'top', position: 'right', style: { background: '#28a745' } }).showToast();
+                    Toastify({ text: 'Thêm tác giả mới thành công!', duration: 3000, style: { background: '#28a745' } }).showToast();
                 },
                 error: function(xhr, status, error) {
-                    console.log('Lỗi thêm tác giả:', error);
-                    Toastify({ text: 'Lỗi thêm tác giả: ' + (xhr.responseText || error), duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
+                    Toastify({ text: 'Lỗi thêm tác giả: ' + (xhr.responseText || error), duration: 3000, style: { background: '#dc3545' } }).showToast();
                     $('#author-select').val(null).trigger('change');
                 }
             });
@@ -178,8 +665,7 @@ $(document).ready(function() {
                 $('#category-select').val(comic.categoryIds || []).trigger('change');
             },
             error: function(xhr, status, error) {
-                console.log('Lỗi tải thông tin truyện:', error);
-                Toastify({ text: 'Lỗi tải thông tin truyện: ' + (xhr.responseText || error), duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
+                Toastify({ text: 'Lỗi tải thông tin truyện: ' + (xhr.responseText || error), duration: 3000, style: { background: '#dc3545' } }).showToast();
             }
         });
     }
@@ -192,7 +678,7 @@ $(document).ready(function() {
     window.removeChapter = function(button) {
         const chapterItem = $(button).closest('.chapter-item');
         if ($('#chapter-list .chapter-item').length > 1) chapterItem.remove();
-        else Toastify({ text: 'Phải có ít nhất một chapter!', duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
+        else Toastify({ text: 'Phải có ít nhất một chapter!', duration: 3000, style: { background: '#dc3545' } }).showToast();
     };
 
     function validateZipOrder(zip) {
@@ -223,7 +709,6 @@ $(document).ready(function() {
         });
     }
 
-
     $('#upload-form').on('submit', async function(e) {
         e.preventDefault();
 
@@ -242,7 +727,7 @@ $(document).ready(function() {
             $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').hide().find('input, textarea').prop('required', false);
             $('#create-btn').hide();
             $('#update-btn').show();
-            $('.card-header').text('Cập nhật Truyện và Chapter');
+            $('#form-header-title').text('Cập nhật Truyện và Chapter');
         } else {
             $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').show().find('input, textarea').prop('required', true);
         }
@@ -265,7 +750,7 @@ $(document).ready(function() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
             } catch (error) {
-                Toastify({ text: 'Lỗi cập nhật thông tin truyện: ' + (error.responseText || error), duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
+                Toastify({ text: 'Lỗi cập nhật thông tin truyện: ' + (error.responseText || error), duration: 3000, style: { background: '#dc3545' } }).showToast();
                 submitButton.prop('disabled', false);
                 return;
             }
@@ -356,21 +841,23 @@ $(document).ready(function() {
             headers: { 'Authorization': `Bearer ${token}` },
             success: function(response) {
                 progressBar.css('width', '100%').attr('aria-valuenow', 100).text('100%');
-                Toastify({ text: isUpdate ? 'Cập nhật chapter thành công!' : 'Đăng truyện thành công!', duration: 3000, gravity: 'top', position: 'right', style: { background: '#28a745' } }).showToast();
+                Toastify({ text: isUpdate ? 'Cập nhật chapter thành công!' : 'Đăng truyện thành công!', duration: 3000, style: { background: '#28a745' } }).showToast();
                 $('#upload-form')[0].reset();
                 $('#chapter-list').empty().append(`<div class="chapter-item"><input type="text" class="form-control chapter-name" placeholder="Tên Chapter" required><input type="file" class="form-control chapter-zip" accept=".zip" required><button type="button" class="btn btn-danger btn-remove-chapter ms-2" onclick="removeChapter(this)">Xóa</button><div class="invalid-feedback">Vui lòng upload file ZIP với tên ảnh theo số thứ tự (ví dụ: 1.jpg, 2.png).</div></div>`);
                 $('#author-select').val(null).trigger('change');
                 $('#category-select').val(null).trigger('change');
                 loadComics();
+                loadAdminComics();
+                loadDashboardStats();
                 setTimeout(() => $('#upload-progress').hide(), 1000);
             },
             error: function(xhr, status, error) {
                 progressBar.css('width', '100%').attr('aria-valuenow', 100).text('Lỗi!');
                 let errorMessage = isUpdate ? 'Cập nhật chapter thất bại' : 'Đăng truyện thất bại';
                 if (status === 'timeout') errorMessage += ': Thời gian xử lý vượt quá 30 giây.';
-                else if (xhr.responseText && xhr.responseText.includes('MaxUploadSizeExceededException')) errorMessage += ': Kích thước file vượt quá giới hạn (tối đa 50MB).';
+                else if (xhr.responseText && xhr.responseText.includes('MaxUploadSizeExceededException')) errorMessage += ': Kích thước file vượt quá giới hạn.';
                 else errorMessage += ': ' + (xhr.responseText || error);
-                Toastify({ text: errorMessage, duration: 3000, gravity: 'top', position: 'right', style: { background: '#dc3545' } }).showToast();
+                Toastify({ text: errorMessage, duration: 3000, style: { background: '#dc3545' } }).showToast();
                 setTimeout(() => $('#upload-progress').hide(), 1000);
             },
             complete: function() {
@@ -395,25 +882,33 @@ $(document).ready(function() {
             $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').show().find('input, textarea').prop('required', true);
             $('#create-btn').show();
             $('#update-btn').hide();
-            $('.card-header').text('Đăng Truyện Mới');
+            $('#form-header-title').text('Đăng Truyện Mới');
             $('#author-select').prop('required', true);
             $('#category-select').prop('required', true);
         } else {
             $('#new-comic-fields, #new-comic-description, #new-comic-note, #new-comic-cover').hide().find('input, textarea').prop('required', false);
             $('#create-btn').hide();
             $('#update-btn').show();
-            $('.card-header').text('Cập nhật Truyện và Chapter');
+            $('#form-header-title').text('Cập nhật Truyện và Chapter');
             loadComicDetails(comicId);
             $('#author-select').prop('required', true);
             $('#category-select').prop('required', true);
         }
     });
 
+    // Khởi chạy khi load trang
     checkAdmin().then(function(isAdmin) {
         if (!isAdmin) return;
-        loadComics();
         loadAuthors();
         loadCategories();
+        loadDashboardStats();
+        loadAdminComics();
+        loadComics();
+
+        if (currentUserRole === "ADMIN") {
+            loadAdminUsers();
+            loadAdminReports();
+        }
     });
 });
 
@@ -422,18 +917,11 @@ if (token) {
     $.ajax({
         url: `${serverHost}/api/auth/user-info`,
         method: "GET",
-        headers: {
-            "Authorization": "Bearer " + token
-        },
+        headers: { "Authorization": "Bearer " + token },
         success: function(data) {
             $('#login-link').hide();
             $('#logout-link').show();
             $('#user-info').text("Xin chào, " + data.username);
-            console.log("Đăng nhập thành công với user:", data.username); // Thêm log
-            // Hiển thị menu admin nếu là ADMIN hoặc CHUTUT
-            if (data.role === "ADMIN" || data.role === "CHUTUT") {
-                $('#admin-menu').show();
-            }
         },
         error: function(xhr) {
             if (xhr.status === 401 || xhr.status === 403) {
@@ -441,7 +929,6 @@ if (token) {
                 $('#login-link').show();
                 $('#logout-link').hide();
                 $('#user-info').text("");
-                $('#admin-menu').hide();
             }
         }
     });
@@ -449,5 +936,4 @@ if (token) {
     $('#login-link').show();
     $('#logout-link').hide();
     $('#user-info').text("");
-    $('#admin-menu').hide();
 }

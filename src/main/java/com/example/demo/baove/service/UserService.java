@@ -37,9 +37,14 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
+        boolean enabled = user.isTrangThai();
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
+                enabled,
+                true,
+                true,
+                true,
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName()))
         );
     }

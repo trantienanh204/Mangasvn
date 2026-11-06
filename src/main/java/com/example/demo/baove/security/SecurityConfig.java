@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/comments/**").permitAll()
                         .requestMatchers("/api/truyen/**", "/api/comments/**", "/api/history/**", "/api/auth/**").authenticated()
                         .requestMatchers("/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/reports").permitAll()
 
                         .anyRequest().authenticated()
                 )

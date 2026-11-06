@@ -54,7 +54,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(jwt)) {
+            if (userDetails.isEnabled() && jwtUtil.validateToken(jwt)) {
                 List<SimpleGrantedAuthority> authorities = userDetails.getAuthorities().stream()
                         .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
                         .toList();

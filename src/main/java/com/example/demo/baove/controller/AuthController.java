@@ -67,6 +67,8 @@ public class AuthController {
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body("Đăng nhập thất bại: Sai tên người dùng hoặc mật khẩu");
+        } catch (org.springframework.security.authentication.DisabledException e) {
+            return ResponseEntity.status(403).body("Tài khoản của bạn đã bị khóa hoặc vô hiệu hóa");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Không thể xử lý yêu cầu đăng nhập");
         }
