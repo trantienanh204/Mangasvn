@@ -3,79 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ Mangasvn </title>
+    <title>MangaSVN - Đọc Truyện Tranh Online</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="stylesheet" href="/css/CSStrangChu.css?v=20260924-3">
+    <!-- Site Styles -->
+    <link rel="stylesheet" href="/css/CSStrangChu.css?v=20260924-5">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/CSSGenneNavbar.css">
 </head>
 <body>
-<div class="container">
-    <!-- Navbar -->
-    <div class="container-fluid">
-        <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" href="/">MANGASVN</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">TRANG CHỦ</a>
-                        </li>
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" href="/theloai">TÌM KIẾM</a>-->
-<!--                        </li>-->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                THỂ LOẠI
-                            </a>
-                            <div class="dropdown-menu p-3 genres-menu" aria-labelledby="navbarDropdown" id="genres-menu">
-                                <ul class="genres-list" id="genres-list">
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/view/favourite" aria-current="page">YÊU THÍCH</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/view/history" aria-current="page">LỊCH SỬ</a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <span class="nav-link" id="user-info"></span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="login-link" href="/api/auth/login" style="display: none;">Đăng nhập</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a>
-                        </li>
-                    </ul>
-                    <form class="d-flex search-container" style="position: relative;" id="search-form">
-                        <input class="form-control me-2" type="search" id="search-input" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit" id="search-button">Search</button>
-                        <div id="search-suggestions"></div>
-                    </form>
-                </div>
-            </div>
-        </nav>
-
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top shadow-sm">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand fw-bold" href="/">MANGASVN</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">TRANG CHỦ</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/theloai" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        THỂ LOẠI
+                    </a>
+                    <div class="dropdown-menu p-3 genres-menu" aria-labelledby="navbarDropdown" id="genres-menu">
+                        <ul class="genres-list" id="genres-list">
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/view/favourite">YÊU THÍCH</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/view/history">LỊCH SỬ</a>
+                </li>
+                <li class="nav-item" id="nav-admin-link" style="display: none;">
+                    <a class="nav-link text-warning fw-bold" href="/view/admin"><i class="fa-solid fa-gauge me-1"></i>QUẢN TRỊ</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <span class="nav-link" id="user-info"></span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-danger btn-sm text-danger ms-2 px-3" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary btn-sm text-primary ms-2 px-3" id="login-link" href="/api/auth/login" style="display: none;">Đăng nhập</a>
+                </li>
+            </ul>
+            <form class="d-flex search-container ms-lg-3 mt-2 mt-lg-0" style="position: relative;" id="search-form">
+                <input class="form-control me-2" type="search" id="search-input" placeholder="Tìm kiếm truyện..." aria-label="Search">
+                <button class="btn btn-outline-success" type="submit" id="search-button">Tìm</button>
+                <div id="search-suggestions"></div>
+            </form>
+        </div>
     </div>
+</nav>
 
-    <!-- Thêm khoảng trống phía dưới navbar -->
-    <div style="margin-top: 80px;"></div>
+<!-- Main Container -->
+<div class="container">
+    <div style="margin-top: 15px;"></div>
 
-    <!-- Truyện hot -->
+    <!-- Truyện hot (Carousel) -->
     <div class="truyen-section">
         <h5>Truyện hot</h5>
         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" style="width: 100%;">
@@ -91,7 +95,7 @@
         </div>
     </div>
 
-    <!-- Danh sách truyện nổi bật -->
+    <!-- Danh sách truyện nổi bật (Cuộn ngang) -->
     <div class="truyen-section">
         <h5>Danh sách truyện nổi bật</h5>
         <div class="truyen-list-container">
@@ -101,7 +105,7 @@
         </div>
     </div>
 
-    <!-- Danh sách truyện -->
+    <!-- Danh sách tất cả truyện -->
     <div class="truyen-section">
         <h5>Danh sách truyện</h5>
         <div class="truyen-list" id="truyen-list"></div>
@@ -118,27 +122,31 @@
         <h5>Danh sách truyện mới</h5>
         <div class="truyen-list-new" id="truyen-list-new"></div>
     </div>
-    <!-- Thay thế nút hard-code bằng container -->
-    <div id="admin-button-container"></div>
+
+    <!-- Container nút tắt Admin -->
+    <div id="admin-button-container" style="position: fixed; bottom: 25px; right: 25px; z-index: 1050;"></div>
 </div>
+
+<!-- Footer -->
 <footer id="footer">
-    <div><a class="navbar-brand fw-bold" href="/view/trangchu.html">MANGASVN</a></div>
-    <div class="footer_edit">
-        <div class="left">
-            <p>Khám phá truyện tranh yêu thích của bạn mỗi ngày.</p>
-        </div>
-        <div class="right">
-            <p>Khám phá truyện tranh yêu thích của bạn mỗi ngày.</p>
+    <div class="container">
+        <div><a class="navbar-brand fw-bold" href="/">MANGASVN</a></div>
+        <div class="footer_edit">
+            <div class="left">
+                <p>Khám phá truyện tranh yêu thích của bạn mỗi ngày trên MangaSVN.</p>
+            </div>
+            <div class="right">
+                <p>© 2026 MangaSVN. All rights reserved.</p>
+            </div>
         </div>
     </div>
-
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 <script src="/js/JStrangChu.js"></script>
 <script src="/js/JSSearch.js"></script>
 <script src="/js/JSGenneNavbar.js"></script>
-
 </body>
 </html>

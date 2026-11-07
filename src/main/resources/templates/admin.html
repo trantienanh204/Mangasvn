@@ -4,118 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng Quản Trị - MangaSVN</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Site Styles -->
+    <link rel="stylesheet" href="/css/CSStrangChu.css">
+    <link rel="stylesheet" href="/css/CSSGenneNavbar.css">
+    <link rel="stylesheet" href="/css/CSSadmin.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/CSStrangChu.css">
-    <link rel="stylesheet" href="/css/CSSadmin.css">
-    <link rel="stylesheet" href="/css/CSSGenneNavbar.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <style>
-        .admin-nav-tabs .nav-link { font-weight: 600; color: #495057; border-radius: 8px; margin: 0 4px; }
-        .admin-nav-tabs .nav-link.active { background-color: #0d6efd; color: white; }
-        .stat-card { border-radius: 10px; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .stat-card:hover { transform: translateY(-3px); }
-        .table-responsive { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-        .badge-role-admin { background-color: #dc3545; color: white; }
-        .badge-role-chutut { background-color: #fd7e14; color: white; }
-        .badge-role-docgia { background-color: #0dcaf0; color: #000; }
-    </style>
 </head>
 <body>
-<div class="container-fluid">
-    <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold text-primary" href="/">MANGASVN</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">TRANG CHỦ</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            THỂ LOẠI
-                        </a>
-                        <div class="dropdown-menu p-3 genres-menu" aria-labelledby="navbarDropdown" id="genres-menu">
-                            <ul class="genres-list" id="genres-list">
-                            </ul>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/view/favourite">YÊU THÍCH</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/view/history">LỊCH SỬ</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-                    <li class="nav-item">
-                        <span class="nav-link fw-bold text-dark" id="user-info"></span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-danger btn-sm text-danger ms-2 px-3" id="logout-link" href="#" style="display: none;" onclick="logout()">Đăng xuất</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="login-link" href="/api/auth/login" style="display: none;">Đăng nhập</a>
-                    </li>
-                </ul>
-            </div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top shadow-sm border-bottom border-secondary">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand fw-bold text-primary fs-4" href="/">MANGASVN</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">TRANG CHỦ</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/theloai" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        THỂ LOẠI
+                    </a>
+                    <div class="dropdown-menu p-3 genres-menu" aria-labelledby="navbarDropdown" id="genres-menu">
+                        <ul class="genres-list" id="genres-list">
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/view/favourite">YÊU THÍCH</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/view/history">LỊCH SỬ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active fw-bold text-warning" href="/view/admin"><i class="fa-solid fa-gauge me-1"></i>QUẢN TRỊ</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <span class="nav-link text-light fw-semibold" id="user-info"></span>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="logout-link" onclick="logout(event)"><i class="fa-solid fa-right-from-bracket me-1"></i>Đăng xuất</button>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-primary btn-sm ms-2" id="login-link" href="/login" style="display: none;">Đăng nhập</a>
+                </li>
+            </ul>
         </div>
-    </nav>
-</div>
+    </div>
+</nav>
 
+<!-- Main Container -->
 <div class="container dashboard">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fa-solid fa-gauge-high text-primary me-2"></i>Bảng Quản Trị Hệ Thống</h2>
-        <span id="role-badge" class="badge bg-primary fs-6">Đang tải...</span>
+    <!-- Header Row -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fa-solid fa-gauge-high text-primary me-2"></i>Bảng Quản Trị Hệ Thống</h2>
+            <p class="text-muted small mb-0">Quản lý truyện tranh, thể loại, thành viên và kiểm duyệt nội dung</p>
+        </div>
+        <span id="role-badge" class="badge bg-primary fs-6 px-3 py-2">Đang tải...</span>
     </div>
 
     <!-- Stats row (Dashboard) -->
     <div class="row g-3 mb-4" id="stats-section">
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card stat-card text-center p-3 border-0 bg-primary text-white">
-                <div class="fs-4 fw-bold" id="stat-comics">0</div>
-                <div class="small">Tổng Truyện</div>
+            <div class="stat-card stat-card-blue text-center">
+                <div class="stat-number" id="stat-comics">0</div>
+                <div class="stat-label"><i class="fa-solid fa-book me-1"></i>Tổng Truyện</div>
             </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card stat-card text-center p-3 border-0 bg-success text-white">
-                <div class="fs-4 fw-bold" id="stat-chapters">0</div>
-                <div class="small">Tổng Chapter</div>
+            <div class="stat-card stat-card-green text-center">
+                <div class="stat-number" id="stat-chapters">0</div>
+                <div class="stat-label"><i class="fa-solid fa-layer-group me-1"></i>Chapters</div>
             </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card stat-card text-center p-3 border-0 bg-info text-dark">
-                <div class="fs-4 fw-bold" id="stat-users">0</div>
-                <div class="small">Thành Viên</div>
+            <div class="stat-card stat-card-cyan text-center">
+                <div class="stat-number" id="stat-users">0</div>
+                <div class="stat-label"><i class="fa-solid fa-users me-1"></i>Thành Viên</div>
             </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card stat-card text-center p-3 border-0 bg-warning text-dark">
-                <div class="fs-4 fw-bold" id="stat-views">0</div>
-                <div class="small">Tổng Lượt Xem</div>
+            <div class="stat-card stat-card-amber text-center">
+                <div class="stat-number" id="stat-views">0</div>
+                <div class="stat-label"><i class="fa-solid fa-eye me-1"></i>Lượt Xem</div>
             </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card stat-card text-center p-3 border-0 bg-secondary text-white">
-                <div class="fs-4 fw-bold" id="stat-comments">0</div>
-                <div class="small">Bình Luận</div>
+            <div class="stat-card stat-card-purple text-center">
+                <div class="stat-number" id="stat-comments">0</div>
+                <div class="stat-label"><i class="fa-solid fa-comments me-1"></i>Bình Luận</div>
             </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card stat-card text-center p-3 border-0 bg-danger text-white">
-                <div class="fs-4 fw-bold" id="stat-reports">0</div>
-                <div class="small">Báo Cáo Lỗi</div>
+            <div class="stat-card stat-card-red text-center">
+                <div class="stat-number" id="stat-reports">0</div>
+                <div class="stat-label"><i class="fa-solid fa-triangle-exclamation me-1"></i>Báo Cáo Lỗi</div>
             </div>
         </div>
     </div>
@@ -125,6 +128,11 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="tab-comics-btn" data-bs-toggle="pill" data-bs-target="#tab-comics" type="button" role="tab">
                 <i class="fa-solid fa-book-open me-1"></i> Quản Lý Truyện
+            </button>
+        </li>
+        <li class="nav-item admin-only" role="presentation">
+            <button class="nav-link" id="tab-categories-btn" data-bs-toggle="pill" data-bs-target="#tab-categories" type="button" role="tab">
+                <i class="fa-solid fa-tags me-1"></i> Quản Lý Thể Loại
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -151,7 +159,7 @@
 
     <!-- Tab Contents -->
     <div class="tab-content" id="adminTabContent">
-        <!-- TAB 1: QUẢN LÝ TRUYỆN -->
+
         <div class="tab-pane fade show active" id="tab-comics" role="tabpanel">
             <div class="card p-3 mb-3">
                 <div class="row g-2 align-items-center">
@@ -192,7 +200,7 @@
                     <span id="comics-count-badge" class="badge bg-light text-dark border">Đang tải...</span>
                 </div>
                 <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th style="width: 50px;">ID</th>
                             <th style="width: 70px;">Bìa</th>
@@ -213,10 +221,49 @@
             </div>
         </div>
 
-        <!-- TAB 2: ĐĂNG / SỬA TRUYỆN (GIỮ NGUYÊN FORM CŨ) -->
+        <!-- TAB 2: QUẢN LÝ THỂ LOẠI (ADMIN ONLY) -->
+        <div class="tab-pane fade" id="tab-categories" role="tabpanel">
+            <div class="card p-3 mb-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                            <input type="text" id="category-search-input" class="form-control" placeholder="Tìm theo tên thể loại hoặc mô tả...">
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-success" onclick="openCategoryModal()"><i class="fa-solid fa-plus me-1"></i> Thêm Thể Loại Mới</button>
+                        <button class="btn btn-outline-secondary ms-1" onclick="loadAdminCategories()" title="Làm mới danh sách"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-tags me-1"></i> Danh Sách Thể Loại Hệ Thống</h6>
+                    <span id="categories-count-badge" class="badge bg-light text-dark border">Đang tải...</span>
+                </div>
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">ID</th>
+                            <th style="width: 200px;">Tên Thể Loại</th>
+                            <th>Mô Tả Thể Loại</th>
+                            <th style="width: 150px;">Trạng Thái</th>
+                            <th class="text-center" style="width: 190px;">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-categories-tbody">
+                        <tr><td colspan="5" class="text-center py-4">Đang tải danh sách thể loại...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: ĐĂNG / SỬA TRUYỆN -->
         <div class="tab-pane fade" id="tab-upload" role="tabpanel">
             <div class="card">
-                <div class="card-header bg-primary text-white" id="form-header-title">Đăng Truyện Mới</div>
+                <div class="card-header" id="form-header-title">Đăng Truyện Mới</div>
                 <div class="card-body">
                     <form id="upload-form">
                         <div class="form-group mb-3" id="comic-select-group">
@@ -264,10 +311,10 @@
                                     <div class="invalid-feedback">Vui lòng upload file ZIP với tên ảnh theo số thứ tự (ví dụ: 1.jpg, 2.png).</div>
                                 </div>
                             </div>
-                            <button type="button" class="btn-add-chapter mt-2" onclick="addChapter()">Thêm Chapter</button>
+                            <button type="button" class="btn-add-chapter mt-2" onclick="addChapter()"><i class="fa-solid fa-plus me-1"></i> Thêm Chapter</button>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="create-btn">Đăng Truyện</button>
-                        <button type="submit" class="btn btn-success" id="update-btn" style="display: none;">Cập nhật Chapter</button>
+                        <button type="submit" class="btn btn-primary" id="create-btn"><i class="fa-solid fa-upload me-1"></i> Đăng Truyện</button>
+                        <button type="submit" class="btn btn-success" id="update-btn" style="display: none;"><i class="fa-solid fa-floppy-disk me-1"></i> Cập nhật Chapter</button>
                         <div id="upload-progress" class="progress">
                             <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                         </div>
@@ -293,7 +340,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: QUẢN LÝ THÀNH VIÊN (ADMIN ONLY) -->
+
         <div class="tab-pane fade" id="tab-users" role="tabpanel">
             <div class="card p-3 mb-3">
                 <div class="row g-2 align-items-center">
@@ -310,7 +357,7 @@
                     </div>
                     <div class="col-md-2">
                         <select id="user-status-filter" class="form-select">
-                            <option value="">Tất cả</option>
+                            <option value="">Tất cả trạng thái</option>
                             <option value="true">Hoạt động</option>
                             <option value="false">Đã bị khóa</option>
                         </select>
@@ -323,7 +370,7 @@
 
             <div class="table-responsive p-3">
                 <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Tên Người Dùng</th>
@@ -342,18 +389,18 @@
             </div>
         </div>
 
-        <!-- TAB 4: BÁO CÁO LỖI (ADMIN ONLY) -->
+
         <div class="tab-pane fade" id="tab-reports" role="tabpanel">
             <div class="card p-3 mb-3">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fa-solid fa-list-check me-2"></i>Danh Sách Phản Ánh Từ Bạn Đọc</h5>
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check me-2 text-primary"></i>Danh Sách Phản Ánh Từ Bạn Đọc</h5>
                     <button class="btn btn-outline-primary btn-sm" onclick="loadAdminReports(0)"><i class="fa-solid fa-rotate me-1"></i> Làm mới</button>
                 </div>
             </div>
 
             <div class="table-responsive p-3">
                 <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Truyện Bị Báo Cáo</th>
@@ -372,10 +419,10 @@
             </div>
         </div>
 
-        <!-- TAB 5: XÓA BÌNH LUẬN (ADMIN ONLY) -->
+
         <div class="tab-pane fade" id="tab-comments" role="tabpanel">
             <div class="card p-4">
-                <h5 class="mb-3 text-danger"><i class="fa-solid fa-trash-can me-2"></i>Xóa Bình Luận Vi Phạm</h5>
+                <h5 class="mb-3 text-danger fw-bold"><i class="fa-solid fa-trash-can me-2"></i>Xóa Bình Luận Vi Phạm</h5>
                 <p class="text-muted">Nhập ID của bình luận cần xóa (ID có thể lấy từ phản ánh báo cáo của bạn đọc hoặc inspect trực tiếp):</p>
                 <div class="row g-2 col-md-6">
                     <div class="col-8">
@@ -390,12 +437,12 @@
     </div>
 </div>
 
-<!-- Modal Đổi Role -->
+
 <div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Phân Quyền Cho Thành Viên</h5>
+                <h5 class="modal-title fw-bold">Phân Quyền Cho Thành Viên</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -413,6 +460,33 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-primary" onclick="submitChangeRole()">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="categoryModalTitle">Thêm Thể Loại Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modal-cat-id">
+                <div class="mb-3">
+                    <label for="modal-cat-name" class="form-label fw-semibold">Tên Thể Loại <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="modal-cat-name" placeholder="Ví dụ: Action, Romcom, Isekai..." required>
+                </div>
+                <div class="mb-3">
+                    <label for="modal-cat-desc" class="form-label fw-semibold">Mô Tả Chi Tiết</label>
+                    <textarea class="form-control" id="modal-cat-desc" rows="4" placeholder="Mô tả nội dung hoặc đặc trưng của thể loại này..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitSaveCategory()"><i class="fa-solid fa-floppy-disk me-1"></i> Lưu Thể Loại</button>
             </div>
         </div>
     </div>

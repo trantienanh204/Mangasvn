@@ -12,7 +12,7 @@ $(document).ready(function() {
                 position: "right",
                 backgroundColor: "#ff4444"
             }).showToast();
-            window.location.href = "/login_dangnhap.html";
+            window.location.href = "/login";
             return;
         }
 
@@ -83,7 +83,7 @@ $(document).ready(function() {
                         backgroundColor: "#ff4444"
                     }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/login_dangnhap.html";
+                    window.location.href = "/login";
                 } else {
                     Toastify({
                         text: isAdding ? "Lỗi khi thêm vào danh sách yêu thích!" : "Lỗi khi xóa khỏi danh sách yêu thích!",

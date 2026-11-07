@@ -4,6 +4,7 @@ import com.example.demo.baove.controller.DTO.*;
 import com.example.demo.baove.controller.error.messageError;
 import com.example.demo.baove.controller.error.messageSuccess;
 import com.example.demo.baove.entity.Comic;
+import com.example.demo.baove.entity.DanhMuc;
 import com.example.demo.baove.entity.Role;
 import com.example.demo.baove.repository.RoleRepository;
 import com.example.demo.baove.service.AdminService;
@@ -229,6 +230,60 @@ public class AdminController {
         try {
             adminService.deleteReport(id);
             return ResponseEntity.ok(new messageSuccess("Đã xóa báo cáo ID " + id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // QUẢN LÝ THỂ LOẠI (DANH MỤC)
+    // ==========================================
+
+    @GetMapping("/categories")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DanhMuc>> getCategories() {
+        return ResponseEntity.ok(adminService.getAllCategoriesForAdmin());
+    }
+
+    @PostMapping("/categories")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createCategory(@RequestBody CategoryRequestDTO request) {
+        try {
+            DanhMuc created = adminService.createCategory(request.getTenDanhMuc(), request.getNoiDung());
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/categories/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateCategory(@PathVariable int id, @RequestBody CategoryRequestDTO request) {
+        try {
+            DanhMuc updated = adminService.updateCategory(id, request.getTenDanhMuc(), request.getNoiDung());
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/categories/{id}/toggle-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> toggleCategoryStatus(@PathVariable int id) {
+        try {
+            DanhMuc updated = adminService.toggleCategoryStatus(id);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/categories/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteCategory(@PathVariable int id) {
+        try {
+            adminService.deleteCategory(id);
+            return ResponseEntity.ok(new messageSuccess("Đã xóa thể loại ID " + id));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
         }

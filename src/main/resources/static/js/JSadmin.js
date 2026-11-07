@@ -1,12 +1,24 @@
 const serverHost = window.location.origin;
 
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+}
+
 let authorsMap = {};
 let categoriesMap = {};
 let currentUserRole = "";
 
-window.logout = function() {
+window.logout = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
     localStorage.removeItem('token');
-    window.location.replace('/login_dangnhap.html');
+    if (typeof Toastify !== 'undefined') {
+        Toastify({ text: "Đã đăng xuất thành công!", duration: 1500, style: { background: "#28a745" } }).showToast();
+    }
+    setTimeout(() => {
+        window.location.replace('/login');
+    }, 200);
 };
 
 $(document).ready(function() {
@@ -32,7 +44,7 @@ $(document).ready(function() {
     function checkAdmin() {
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.replace('/login_dangnhap.html');
+            window.location.replace('/login');
             return Promise.resolve(false);
         }
 
@@ -42,6 +54,9 @@ $(document).ready(function() {
             headers: { "Authorization": "Bearer " + token },
             success: function(data) {
                 currentUserRole = data.role;
+                $('#user-info').text("Xin chào, " + (data.username || "Admin"));
+                $('#logout-link').show();
+                $('#login-link').hide();
                 if (data.role === "ADMIN") {
                     $('#role-badge').text("QUẢN TRỊ VIÊN (ADMIN)").removeClass('bg-secondary bg-warning').addClass('bg-danger');
                     $('.admin-only').show();
@@ -54,7 +69,7 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 localStorage.removeItem('token');
-                window.location.replace('/login_dangnhap.html');
+                window.location.replace('/login');
             }
         }).then(function(data) {
             return (data.role === "ADMIN" || data.role === "CHUTUT");
@@ -518,6 +533,190 @@ $(document).ready(function() {
         });
     };
 
+    // ==========================================
+    // 6. QUẢN LÝ THỂ LOẠI (CATEGORIES - ADMIN ONLY)
+    // ==========================================
+    let adminCategoriesList = [];
+
+    window.loadAdminCategories = function() {
+        if (currentUserRole !== "ADMIN") return;
+        const token = localStorage.getItem('token');
+        const tbody = $('#admin-categories-tbody');
+        tbody.html('<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>');
+
+        $.ajax({
+            url: `${serverHost}/api/admin/categories`,
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function(categories) {
+                adminCategoriesList = categories || [];
+                renderAdminCategoriesTable(adminCategoriesList);
+            },
+            error: function(xhr) {
+                tbody.html(`<tr><td colspan="5" class="text-center text-danger py-4">Lỗi: ${xhr.responseText || 'Không thể tải danh sách thể loại'}</td></tr>`);
+            }
+        });
+    };
+
+    function renderAdminCategoriesTable(categories) {
+        const tbody = $('#admin-categories-tbody');
+        tbody.empty();
+        $('#categories-count-badge').text(`Tổng: ${categories.length} thể loại`);
+
+        if (categories.length === 0) {
+            tbody.html('<tr><td colspan="5" class="text-center py-4 text-muted"><i class="fa-solid fa-tags me-1"></i> Không có thể loại nào phù hợp.</td></tr>');
+            return;
+        }
+
+        categories.forEach(cat => {
+            const isAct = (cat.trangThai !== false);
+            const statusBadge = isAct
+                ? '<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Đang hiển thị</span>'
+                : '<span class="badge bg-secondary"><i class="fa-solid fa-ban me-1"></i>Đang ẩn</span>';
+
+            const toggleBtnText = isAct ? 'Ẩn' : 'Hiện';
+            const toggleBtnClass = isAct ? 'btn-outline-warning' : 'btn-outline-success';
+            const toggleIcon = isAct ? 'fa-eye-slash' : 'fa-eye';
+
+            const row = `
+                <tr>
+                    <td><strong>#${cat.id}</strong></td>
+                    <td>
+                        <span class="fw-bold text-primary">${escapeHtml(cat.tenDanhMuc)}</span>
+                    </td>
+                    <td>
+                        <span class="text-muted small">${escapeHtml(cat.noiDung || 'Chưa có mô tả')}</span>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="openCategoryModal(${cat.id})" title="Chỉnh sửa">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa
+                        </button>
+                        <button class="btn btn-sm ${toggleBtnClass} me-1" onclick="toggleCategoryStatusAction(${cat.id})" title="${toggleBtnText} thể loại">
+                            <i class="fa-solid ${toggleIcon}"></i> ${toggleBtnText}
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCategoryAction(${cat.id}, '${escapeHtml(cat.tenDanhMuc)}')" title="Xóa thể loại">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.append(row);
+        });
+    }
+
+    // Lọc thể loại theo từ khóa tìm kiếm
+    $('#category-search-input').on('input', function() {
+        const kw = $(this).val().toLowerCase().trim();
+        if (!kw) {
+            renderAdminCategoriesTable(adminCategoriesList);
+            return;
+        }
+        const filtered = adminCategoriesList.filter(c => 
+            (c.tenDanhMuc && c.tenDanhMuc.toLowerCase().includes(kw)) ||
+            (c.noiDung && c.noiDung.toLowerCase().includes(kw))
+        );
+        renderAdminCategoriesTable(filtered);
+    });
+
+    window.openCategoryModal = function(catId = null) {
+        if (catId) {
+            const cat = adminCategoriesList.find(c => c.id === catId);
+            if (cat) {
+                $('#categoryModalTitle').text('Chỉnh Sửa Thể Loại');
+                $('#modal-cat-id').val(cat.id);
+                $('#modal-cat-name').val(cat.tenDanhMuc);
+                $('#modal-cat-desc').val(cat.noiDung || '');
+            }
+        } else {
+            $('#categoryModalTitle').text('Thêm Thể Loại Mới');
+            $('#modal-cat-id').val('');
+            $('#modal-cat-name').val('');
+            $('#modal-cat-desc').val('');
+        }
+        const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+        modal.show();
+    };
+
+    window.submitSaveCategory = function() {
+        const catId = $('#modal-cat-id').val();
+        const tenDanhMuc = $('#modal-cat-name').val().trim();
+        const noiDung = $('#modal-cat-desc').val().trim();
+
+        if (!tenDanhMuc) {
+            Toastify({ text: "Vui lòng nhập tên thể loại!", duration: 3000, style: { background: "#dc3545" } }).showToast();
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        const isUpdate = Boolean(catId);
+        const url = isUpdate ? `${serverHost}/api/admin/categories/${catId}` : `${serverHost}/api/admin/categories`;
+        const method = isUpdate ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: url,
+            method: method,
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            data: JSON.stringify({ tenDanhMuc, noiDung }),
+            success: function() {
+                Toastify({ text: isUpdate ? "Cập nhật thể loại thành công!" : "Tạo thể loại mới thành công!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                const modalEl = document.getElementById('categoryModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                loadAdminCategories();
+                loadCategories();
+            },
+            error: function(xhr) {
+                let err = "Không thể lưu thể loại!";
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) err = parsed.message;
+                } catch(e) { err = xhr.responseText || err; }
+                Toastify({ text: "Lỗi: " + err, duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    window.toggleCategoryStatusAction = function(catId) {
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/categories/${catId}/toggle-status`,
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() {
+                Toastify({ text: "Đã thay đổi trạng thái thể loại!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminCategories();
+                loadCategories();
+            },
+            error: function(xhr) {
+                Toastify({ text: "Lỗi: " + (xhr.responseText || 'Không thể đổi trạng thái'), duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
+    window.deleteCategoryAction = function(catId, catName) {
+        if (!confirm(`Bạn có chắc chắn muốn xóa thể loại "${catName}"?`)) return;
+        const token = localStorage.getItem('token');
+        $.ajax({
+            url: `${serverHost}/api/admin/categories/${catId}`,
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+            success: function() {
+                Toastify({ text: "Đã xóa thể loại thành công!", duration: 2500, style: { background: "#28a745" } }).showToast();
+                loadAdminCategories();
+                loadCategories();
+            },
+            error: function(xhr) {
+                let err = "Không thể xóa thể loại!";
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) err = parsed.message;
+                } catch(e) { err = xhr.responseText || err; }
+                Toastify({ text: "Lỗi: " + err, duration: 3000, style: { background: "#dc3545" } }).showToast();
+            }
+        });
+    };
+
     // Helper: Render Pagination UI
     function renderPagination(containerId, pageData, callbackFnName) {
         const container = $(containerId);
@@ -906,34 +1105,13 @@ $(document).ready(function() {
         loadComics();
 
         if (currentUserRole === "ADMIN") {
+            loadAdminCategories();
             loadAdminUsers();
             loadAdminReports();
         }
     });
-});
 
-const token = localStorage.getItem("token");
-if (token) {
-    $.ajax({
-        url: `${serverHost}/api/auth/user-info`,
-        method: "GET",
-        headers: { "Authorization": "Bearer " + token },
-        success: function(data) {
-            $('#login-link').hide();
-            $('#logout-link').show();
-            $('#user-info').text("Xin chào, " + data.username);
-        },
-        error: function(xhr) {
-            if (xhr.status === 401 || xhr.status === 403) {
-                localStorage.removeItem("token");
-                $('#login-link').show();
-                $('#logout-link').hide();
-                $('#user-info').text("");
-            }
-        }
+    $('#tab-categories-btn').on('click', function() {
+        loadAdminCategories();
     });
-} else {
-    $('#login-link').show();
-    $('#logout-link').hide();
-    $('#user-info').text("");
-}
+});

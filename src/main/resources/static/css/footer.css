@@ -1,60 +1,25 @@
 footer {
-    border: 10px solid white;
+    border: none;
 }
 
 .footer_edit {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    gap: 40px; /* khoảng cách giữa các phần tử */
-    border: 2px solid white; /* border phải có kiểu và màu */
+    padding: 12px 0;
+    border: none;
 }
 
-.footer_edit .left p {
-    color: black;
+.footer_edit .left p,
+.footer_edit .right p {
+    color: #9298a5;
+    margin: 0;
 }
 
-.right {
-    display: grid;
-    grid-template-columns: repeat(5, auto);
-    gap: 8px;
-}
-
-/* Responsive cho footer */
-/* For large tablets/laptops small (max-width: 992px) */
-@media (max-width: 992px) {
-    .footer_edit {
-        flex-direction: column; /* Stack footer parts dọc */
-    }
-
-    .right {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-}
-
-/* For tablets/mobile large (max-width: 768px) */
 @media (max-width: 768px) {
     .footer_edit {
-        gap: 20px; /* Giảm gap */
-    }
-
-    .right {
-        grid-template-columns: repeat(3, auto); /* Giảm xuống 3 columns cho footer buttons */
-        gap: 5px;
-    }
-}
-
-/* For small mobiles (max-width: 576px) */
-@media (max-width: 576px) {
-    .footer_edit .right button {
-        width: 100%; /* Full width buttons trong footer */
-        margin: 5px 0;
-    }
-
-    .right {
-        grid-template-columns: repeat(2, auto); /* Giảm xuống 2 columns cho footer buttons */
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
     }
 }

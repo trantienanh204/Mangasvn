@@ -1,36 +1,35 @@
 .genres-menu {
     position: fixed !important;
-    top: 60px !important;
+    top: 65px !important;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     transform: none !important;
-    background-color: rgba(28, 28, 28, 0.98) !important;
-    backdrop-filter: blur(10px);
-    border-top: 1px solid #444;
-    border-bottom: 3px solid #ffcc00;
+    background-color: rgba(18, 20, 26, 0.96) !important;
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid #3b82f6;
     border-radius: 0 !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
-    padding: 30px 8% !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+    padding: 24px 8% !important;
     max-height: 75vh !important;
     overflow-y: auto !important;
     display: none;
-    z-index: 9999 !important; /* Đảm bảo đè lên mọi thứ */
-    -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
-
+    z-index: 9999 !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 .genres-menu.show {
     display: block !important;
-    animation: slideDown 0.25s ease-out;
+    animation: slideDown 0.22s ease-out;
 }
 
 .genres-list {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+    gap: 12px;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -38,58 +37,51 @@
 
 .genres-list a {
     text-decoration: none !important;
-    color: #e0e0e0 !important;
-    background-color: #333;
-    padding: 10px 5px;
+    color: #e2e8f0 !important;
+    background-color: #242731;
+    padding: 8px 12px;
     display: block;
     text-align: center;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
     transition: all 0.2s ease;
-    border: 1px solid transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .genres-list a:hover {
     text-decoration: none !important;
-    background-color: #ffcc00 !important;
-    color: #000 !important;
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border-color: #60a5fa !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35);
     font-weight: 600;
 }
 
 @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
+    from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive cho genres menu */
-/* For large tablets/laptops small (max-width: 992px) */
 @media (max-width: 992px) {
     .genres-list {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Giảm size items */
-        gap: 10px;
-    }
-    .genres-menu {
-        top: 70px !important; /* Dịch xuống 1 chút so với navbar để ngón tay không chạm nhầm */
-    }
-}
-/* For tablets/mobile large (max-width: 768px) */
-@media (max-width: 768px) {
-    .genres-list {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    }
-}
-
-/* For small mobiles (max-width: 576px) */
-@media (max-width: 576px) {
-    .genres-list {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Nhỏ hơn nữa */
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         gap: 8px;
     }
-
     .genres-menu {
-        padding: 15px 3%;
+        top: 60px !important;
+        padding: 16px 4% !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .genres-list {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 6px;
+    }
+    .genres-menu {
+        padding: 12px 3%;
         max-height: 70vh;
     }
 }

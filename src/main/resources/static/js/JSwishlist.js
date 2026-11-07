@@ -32,7 +32,7 @@ $(document).ready(function() {
                         style: { background: "#ff4444" }
                     }).showToast();
                     setTimeout(() => {
-                        window.location.href = "/login_dangnhap.html";
+                        window.location.href = "/login";
                     }, 3000);
                 }
             }

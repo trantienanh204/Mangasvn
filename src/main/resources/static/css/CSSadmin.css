@@ -1,21 +1,293 @@
+/* ===================================================
+   MANGASVN - ADMIN DASHBOARD MODERN UI/UX STYLES
+   =================================================== */
 
-.dashboard { margin-top: 80px; padding: 20px; }
-.card { margin-bottom: 20px; border: none; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); border-radius: 8px; }
-.card-header { background-color: #007bff; color: white; font-weight: bold; border-radius: 8px 8px 0 0; }
-.form-group label { font-weight: 500; }
-.chapter-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px; }
-.chapter-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #eee; }
-.chapter-item:last-child { border-bottom: none; }
-.btn-add-chapter { background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-.btn-add-chapter:hover { background-color: #218838; }
-.btn-remove-chapter { padding: 5px 10px; font-size: 0.875em; }
-#upload-progress { display: none; margin-top: 10px; }
-.invalid-feedback { display: none; color: #dc3545; font-size: 0.875em; }
-#comic-select { margin-bottom: 15px; }
-.select2-container .select2-selection--single { min-height: 38px; }
-.select2-container--default .select2-selection--single .select2-selection__rendered { padding: 6px 12px; }
-.select2-container--default .select2-selection--multiple .select2-selection__choice { background-color: #007bff; color: white; border: none; border-radius: 4px; }
-.select2-container--default .select2-results__option[aria-selected="true"] {
-    background-color: #28a745;
+:root {
+    --admin-bg: #f4f6f9;
+    --admin-card-bg: #ffffff;
+    --admin-border: #e2e8f0;
+    --admin-text-main: #1e293b;
+    --admin-text-muted: #64748b;
+    --admin-primary: #2563eb;
+    --admin-primary-hover: #1d4ed8;
+}
+
+body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+}
+
+.dashboard {
+    margin-top: 85px;
+    padding: 24px 20px 60px;
+    max-width: 1400px;
+}
+
+/* Stat Cards */
+.stat-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 1.25rem 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .stat-number {
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+}
+
+.stat-card .stat-label {
+    font-size: 0.825rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.9;
+}
+
+/* Stat Card Gradients */
+.stat-card-blue {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+}
+.stat-card-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+}
+.stat-card-cyan {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+}
+.stat-card-amber {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+}
+.stat-card-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: #ffffff;
+}
+.stat-card-red {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+}
+
+/* Tabs */
+.admin-nav-tabs {
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--admin-border);
+    gap: 4px;
+}
+
+.admin-nav-tabs .nav-link {
+    font-weight: 600;
+    color: var(--admin-text-muted);
+    border-radius: 8px;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.9rem;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.admin-nav-tabs .nav-link:hover {
+    color: var(--admin-primary);
+    background-color: #f1f5f9;
+}
+
+.admin-nav-tabs .nav-link.active {
+    background-color: var(--admin-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+/* Cards & Tables */
+.card {
+    margin-bottom: 24px;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.card-header {
+    background-color: #ffffff;
+    color: var(--admin-text-main);
+    font-weight: 700;
+    border-bottom: 1px solid var(--admin-border);
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1rem 1.25rem;
+}
+
+.table-responsive {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--admin-border);
+    padding: 0.85rem 1rem;
+}
+
+.table tbody td {
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Badges */
+.badge-role-admin {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+    font-weight: 600;
+}
+.badge-role-chutut {
+    background-color: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fcd34d;
+    font-weight: 600;
+}
+.badge-role-docgia {
+    background-color: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+    font-weight: 600;
+}
+
+/* Chapter form elements */
+.form-group label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.4rem;
+    color: #334155;
+}
+
+.chapter-list {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    padding: 12px;
+    background: #f8fafc;
+}
+
+.chapter-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+    gap: 8px;
+}
+
+.chapter-item:last-child {
+    border-bottom: none;
+}
+
+.btn-add-chapter {
+    background-color: #10b981;
     color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-add-chapter:hover {
+    background-color: #059669;
+}
+
+.btn-remove-chapter {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+}
+
+#upload-progress {
+    display: none;
+    margin-top: 15px;
+    height: 12px;
+    border-radius: 6px;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc2626;
+    font-size: 0.825rem;
+    margin-top: 0.25rem;
+}
+
+#comic-select {
+    margin-bottom: 15px;
+}
+
+/* Select2 Customization */
+.select2-container .select2-selection--single {
+    min-height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding: 6px 14px;
+    line-height: 26px;
+    color: #1e293b;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+    right: 8px;
+}
+.select2-container .select2-selection--multiple {
+    min-height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 3px 6px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.85rem;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: white;
+    margin-right: 5px;
+}
+.select2-container--default .select2-results__option[aria-selected="true"] {
+    background-color: #10b981;
+    color: white;
+}
+.select2-dropdown {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }

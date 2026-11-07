@@ -1,219 +1,282 @@
 const serverHost = window.location.origin;
+let currentGenre = '';
+let currentSort = 'date-desc';
+let currentStatus = '';
+let currentPage = 1;
 
 $(document).ready(function () {
+    // 1. Phân tích thể loại từ URL pathname
+    // URL có thể là /theloai, /theloai/, hoặc /theloai/{genre}
+    const path = window.location.pathname;
+    const parts = path.split('/').filter(p => p.length > 0);
+    
+    if (parts.length >= 2 && parts[0].toLowerCase() === 'theloai') {
+        try {
+            currentGenre = decodeURIComponent(parts[1]);
+        } catch (e) {
+            currentGenre = parts[1];
+        }
+    }
 
-    const token = localStorage.getItem("token");
-    const $carouselInner = $('#genre-select');
-    const pathParts = window.location.pathname.split('/');
+    // 2. Tải danh sách tất cả thể loại và hiển thị dạng Pills/Chips
+    loadGenreChips();
 
-    let currentGenre = pathParts[pathParts.length - 1] || $('#genre-select').val() || 'romcom';
-    $('#genre-select').val(currentGenre);
+    // 3. Xử lý sắp xếp và bộ lọc
+    $('#sort-select').on('change', function () {
+        currentSort = $(this).val();
+        loadComics(currentGenre, currentStatus, currentSort, 1);
+    });
 
+    $('#status-select').on('change', function () {
+        currentStatus = $(this).val();
+        loadComics(currentGenre, currentStatus, currentSort, 1);
+    });
 
+    // 4. Click chuyển trang (Pagination)
+    $(document).on('click', '.genre-page-btn', function (e) {
+        e.preventDefault();
+        if ($(this).hasClass('disabled') || $(this).hasClass('active')) return;
+        const page = parseInt($(this).attr('data-page'));
+        if (page && page > 0) {
+            loadComics(currentGenre, currentStatus, currentSort, page);
+            $('html, body').animate({
+                scrollTop: $("#comic-grid").offset().top - 100
+            }, 300);
+        }
+    });
+
+    // 5. Click chọn thể loại từ chip
+    $(document).on('click', '.genre-chip', function (e) {
+        e.preventDefault();
+        const selectedGenre = $(this).attr('data-genre');
+        if (!selectedGenre || selectedGenre === currentGenre) return;
+
+        currentGenre = selectedGenre;
+        $('.genre-chip').removeClass('active');
+        $(this).addClass('active');
+
+        // Cập nhật URL trình duyệt không reload trang
+        const newUrl = '/theloai/' + encodeURIComponent(selectedGenre);
+        window.history.pushState({ genre: selectedGenre }, '', newUrl);
+
+        loadComics(currentGenre, currentStatus, currentSort, 1);
+    });
+
+    // 6. Xử lý nút Back/Forward của trình duyệt
+    window.addEventListener('popstate', function () {
+        const p = window.location.pathname.split('/').filter(x => x.length > 0);
+        if (p.length >= 2 && p[0].toLowerCase() === 'theloai') {
+            currentGenre = decodeURIComponent(p[1]);
+        } else {
+            currentGenre = '';
+        }
+        highlightActiveChip(currentGenre);
+        loadComics(currentGenre, currentStatus, currentSort, 1);
+    });
+
+    // 7. Khởi tạo trạng thái đăng nhập
+    initAuthStatus();
+});
+
+function loadGenreChips() {
     $.ajax({
         url: `${serverHost}/theloai/fill/AllGenre`,
         method: "GET",
-        success: function(data) {
-            if ($carouselInner.length) $carouselInner.empty();
-            if (Array.isArray(data)) {
-                data.forEach((truyen) => {
-                    $carouselInner.append(
-                        `<option value="${truyen.tenDanhMuc}">${truyen.tenDanhMuc}</option>`
-                    );
+        success: function (data) {
+            const $chipsList = $('#genre-chips-list');
+            $chipsList.empty();
+
+            if (Array.isArray(data) && data.length > 0) {
+                // Nếu chưa có currentGenre, mặc định chọn thể loại đầu tiên
+                if (!currentGenre) {
+                    currentGenre = data[0].tenDanhMuc;
+                }
+
+                data.forEach(dm => {
+                    const isActive = (dm.tenDanhMuc.toLowerCase() === currentGenre.toLowerCase());
+                    const chip = $(`
+                        <a href="/theloai/${encodeURIComponent(dm.tenDanhMuc)}" 
+                           class="genre-chip ${isActive ? 'active' : ''}" 
+                           data-genre="${dm.tenDanhMuc}">
+                           ${dm.tenDanhMuc}
+                        </a>
+                    `);
+                    $chipsList.append(chip);
                 });
-                $carouselInner.val(decodeURIComponent(currentGenre));
+
+                // Tải truyện cho thể loại đã chọn
+                loadComics(currentGenre, currentStatus, currentSort, 1);
             } else {
-                console.warn("Expected array from server, got:", data);
+                $chipsList.html('<span class="text-muted small">Không tìm thấy thể loại nào.</span>');
             }
         },
-        error: function(xhr) {
-            console.error("Lỗi tải danh sách thể loại", xhr);
+        error: function (xhr) {
+            console.error("Lỗi tải danh sách thể loại:", xhr);
+            $('#genre-chips-list').html('<span class="text-danger small">Lỗi khi tải danh sách thể loại.</span>');
         }
     });
-
-    function loadComics(genre, status = '', sort = '', page = 1) {
-        let url = `${serverHost}/theloai/translate/${genre}?page=${page}`;
-        if (status) url += `&status=${status}`;
-        if (sort) url += `&sort=${sort}`;
-
-        $.ajax({
-            url: url,
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function (data) {
-                if (data && data.content && data.content.length > 0) {
-                    $.ajax({
-                        url : `${serverHost}/theloai/search/${genre}`,
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        success : function (dataInfo){
-                            if(dataInfo && dataInfo.noiDung){
-                                $('#summary_genre').text(dataInfo.noiDung);
-                                $('#theLoai').text(dataInfo.tenDanhMuc.toUpperCase());
-                            }else {
-                                $('#theLoai').text("Không tìm thấy truyện");
-                                $('#summary_genre').html('<p>lỗi không có danh mục</p>');
-                            }
-                        }
-                    });
-
-                    displayComics(data.content);
-                    renderPagination(data.currentPage, data.totalPages);
-                } else {
-                    $('#theLoai').text("Không tìm thấy truyện");
-                    $('#comic-list').html('<p>Không có truyện nào trong danh mục này.</p>');
-                    $('#pagination-container').empty();
-                }
-            },
-            error: function (xhr, status, error) {
-                $('#theLoai').text("Lỗi tải dữ liệu");
-                $('#comic-list').html('<p>Lỗi khi tải truyện, vui lòng thử lại!</p>');
-                $('#pagination-container').empty();
-                if (typeof Toastify !== 'undefined') {
-                    Toastify({
-                        text: "Lỗi khi tải truyện, vui lòng thử lại! Chi tiết: " + error,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        style: { background: "#dc3545" }
-                    }).showToast();
-                }
-            }
-        });
-    }
-
-    function displayComics(comics) {
-        const comicList = $('#comic-list');
-        comicList.empty();
-        if (!comicList.length) {
-            return;
-        }
-        comics.forEach(comic => {
-            const tenTruyen = comic.tenTruyen || 'Không có tiêu đề';
-            const moTa = comic.moTa || 'Không có mô tả';
-
-            const comicCard = `
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <a href="/truyen/${comic.id}">
-                            <img src="${comic.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
-                                 alt="${tenTruyen}" 
-                                 style="width: 100%; height: 260px; object-fit: cover; border-bottom: 2px solid #fff;">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">${tenTruyen.substring(0, 40)}${tenTruyen.length > 40 ? '...' : ''}</h5>
-                            <p class="card-text">${moTa.substring(0, 100)}${moTa.length > 60 ? '...' : ''}</p>
-                            <p>Lượt xem: ${comic.luotXem || 0}</p>
-                            <p>Lượt thích: ${comic.luotThich || 0}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            comicList.append(comicCard);
-        });
-    }
-
-    function renderPagination(currentPage, totalPages) {
-        if (totalPages <= 1) {
-            $('#pagination-container').empty();
-            return;
-        }
-        let paginationHtml = '<nav aria-label="Page navigation" class="w-100 d-flex justify-content-center"><ul class="pagination mb-0" style="gap: 5px;">';
-        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link shadow-none" href="#" data-page="${currentPage - 1}">Trước</a>
-        </li>`;
-
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, currentPage + 2);
-
-        if (startPage > 1) {
-            paginationHtml += `<li class="page-item"><a class="page-link shadow-none" href="#" data-page="1">1</a></li>`;
-            if (startPage > 2) {
-                paginationHtml += `<li class="page-item disabled"><span class="page-link shadow-none">...</span></li>`;
-            }
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            paginationHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}">
-                <a class="page-link shadow-none" href="#" data-page="${i}">${i}</a>
-            </li>`;
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                paginationHtml += `<li class="page-item disabled"><span class="page-link shadow-none">...</span></li>`;
-            }
-            paginationHtml += `<li class="page-item"><a class="page-link shadow-none" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
-        }
-
-        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link shadow-none" href="#" data-page="${currentPage + 1}">Sau</a>
-        </li>`;
-
-        paginationHtml += '</ul></nav>';
-
-        if ($('#pagination-container').length === 0) {
-            $('#comic-list').after(`
-                <div id="pagination-container" 
-                     class="w-100 d-flex justify-content-center py-3 mt-4" 
-                     style="position: sticky; bottom: 0; background-color: #212529; z-index: 999; box-shadow: 0 -5px 10px rgba(0,0,0,0.2);">
-                </div>
-            `);
-        }
-        $('#pagination-container').html(paginationHtml);
-    }
-
-    $(document).on('click', '.page-link', function(e) {
-        e.preventDefault();
-
-        if ($(this).parent().hasClass('disabled') || $(this).parent().hasClass('active')) {
-            return;
-        }
-
-        const selectedPage = parseInt($(this).attr('data-page'));
-        const status = $('#status-select').val();
-        const sort = $('#sort-select').val();
-        loadComics(currentGenre, status, sort, selectedPage);
-
-        $('html, body').animate({
-            scrollTop: $("#comic-list").offset().top - 50
-        }, 300);
-    });
-
-    loadComics(currentGenre);
-
-    $('#genre-select, #status-select, #sort-select').on('change', function () {
-        const genre = $('#genre-select').val();
-        const status = $('#status-select').val();
-        const sort = $('#sort-select').val();
-
-        if (genre !== currentGenre) {
-            window.location.href = `/theloai/${genre}`;
-            currentGenre = genre;
-        }
-
-        loadComics(genre, status, sort, 1);
-    });
-});
-
-function logout() {
-    localStorage.removeItem('token');
-    $('#login-link').show();
-    $('#logout-link').hide();
-    $('#user-info').text('');
-    if (typeof loadHistory === 'function') loadHistory();
-    console.log("Đăng xuất thành công, localHistory:", localStorage.getItem('localHistory'));
-    Toastify({ text: "Đã đăng xuất!", duration: 3000, gravity: "top", position: "right", style: { background: "#28a745" } }).showToast();
-    window.location.href = "/view/trangchu.html";
 }
 
-$(document).ready(function() {
-    if (typeof loadHistory === 'function') loadHistory();
+function highlightActiveChip(genreName) {
+    if (!genreName) return;
+    $('.genre-chip').each(function () {
+        const chipGenre = $(this).attr('data-genre');
+        if (chipGenre && chipGenre.toLowerCase() === genreName.toLowerCase()) {
+            $(this).addClass('active');
+        } else {
+            $(this).removeClass('active');
+        }
+    });
+}
 
+function loadComics(genre, status = '', sort = 'date-desc', page = 1) {
+    currentPage = page;
+    let url = `${serverHost}/theloai/translate/${encodeURIComponent(genre)}?page=${page}`;
+    if (sort) url += `&sort=${sort}`;
+    if (status) url += `&status=${status}`;
+
+    // Hiển thị loading skeleton / text
+    $('#comic-grid').html(`
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted small mt-2">Đang tải danh sách truyện...</p>
+        </div>
+    `);
+
+    $.ajax({
+        url: url,
+        method: "GET",
+        success: function (data) {
+            // Cập nhật thông tin tiêu đề và mô tả thể loại
+            if (data.genreInfo) {
+                const genreName = data.genreInfo.tenDanhMuc;
+                $('#theLoai').text(genreName);
+                $('#breadcrumb-genre').text(genreName);
+                $('#summary_genre').text(data.genreInfo.noiDung || "Thể loại tổng hợp truyện tranh chất lượng tại MangaSVN.");
+                highlightActiveChip(genreName);
+            } else {
+                $('#theLoai').text(genre);
+                $('#breadcrumb-genre').text(genre);
+            }
+
+            const total = data.totalElements !== undefined ? data.totalElements : (data.content ? data.content.length : 0);
+            $('#comic-count-display').html(`<i class="fa-solid fa-book-open me-1"></i> Có <strong>${total}</strong> truyện`);
+
+            if (data && data.content && data.content.length > 0) {
+                displayComics(data.content);
+                renderPagination(data.currentPage, data.totalPages);
+            } else {
+                $('#comic-grid').html(`
+                    <div class="col-12 text-center py-5 w-100" style="grid-column: 1 / -1;">
+                        <i class="fa-solid fa-folder-open text-muted mb-3" style="font-size: 3.5rem;"></i>
+                        <h5 class="text-light fw-bold">Chưa có truyện nào trong thể loại này</h5>
+                        <p class="text-muted small">Hãy chọn một thể loại khác hoặc quay lại trang chủ.</p>
+                        <a href="/" class="btn btn-outline-primary btn-sm mt-2"><i class="fa-solid fa-house me-1"></i>Về trang chủ</a>
+                    </div>
+                `);
+                $('#pagination-container').empty();
+            }
+        },
+        error: function (xhr) {
+            console.error("Lỗi khi tải truyện:", xhr);
+            $('#theLoai').text("Không tìm thấy thể loại");
+            $('#comic-grid').html(`
+                <div class="col-12 text-center py-5 w-100" style="grid-column: 1 / -1;">
+                    <i class="fa-solid fa-triangle-exclamation text-danger mb-3" style="font-size: 3.5rem;"></i>
+                    <h5 class="text-light">Lỗi khi tải danh sách truyện</h5>
+                    <p class="text-muted small">Vui lòng thử lại sau giây lát.</p>
+                </div>
+            `);
+            $('#pagination-container').empty();
+            if (typeof Toastify !== 'undefined') {
+                Toastify({
+                    text: "Không thể tải truyện của thể loại này!",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#dc3545" }
+                }).showToast();
+            }
+        }
+    });
+}
+
+function displayComics(comics) {
+    const $grid = $('#comic-grid');
+    $grid.empty();
+
+    comics.forEach(comic => {
+        const tenTruyen = comic.tenTruyen || 'Không có tiêu đề';
+        const moTa = comic.moTa || 'Chưa có mô tả chi tiết cho truyện này.';
+        const imgSrc = comic.imageComic || '/img/placeholder.jpg';
+        const views = (comic.luotXem || 0).toLocaleString();
+        const likes = (comic.luotThich || 0).toLocaleString();
+
+        const card = `
+            <div class="comic-poster-card">
+                <div class="comic-thumb-wrapper">
+                    <a href="/truyen/${comic.id}">
+                        <img class="comic-thumb" src="${imgSrc}" alt="${tenTruyen}" loading="lazy" onerror="this.src='https://i.postimg.cc/zBZ7k81R/cass.jpg'">
+                    </a>
+                    <div class="comic-badge-top">HOT</div>
+                    <div class="comic-badge-bottom">
+                        <span><i class="fa-solid fa-eye me-1"></i>${views}</span>
+                        <span><i class="fa-solid fa-heart me-1"></i>${likes}</span>
+                    </div>
+                </div>
+                <div class="comic-card-info">
+                    <a href="/truyen/${comic.id}" class="comic-card-title" title="${tenTruyen}">${tenTruyen}</a>
+                    <div class="comic-card-desc">${moTa}</div>
+                </div>
+            </div>
+        `;
+        $grid.append(card);
+    });
+}
+
+function renderPagination(currentPage, totalPages) {
+    const $container = $('#pagination-container');
+    $container.empty();
+
+    if (!totalPages || totalPages <= 1) return;
+
+    let html = '';
+
+    // Nút Trang trước
+    html += `<a href="#" class="genre-page-btn ${currentPage === 1 ? 'disabled' : ''}" data-page="${currentPage - 1}">
+        <i class="fa-solid fa-chevron-left"></i>
+    </a>`;
+
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    if (startPage > 1) {
+        html += `<a href="#" class="genre-page-btn" data-page="1">1</a>`;
+        if (startPage > 2) {
+            html += `<span class="genre-page-btn disabled" style="border:none;background:transparent;">...</span>`;
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<a href="#" class="genre-page-btn ${currentPage === i ? 'active' : ''}" data-page="${i}">${i}</a>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += `<span class="genre-page-btn disabled" style="border:none;background:transparent;">...</span>`;
+        }
+        html += `<a href="#" class="genre-page-btn" data-page="${totalPages}">${totalPages}</a>`;
+    }
+
+    // Nút Trang sau
+    html += `<a href="#" class="genre-page-btn ${currentPage === totalPages ? 'disabled' : ''}" data-page="${currentPage + 1}">
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>`;
+
+    $container.html(html);
+}
+
+function initAuthStatus() {
     const token = localStorage.getItem("token");
     if (token) {
         $.ajax({
@@ -222,18 +285,21 @@ $(document).ready(function() {
             headers: {
                 "Authorization": "Bearer " + token
             },
-            success: function(data) {
+            success: function (data) {
                 $('#login-link').hide();
                 $('#logout-link').show();
-                $('#user-info').text("Xin chào, " + data.username);
-                console.log("Đăng nhập thành công với user:", data.username);
+                $('#user-info').text("Xin chào, " + (data.username || "Thành viên"));
+                if (data.role === "ADMIN" || data.role === "CHUTUT") {
+                    $('#nav-admin-link').show();
+                }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 if (xhr.status === 401 || xhr.status === 403) {
                     localStorage.removeItem("token");
                     $('#login-link').show();
                     $('#logout-link').hide();
                     $('#user-info').text("");
+                    $('#nav-admin-link').hide();
                 }
             }
         });
@@ -241,5 +307,25 @@ $(document).ready(function() {
         $('#login-link').show();
         $('#logout-link').hide();
         $('#user-info').text("");
+        $('#nav-admin-link').hide();
     }
-});
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    $('#login-link').show();
+    $('#logout-link').hide();
+    $('#user-info').text('');
+    if (typeof Toastify !== 'undefined') {
+        Toastify({
+            text: "Đã đăng xuất!",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: { background: "#28a745" }
+        }).showToast();
+    }
+    setTimeout(() => {
+        window.location.href = "/";
+    }, 500);
+}

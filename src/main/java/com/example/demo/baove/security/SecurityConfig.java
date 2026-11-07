@@ -50,7 +50,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/view/**", "/favicon.ico", "/error", "/truyen/**", "/trangchu/**").permitAll()
+                        .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/view/**", "/favicon.ico", "/error", "/truyen/**", "/trangchu/**", "/login", "/dangnhap", "/register", "/dangky").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/user-info").permitAll()
                         .requestMatchers("/api/categories", "/api/authors", "/api/chapters", "/api/images", "/api/comments/chapter/**", "/api/comments/comic/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/truyen/favorite/list", "/api/truyen/favorite/status/**").authenticated()
@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/comments/add", "/api/comments/*/like").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/comments/**").permitAll()
                         .requestMatchers("/api/truyen/**", "/api/comments/**", "/api/history/**", "/api/auth/**").authenticated()
-                        .requestMatchers("/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
+                        .requestMatchers("/theloai", "/theloai/**", "/search/**", "/fill/**", "/read/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/reports").permitAll()
 
                         .anyRequest().authenticated()

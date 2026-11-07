@@ -49,6 +49,12 @@ public class AdminService {
     @Autowired
     private CommentLikeRepository commentLikeRepository;
 
+    @Autowired
+    private DanhMucRepository danhMucRepository;
+
+    @Autowired
+    private ComicDanhMucRepository comicDanhMucRepository;
+
     /**
      * Thống kê tổng quan hệ thống cho Admin Dashboard
      */
@@ -310,6 +316,75 @@ public class AdminService {
         reportRepo.save(report);
         log.info("Đã tạo báo cáo mới từ user {} cho truyện ID {}", username, comicId);
         return toReportDTO(report);
+    }
+
+    // ==========================================
+    // QUẢN LÝ THỂ LOẠI (DANH MỤC)
+    // ==========================================
+
+    @Transactional(readOnly = true)
+    public List<DanhMuc> getAllCategoriesForAdmin() {
+        return danhMucRepository.findAll();
+    }
+
+    @Transactional
+    public DanhMuc createCategory(String tenDanhMuc, String noiDung) {
+        if (tenDanhMuc == null || tenDanhMuc.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên thể loại không được để trống!");
+        }
+        String cleanName = tenDanhMuc.trim();
+        if (danhMucRepository.findByTenDanhMucIgnoreCase(cleanName) != null) {
+            throw new IllegalArgumentException("Thể loại '" + cleanName + "' đã tồn tại!");
+        }
+        DanhMuc dm = new DanhMuc();
+        dm.setTenDanhMuc(cleanName);
+        dm.setNoiDung(noiDung != null ? noiDung.trim() : "");
+        dm.setTrangThai(true);
+        dm.setNgayTao(LocalDate.now());
+        dm.setNgaySua(LocalDate.now());
+        return danhMucRepository.save(dm);
+    }
+
+    @Transactional
+    public DanhMuc updateCategory(int id, String tenDanhMuc, String noiDung) {
+        DanhMuc dm = danhMucRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thể loại với ID: " + id));
+
+        if (tenDanhMuc != null && !tenDanhMuc.trim().isEmpty()) {
+            String cleanName = tenDanhMuc.trim();
+            DanhMuc existing = danhMucRepository.findByTenDanhMucIgnoreCase(cleanName);
+            if (existing != null && existing.getId() != id) {
+                throw new IllegalArgumentException("Thể loại '" + cleanName + "' đã được sử dụng!");
+            }
+            dm.setTenDanhMuc(cleanName);
+        }
+
+        if (noiDung != null) {
+            dm.setNoiDung(noiDung.trim());
+        }
+        dm.setNgaySua(LocalDate.now());
+        return danhMucRepository.save(dm);
+    }
+
+    @Transactional
+    public DanhMuc toggleCategoryStatus(int id) {
+        DanhMuc dm = danhMucRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thể loại với ID: " + id));
+        dm.setTrangThai(!dm.isTrangThai());
+        dm.setNgaySua(LocalDate.now());
+        return danhMucRepository.save(dm);
+    }
+
+    @Transactional
+    public void deleteCategory(int id) {
+        if (!danhMucRepository.existsById(id)) {
+            throw new IllegalArgumentException("Không tìm thấy thể loại với ID: " + id);
+        }
+        List<ComicDanhMuc> links = comicDanhMucRepository.findByDanhMucId(id, Pageable.unpaged()).getContent();
+        if (links != null && !links.isEmpty()) {
+            comicDanhMucRepository.deleteAll(links);
+        }
+        danhMucRepository.deleteById(id);
     }
 
     private UserAdminDTO toUserAdminDTO(User user) {

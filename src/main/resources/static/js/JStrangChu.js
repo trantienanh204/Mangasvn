@@ -302,7 +302,7 @@ $(document).ready(function() {
                         style: { background: "#ff4444" }
                     }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/login_dangnhap.html";
+                    window.location.href = "/login";
                 }
             }
         });
@@ -339,14 +339,19 @@ async function checkAdminAccess() {
         const userRole = userInfo.role;
 
         if (userRole === "ADMIN" || userRole === "CHUTUT") {
-            adminButtonContainer.innerHTML = `
-                    <button id="goToAdmin">Truy cập Admin</button>
+            const adminNav = document.getElementById("nav-admin-link");
+            if (adminNav) adminNav.style.display = "block";
+            if (adminButtonContainer) {
+                adminButtonContainer.innerHTML = `
+                    <a href="/view/admin" class="btn btn-warning shadow-lg fw-bold rounded-pill px-3 py-2 d-flex align-items-center gap-2" style="border: 2px solid rgba(0,0,0,0.15);">
+                        <i class="fa-solid fa-gauge-high"></i> Bảng Quản Trị
+                    </a>
                 `;
-            document.getElementById("goToAdmin").addEventListener("click", function() {
-                window.location.href = "/view/admin";
-            });
+            }
         } else {
-            adminButtonContainer.innerHTML = "";
+            const adminNav = document.getElementById("nav-admin-link");
+            if (adminNav) adminNav.style.display = "none";
+            if (adminButtonContainer) adminButtonContainer.innerHTML = "";
         }
     } catch (error) {
         console.error("Lỗi khi kiểm tra quyền truy cập:", error);

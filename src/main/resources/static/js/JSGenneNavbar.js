@@ -2,7 +2,7 @@
 $(document).ready(function () {
     const serverHost = window.location.origin;
     $.ajax({
-        url: `${serverHost}/theloai/fill/AllGenre`,
+        url: `/theloai/fill/AllGenre`,
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -28,7 +28,7 @@ $(document).ready(function () {
             if (item.trangThai === false) return;
             const slug = encodeURIComponent(rawName);
             const li = document.createElement('li');
-            li.innerHTML = `<a href="${serverHost}/theloai/${slug}" style="text-transform: capitalize;">${rawName}</a>`;
+            li.innerHTML = `<a href="/theloai/${slug}" style="text-transform: capitalize;">${rawName}</a>`;
             genresList.appendChild(li);
         });
     }
