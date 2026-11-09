@@ -22,7 +22,7 @@ $(document).ready(function() {
                 if (xhr.status === 401 || xhr.status === 403) {
                     Toastify({ text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/api/auth/login";
+                    window.location.href = "/login";
                 }
                 if (resolve) resolve();
             }
@@ -45,7 +45,7 @@ $(document).ready(function() {
                 if (xhr.status === 401 || xhr.status === 403) {
                     Toastify({ text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/api/auth/login";
+                    window.location.href = "/login";
                 }
                 if (resolve) resolve();
             }
@@ -129,7 +129,7 @@ $(document).ready(function() {
                             style: { background: "#ff4444" }
                         }).showToast();
                         localStorage.removeItem("token");
-                        window.location.href = "/api/auth/login";
+                        window.location.href = "/login";
                     }
                 }
             });
@@ -210,7 +210,7 @@ $(document).ready(function() {
                     imagesData.sort((a, b) => a.pageNumber - b.pageNumber);
                     images = imagesData.map(img => {
                         let url = img.imageUrl || 'https://i.postimg.cc/zBZ7k81R/cass.jpg';
-                        if (!url.startsWith('http')) url = `http://localhost:8080${url}`;
+                        if (!url.startsWith('http')) url = `${serverHost}${url}`;
                         return url;
                     });
 
@@ -354,16 +354,19 @@ $(document).ready(function() {
                                 headers: { "Authorization": "Bearer " + token },
                                 success: function(isFavorited) {
                                     const buttonHtml = isFavorited
-                                        ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
-                                        : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
+                                        ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}"><i class="fa-solid fa-heart me-1"></i> Xóa khỏi yêu thích</button>`
+                                        : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}"><i class="fa-regular fa-heart me-1"></i> Thêm vào yêu thích</button>`;
                                     $("#favorite-button-container").html(buttonHtml);
                                 },
                                 error: function(xhr, status, error) {
                                     console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyenId}: ${status} - ${error}`);
-                                    const buttonHtml = `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
+                                    const buttonHtml = `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}"><i class="fa-regular fa-heart me-1"></i> Thêm vào yêu thích</button>`;
                                     $("#favorite-button-container").html(buttonHtml);
                                 }
                             });
+                        } else {
+                            const buttonHtml = `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}"><i class="fa-regular fa-heart me-1"></i> Thêm vào yêu thích</button>`;
+                            $("#favorite-button-container").html(buttonHtml);
                         }
                         
                         loadHistory(function(history) {
@@ -616,7 +619,7 @@ $(document).ready(function() {
 
         if (!token) {
             Toastify({ text: "Bạn cần đăng nhập để thích bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ffc107" } }).showToast();
-            window.location.href = serverHost + "/api/auth/login";
+            window.location.href = "/login";
             return;
         }
 
@@ -715,7 +718,7 @@ $(document).ready(function() {
 
         if (!token) {
             Toastify({ text: "Bạn cần đăng nhập để bình luận!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
-            window.location.href=serverHost+"/api/auth/login";
+            window.location.href = "/login";
             return;
         }
 
@@ -757,6 +760,72 @@ $(document).ready(function() {
         if (!localStorage.getItem("token")) {
             window.clearLocalHistory();
         }
+    });
+
+    // Xử lý gửi Báo Cáo Lỗi truyện / chapter
+    $('#btn-submit-report').on('click', function() {
+        const comicId = window.location.pathname.split("/").pop();
+        const reason = $('#report-reason-select').val();
+        const detail = $('#report-detail-input').val().trim();
+        const chapterTitle = $('#chapter-title').text().trim();
+
+        let lyDoFull = reason;
+        if (chapterTitle) {
+            lyDoFull += ` [Tại: ${chapterTitle}]`;
+        }
+        if (detail) {
+            lyDoFull += `: ${detail}`;
+        }
+
+        const token = localStorage.getItem("token");
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers['Authorization'] = 'Bearer ' + token;
+        }
+
+        const btn = $(this);
+        btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang gửi...');
+
+        $.ajax({
+            url: `${serverHost}/api/reports`,
+            method: 'POST',
+            headers: headers,
+            data: JSON.stringify({
+                comicId: parseInt(comicId),
+                lyDo: lyDoFull
+            }),
+            success: function() {
+                Toastify({
+                    text: "Báo cáo của bạn đã được gửi tới Ban quản trị. Cảm ơn bạn!",
+                    duration: 3500,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#28a745" }
+                }).showToast();
+
+                $('#report-detail-input').val('');
+                const modalEl = document.getElementById('reportModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            },
+            error: function(xhr) {
+                let msg = "Không thể gửi báo cáo lỗi lúc này!";
+                try {
+                    const res = JSON.parse(xhr.responseText);
+                    if (res.message) msg = res.message;
+                } catch(e) {}
+                Toastify({
+                    text: msg,
+                    duration: 3500,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#ff4444" }
+                }).showToast();
+            },
+            complete: function() {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Gửi Báo Cáo');
+            }
+        });
     });
 });
 

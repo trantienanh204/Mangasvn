@@ -1,1027 +1,422 @@
-.img-shadow {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-}
+/* ==========================================================================
+   MANGASVN - HOMEPAGE (TRANG CHỦ) DARK MODERN MANGA STYLES
+   ========================================================================== */
 
-.img-carousel {
-    width: 15%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.text-container {
-    width: 85%;
-    padding: 1rem;
-    background-color: #f8f9fa;
+/* Main Page Container */
+.container {
+    max-width: 1440px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 body {
-    margin-top: 70px;
-    overflow-x: hidden; /* Ngăn overflow ngang trên mobile */
-}
-
-.navbar {
-    z-index: 1030;
+    margin-top: 80px;
+    background-color: var(--bg-base, #0b0f19);
+    color: var(--text-main, #f1f5f9);
 }
 
 .truyen-section {
-    margin-top: 20px;
-}
-
-.truyen-list-container {
+    margin-top: 2.75rem;
     position: relative;
 }
 
-.truyen-list {
+.truyen-section h5 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.truyen-section h5::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 1.2em;
+    border-radius: 9999px;
+    background: var(--accent-primary, #06b6d4);
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.6);
+}
+
+/* ==========================================================================
+   HOT TRUYEN SPOTLIGHT CAROUSEL
+   ========================================================================== */
+.carousel {
+    border-radius: var(--radius-xl, 22px);
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(19, 27, 46, 0.85) 0%, rgba(11, 15, 25, 0.95) 100%);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    position: relative;
+}
+
+.carousel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 20%;
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.carousel-item {
+    padding: 2.25rem 3.5rem;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+}
+
+.hot-slide {
+    display: flex;
+    align-items: center;
+    gap: clamp(24px, 4vw, 56px);
+    width: 100%;
+    min-height: 320px;
+    position: relative;
+    z-index: 1;
+}
+
+.hot-cover {
+    flex: 0 0 220px;
+    width: 220px;
+    height: 310px;
+    object-fit: cover;
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 25px rgba(6, 182, 212, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hot-slide:hover .hot-cover {
+    transform: scale(1.03) rotate(-1deg);
+}
+
+.hot-copy {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.775rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-primary, #06b6d4);
+    margin-bottom: 0.65rem;
+    text-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+}
+
+.text-title {
+    font-size: clamp(1.4rem, 2.5vw, 2.25rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.text-content {
+    font-size: 0.95rem;
+    color: var(--text-muted, #94a3b8);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 680px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.hot-copy .btn-primary {
+    align-self: flex-start;
+    padding: 0.65rem 1.6rem;
+    font-size: 0.95rem;
+    border-radius: var(--radius-pill, 9999px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Carousel Prev/Next Buttons */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(11, 15, 25, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-light, rgba(255, 255, 255, 0.14));
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: all 0.25s ease;
+    z-index: 10;
+}
+.carousel-control-prev { left: 16px; }
+.carousel-control-next { right: 16px; }
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+    background: var(--accent-primary, #06b6d4);
+    border-color: var(--accent-primary, #06b6d4);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ==========================================================================
+   FEATURED COMICS (HORIZONTAL SCROLL LIST)
+   ========================================================================== */
+.truyen-list-container {
+    position: relative;
+    padding: 0 4px;
+}
+
+.truyen-list-hot {
     display: flex;
     overflow-x: auto;
-    gap: 15px;
-    padding-bottom: 10px;
+    scroll-behavior: smooth;
+    gap: 1.25rem;
+    padding: 0.75rem 0.5rem 1.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(6, 182, 212, 0.4) transparent;
+}
+.truyen-list-hot::-webkit-scrollbar {
+    height: 6px;
+}
+.truyen-list-hot::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+}
+.truyen-list-hot::-webkit-scrollbar-thumb {
+    background: var(--accent-primary-dark, #0891b2);
+    border-radius: 10px;
 }
 
-.truyen-item {
-    flex: 0 0 auto;
-    width: 150px;
-    text-align: center;
-}
-
-.truyen-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 5px;
-    transition: transform 0.3s ease;
-}
-
-.truyen-item img:hover {
-    transform: scale(1.05);
-}
-
-.truyen-item a {
-    text-decoration: none;
-    color: #333;
-    display: block;
-}
-
-.truyen-item span {
-    display: block;
-    font-size: 14px;
-    margin-top: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #333;
-    text-decoration: none;
-}
-
-.truyen-item a:hover span {
-    color: #007bff;
-    text-decoration: none !important;
-}
-
-.truyen-item button {
-    margin-top: 5px;
-    font-size: 12px;
+.truyen-list-hot .comic-card {
+    flex: 0 0 190px;
+    width: 190px;
 }
 
 .scroll-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    padding: 10px;
+    width: 42px;
+    height: 42px;
+    background: rgba(11, 15, 25, 0.85);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    border: 1px solid var(--border-light, rgba(255, 255, 255, 0.14));
+    border-radius: 50%;
     cursor: pointer;
-    z-index: 1;
-}
-
-.scroll-left {
-    left: 0;
-}
-
-.scroll-right {
-    right: 0;
-}
-
-.scroll-btn:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* CSS cho danh sách truyện nổi bật (cuộn ngang) */
-.truyen-list-hot {
+    z-index: 10;
     display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px 0;
-    scroll-behavior: smooth;
-}
-
-.truyen-list-hot::-webkit-scrollbar {
-    height: 8px;
-}
-
-.truyen-list-hot::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
-}
-
-.truyen-list-hot::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-/* CSS cho danh sách truyện và truyện mới (grid, mặc định 4 item ngang hàng) */
-.truyen-list, .truyen-list-new {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Thay đổi thành 4 item ngang hàng */
-    gap: 20px;
-    padding: 10px 0;
-}
-
-/* CSS chung cho card truyện */
-.card {
-    background-color: #1a1a1a;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.05);
-}
-
-.card img {
-    width: 100%;
-    height: 260px;
-    object-fit: cover;
-    border-bottom: 2px solid #fff;
-}
-
-.card h6 {
-    color: #fff;
-    margin: 0;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Search results */
-.search-results {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-#search-suggestions .suggestion-item {
-    padding: 8px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-#search-suggestions .suggestion-item:hover {
-    background-color: #f0f0f0;
-}
-
-/* Navbar */
-.navbar {
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand {
-    font-weight: bold;
-    color: #007bff !important;
-}
-
-.navbar-nav .nav-link {
-    color: #000;
-}
-
-.navbar-nav .nav-link:hover {
-    color: #007bff;
-}
-
-/* Search container */
-.search-container {
-    position: relative;
-    width: 300px;
-}
-
-#search-input {
-    border-radius: 20px;
-}
-
-#search-button {
-    border-radius: 20px;
-    margin-left: 5px;
-}
-
-#search-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 300px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    display: none;
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-#search-suggestions div {
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-#search-suggestions div:hover {
-    background-color: #f0f0f0;
-}
-
-/* Content */
-.content {
-    margin-top: 80px;
-    padding: 20px;
-}
-
-/* Carousel adjustments */
-.carousel-inner {
-    height: auto; /* Làm responsive height */
-}
-
-.carousel-item {
-    height: auto; /* Để hình ảnh tự điều chỉnh */
-}
-
-.carousel-item .d-flex {
-    flex-direction: row; /* Mặc định ngang */
-}
-
-/* Pagination */
-.pagination-wrapper {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
-    flex-wrap: wrap; /* Wrap trên mobile */
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+.scroll-btn:hover {
+    background: var(--accent-primary, #06b6d4);
+    color: #0b0f19;
+    border-color: var(--accent-primary, #06b6d4);
+    box-shadow: 0 0 18px rgba(6, 182, 212, 0.5);
+    transform: translateY(-50%) scale(1.1);
+}
+.scroll-left { left: -16px; }
+.scroll-right { right: -16px; }
+
+/* ==========================================================================
+   ALL COMICS & NEW COMICS GRID
+   ========================================================================== */
+.truyen-list,
+.truyen-list-new {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 1.25rem;
+    padding: 0.5rem 0;
+}
+
+/* ==========================================================================
+   PAGINATION CONTROLS
+   ========================================================================== */
+.pagination-wrapper {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 1.25rem;
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-lg, 16px);
+    backdrop-filter: blur(12px);
 }
 
 #pagination-container {
     display: flex;
-    gap: 5px;
-    flex-wrap: wrap; /* Wrap buttons nếu nhiều */
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
 }
 
 #pagination-container button {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    background-color: #f8f9fa;
-    color: #333;
+    background: var(--bg-card, #131b2e);
+    color: var(--text-main, #f1f5f9);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-md, 10px);
+    padding: 0.45rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 600;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    transition: all 0.2s ease;
+    min-width: 38px;
 }
 
-#pagination-container button:hover {
-    background-color: #e2e6ea;
+#pagination-container button:hover:not(:disabled) {
+    background: var(--bg-surface-hover, #1e293b);
+    color: var(--accent-primary, #06b6d4);
+    border-color: var(--accent-primary, #06b6d4);
+    transform: translateY(-1px);
 }
 
 #pagination-container button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
+    background: var(--grad-primary, linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%));
+    color: #0b0f19;
+    border-color: transparent;
+    font-weight: 800;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
 }
 
 #pagination-container button:disabled {
-    background-color: #f8f9fa;
-    color: #6c757d;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
+#pagination-container span {
+    color: var(--text-dim, #64748b);
+    padding: 0 4px;
+}
+
 .page-info {
-    font-size: 14px;
-    color: #666;
-    margin-left: 20px;
+    font-size: 0.875rem;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 600;
+    margin: 0 10px;
 }
 
-/* Chapter list adjustments (để có 4 chương mỗi hàng) */
-.chapter-list {
-    display: grid; /* Chuyển sang grid để dễ kiểm soát columns */
-    grid-template-columns: repeat(4, 1fr); /* 4 chương mỗi hàng mặc định */
-    gap: 10px; /* Giảm gap để vừa màn hình */
-    overflow-x: hidden; /* Bỏ scroll ngang, dùng wrap nếu cần */
-    overflow-y: auto; /* Scroll dọc nếu nhiều */
-    max-height: 300px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.chapter-list button {
-    min-width: auto; /* Bỏ min-width để fit grid */
-    padding: 8px; /* Padding nhỏ hơn */
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
-
-.chapter-list button:hover {
-    background-color: #e9ecef;
-}
-
-/* Các phần khác từ CSS gốc của bạn (comic-info, image-section, v.v.) */
-.comic-info {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    gap: 20px;
-}
-
-.comic-info .cover-image {
-    flex: 0 0 200px;
-}
-
-.comic-info .cover-image img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-}
-
-.comic-info .details {
-    flex: 1;
-}
-
-.chapter-section {
-    margin-bottom: 20px;
-}
-
-.image-section {
-    margin-bottom: 20px;
-}
-
-.image-container {
-    max-width: 100%;
-    margin: 20px auto;
+#jump-page {
+    background: var(--bg-base, #0b0f19);
+    color: var(--text-main, #f1f5f9);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-md, 10px);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.875rem;
     text-align: center;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 90px;
+    transition: border-color 0.2s ease;
+}
+#jump-page:focus {
+    border-color: var(--accent-primary, #06b6d4);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25);
 }
 
-.image-container img {
-    max-width: 100%;
-    height: auto;
-    margin: 5px 0;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.image-container img:hover {
-    transform: scale(1.05);
-}
-
-#chapter-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.scroll-btn {
-    background-color: #007bff;
-    color: white;
+.pagination-wrapper button:not(#pagination-container button) {
+    background: var(--accent-primary, #06b6d4);
+    color: #0b0f19;
     border: none;
-    padding: 10px;
+    border-radius: var(--radius-md, 10px);
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 1.2rem;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 5px;
+    transition: all 0.2s ease;
+}
+.pagination-wrapper button:not(#pagination-container button):hover {
+    background: var(--accent-primary-hover, #22d3ee);
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
 }
 
-.scroll-btn:hover {
-    background-color: #0056b3;
-}
-
-.chapter-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 10px;
-    justify-content: center;
-}
-
-#back-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: opacity 0.3s;
-    opacity: 0;
-    z-index: 1000;
-}
-
-#back-to-top:hover {
-    background-color: #0056b3;
-}
-
-#back-to-top.show {
-    opacity: 1;
-}
-
-/* Chế độ đọc sách */
-.reading-mode {
-    display: none;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background-color: rgba(0, 0, 0, 0.95) !important;
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    overflow-y: auto;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.reading-mode.active {
-    display: flex !important;
-    opacity: 1;
-}
-
-.reading-image {
-    max-width: 90%;
-    max-height: 80vh;
-    object-fit: contain;
-    display: block !important;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease;
-}
-
-.reading-image:hover {
-    transform: scale(1.02);
-}
-
-.nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #1e90ff;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    cursor: pointer;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.nav-btn.prev {
-    left: 30px;
-}
-
-.nav-btn.next {
-    right: 30px;
-}
-
-.nav-btn:hover {
-    background-color: #ff4500;
-    transform: translateY(-50%) scale(1.1);
-}
-
-.pagination {
-    position: fixed;
-    bottom: 30px;
-    width: auto;
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    background-color: rgba(30, 30, 30, 0.8);
-    padding: 10px 20px;
-    border-radius: 25px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.pagination button {
-    background-color: #1e90ff;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.pagination button:hover {
-    background-color: #ff4500;
-    transform: scale(1.1);
-}
-
-.pagination button[style*="background-color: #0056b3"] {
-    background-color: #ff4500 !important;
-}
-
-.close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    z-index: 10001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.close-btn:hover {
-    background-color: #cc0000;
-    transform: scale(1.1);
-}
-
-#toggle-reading-mode {
-    margin-top: 10px;
-    background-color: #28a745;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#toggle-reading-mode:hover {
-    background-color: #218838;
-}
-
-.load-more {
-    margin-top: 10px;
-    background-color: #6c757d;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-}
-
-.load-more:hover {
-    background-color: #5a6268;
-}
-
-#load-all, #load-15 {
-    display: none;
-}
-
-.invalid-feedback {
-    display: none;
-    color: #dc3545;
-    font-size: 0.875em;
-}
-
-/* Responsive adjustments cho phần chính */
-/* For large tablets/laptops small (max-width: 992px) */
+/* ==========================================================================
+   RESPONSIVE QUERIES
+   ========================================================================== */
 @media (max-width: 992px) {
-    .truyen-list, .truyen-list-new, .search-results {
-        grid-template-columns: repeat(3, 1fr); /* Giảm xuống 3 columns */
-        gap: 15px;
-    }
-
-    .card img {
-        height: 220px; /* Giảm height img */
-    }
-
-    .carousel-item .d-flex {
-        flex-direction: column; /* Stack carousel nội dung dọc */
-        align-items: center;
-    }
-
-    .img-carousel {
-        width: 100%; /* Full width img carousel */
-        height: auto;
-    }
-
-    .text-container {
-        width: 100%; /* Full width text */
-    }
-
-    .search-container {
-        width: 100%; /* Full width search */
-    }
-
-    #search-suggestions {
-        width: 100%;
-    }
-
-    /* Chapter list: Giữ 4 columns */
-    .chapter-list {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-@media (max-width: 1100px) {
-    .truyen-list, .truyen-list-new, .search-results { grid-template-columns: repeat(4,minmax(0,1fr)); }
-}
-
-/* For tablets/mobile large (max-width: 768px) */
-@media (max-width: 768px) {
-    .truyen-list, .truyen-list-new, .search-results {
-        grid-template-columns: repeat(2, 1fr); /* Giảm xuống 2 columns */
-        gap: 10px;
-    }
-
-    .card img {
-        height: 200px;
-    }
-
-    .truyen-list-hot {
-        overflow-x: scroll; /* Cho phép touch scroll */
-    }
-
-    .scroll-btn {
-        padding: 8px;
-        font-size: 1rem;
-    }
-
-    body {
-        margin-top: 60px; /* Giảm margin top cho navbar collapse */
-    }
-
-    .content {
-        padding: 15px;
-        margin-top: 70px;
-    }
-
-    .truyen-section {
-        margin-top: 15px;
-    }
-
-    .pagination-wrapper {
-        justify-content: center; /* Center pagination */
-    }
-
-    .page-info {
-        margin-left: 0;
-        margin-top: 10px;
-    }
-
-    #jump-page {
-        width: 80px;
-    }
-
-    /* Ẩn scroll buttons cho hot list, dựa vào touch */
-    .scroll-left, .scroll-right {
-        display: none;
-    }
-
-    /* Chapter list: Giảm xuống 3 columns để vừa màn hình */
-    .chapter-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .chapter-list button {
-        font-size: 12px; /* Giảm font */
-        padding: 6px;
-    }
-
-    .comic-info {
-        flex-direction: column; /* Stack comic info dọc */
-        gap: 10px;
-    }
-
-    .comic-info .cover-image {
-        width: 100%;
-    }
-
-    /* Fix Truyện hot (carousel) trên mobile */
-    .carousel-item .d-flex {
-        flex-direction: column; /* Stack dọc để hiển thị đầy đủ */
-        align-items: center;
-        margin-bottom: 20px; /* Thêm khoảng cách dưới để tách khỏi phần nổi bật */
-    }
-
-    .carousel-item img {
-        width: 100%; /* Full width để không cắt */
-        height: auto; /* Auto height để responsive */
-        object-fit: contain; /* Contain để thấy hết hình, không cover cắt */
-    }
-
-    /* Fix Danh sách truyện nổi bật trên mobile */
-    .truyen-list-hot {
-        gap: 15px; /* Thêm gap để không sát nhau */
-    }
-
-    .truyen-list-hot .card {
-        flex: 0 0 150px; /* Width cố định để hiển thị ngang, không xoay */
-        margin: 0 5px; /* Thêm margin để tách item */
-    }
-
-    .truyen-list-hot .card img {
-        height: 200px; /* Giảm height để card ngắn hơn, tránh dọc kỳ cục */
-    }
-}
-
-@media (max-width: 420px) {
-    .truyen-list, .truyen-list-new, .search-results { gap: 9px; }
-    .card img { height: 155px; }
-    .card h6 { padding: 8px; font-size: .78rem; }
-    .truyen-section { margin: 26px 0 32px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
-}
-
-/* For small mobiles (max-width: 576px) */
-@media (max-width: 576px) {
-    .truyen-list, .truyen-list-new, .search-results {
-        grid-template-columns: repeat(2, 1fr); /* Giữ 2 columns thay vì 1 để tránh hiển thị chỉ 1 item */
-        gap: 10px;
-    }
-
-    .card img {
-        height: 180px; /* Giảm thêm height */
-    }
-
-    .card h6 {
-        font-size: 12px; /* Giảm font size */
-    }
-
-    .favorite-btn {
-        font-size: 10px; /* Nhỏ hơn cho buttons */
-    }
-
-    .navbar-nav .nav-link {
-        font-size: 14px; /* Giảm font navbar */
-    }
-
     .carousel-item {
-        height: auto;
+        padding: 1.75rem 2.25rem;
     }
-
-    .text-container {
-        padding: 0.5rem;
+    .hot-slide {
+        min-height: 260px;
+        gap: 24px;
     }
-
-    #pagination-container button {
-        padding: 6px 8px;
-        font-size: 12px;
+    .hot-cover {
+        flex: 0 0 170px;
+        width: 170px;
+        height: 240px;
     }
-
-    .page-info {
-        font-size: 12px;
-    }
-
-    /* Chapter list: Giảm xuống 2 columns để tránh chỉ 1 chương/hàng, vẫn wrap đẹp */
-    .chapter-list {
-        grid-template-columns: repeat(2, 1fr); /* 2 chương mỗi hàng trên mobile nhỏ */
-    }
-
-    .chapter-list button {
-        font-size: 11px;
-        padding: 5px;
-    }
-
-    /* Fix Truyện hot (carousel) trên mobile nhỏ */
-    .carousel-item img {
-        max-height: 200px; /* Giới hạn height để không quá lớn */
-    }
-
-    .carousel-item .d-flex {
-        margin-bottom: 30px; /* Tăng khoảng cách dưới để tách thêm */
-    }
-
-    /* Fix Danh sách truyện nổi bật trên mobile nhỏ */
-    .truyen-list-hot {
-        gap: 10px; /* Gap nhỏ hơn nhưng đủ tách */
-    }
-
-    .truyen-list-hot .card {
-        flex: 0 0 140px; /* Giảm width để vừa nhiều item hơn */
-        margin: 0 5px;
-    }
-
-    .truyen-list-hot .card img {
-        height: 180px; /* Giảm height thêm để tránh kỳ cục */
-    }
+    .scroll-left { left: 4px; }
+    .scroll-right { right: 4px; }
 }
 
-/* MangaSVN home experience */
-:root {
-    color-scheme: dark;
-    --page: #111318;
-    --surface: #1b1e25;
-    --surface-raised: #232731;
-    --text: #f2f3f5;
-    --muted: #a5aab5;
-    --accent: #e8aa45;
-    --line: rgba(255,255,255,.09);
-}
-
-html { scroll-behavior: smooth; }
-body {
-    margin-top: 70px;
-    overflow-x: hidden;
-    background: radial-gradient(ellipse at 50% -20%, #33303a 0, var(--page) 48rem);
-    color: var(--text);
-    font-family: Inter, "Segoe UI", system-ui, sans-serif;
-}
-body > .container { max-width: 1320px; }
-.navbar {
-    z-index: 1030;
-    background: rgba(20,22,27,.92) !important;
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 8px 26px rgba(0,0,0,.25);
-    backdrop-filter: blur(16px);
-}
-.navbar-brand { color: var(--accent) !important; letter-spacing: .12em; }
-.navbar-nav .nav-link { color: #d9dbe0; }
-.navbar-nav .nav-link:hover, .navbar-nav .nav-link:focus { color: var(--accent); }
-.navbar-toggler { border-color: var(--line); }
-.navbar-toggler-icon { filter: invert(1); }
-.search-container { gap: 8px; }
-#search-input {
-    min-width: 210px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: #252831;
-    color: var(--text);
-}
-#search-input::placeholder { color: #9297a1; }
-#search-button { border-radius: 999px; border-color: var(--accent); color: var(--accent); }
-#search-button:hover { background: var(--accent); color: #171717; }
-#search-suggestions { background: var(--surface-raised); border-color: var(--line); color: var(--text); border-radius: 10px; }
-.truyen-section { margin: 34px 0 42px; }
-.truyen-section > h5 {
-    margin-bottom: 18px;
-    color: var(--text);
-    font-size: 1.22rem;
-    font-weight: 750;
-    letter-spacing: -.02em;
-}
-.truyen-section > h5::before { content: ""; display: inline-block; width: 4px; height: 19px; margin: 0 10px -3px 0; border-radius: 4px; background: var(--accent); }
-.carousel { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(120deg,#292833,#1b1e25 58%); }
-.carousel-inner { min-height: 290px; }
-.carousel-item { min-height: 290px; padding: 22px; }
-.carousel-control-prev, .carousel-control-next { width: 8%; }
-.truyen-list-hot { gap: 16px; padding: 4px 2px 16px; scrollbar-color: #565b66 transparent; }
-.truyen-list, .truyen-list-new, .search-results { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 16px; padding: 4px 0; }
-.truyen-list-hot .card, .truyen-list .card, .truyen-list-new .card, .search-results .card {
-    min-width: 0;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.17);
-    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-.truyen-list-hot .card:hover, .truyen-list .card:hover, .truyen-list-new .card:hover, .search-results .card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(232,170,69,.55);
-    box-shadow: 0 14px 30px rgba(0,0,0,.34);
-}
-.card img { height: 245px; border: 0; object-fit: cover; }
-.card h6 { padding: 11px 12px 13px; color: var(--text); font-size: .88rem; line-height: 1.4; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.scroll-btn { border-radius: 50%; background: rgba(17,19,24,.84); border: 1px solid var(--line); }
-.scroll-btn:hover { background: var(--accent); color: #161616; }
-.pagination-wrapper { gap: 12px; color: var(--muted); }
-#pagination-container button, .pagination-wrapper > button { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); }
-#pagination-container button.active { border-color: var(--accent); background: var(--accent); color: #181818; }
-#jump-page { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); }
-#footer { margin-top: 64px; padding: 28px max(5vw, calc((100vw - 1320px)/2)); border: 0; border-top: 1px solid var(--line); background: #0d0f13; color: var(--muted); }
-.footer_edit { justify-content: space-between; border: 0; padding: 14px 0 0; }
-.footer_edit .left p, .footer_edit .right p { margin: 0; color: var(--muted); }
-.content { color: var(--text); }
-
-.navbar.navbar-light .navbar-nav .nav-link { color: #d9dbe0; }
-.navbar.navbar-light .navbar-nav .nav-link.active { color: var(--accent); }
-#user-info, #login-link, #logout-link { color: #c5c8d0 !important; }
-.hot-slide {
-    display: flex;
-    align-items: center;
-    gap: clamp(22px, 5vw, 70px);
-    width: 100%;
-    min-height: 320px;
-    padding: clamp(8px, 2vw, 24px) clamp(34px, 8vw, 110px);
-}
-.hot-cover {
-    flex: 0 0 215px;
-    width: 215px;
-    height: 285px;
-    max-width: 35vw;
-    object-fit: cover;
-    border-radius: 14px;
-    box-shadow: 0 18px 44px rgba(0,0,0,.4);
-}
-.hot-copy, #hot-truyen-carousel .text-container {
-    flex: 1 1 auto;
-    width: auto !important;
-    padding: 0 !important;
-    background: transparent !important;
-    color: var(--text) !important;
-}
-.hot-copy { max-width: 620px; }
-.eyebrow { color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .16em; }
-.hot-copy .text-title { margin: 12px 0; color: #fff; font-size: clamp(1.7rem, 3.2vw, 3rem); font-weight: 800; line-height: 1.08; }
-.hot-copy .text-content { display: -webkit-box; max-width: 58ch; margin: 0 0 22px; overflow: hidden; color: #b7bac4; font-size: 1rem; line-height: 1.7; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-.hot-copy .btn { padding: 10px 18px; border: 0; border-radius: 8px; background: var(--accent); color: #171717; font-weight: 750; }
-.hot-copy .btn:hover { background: #f4bf65; color: #111; }
-.truyen-list-hot { display: flex; align-items: stretch; overflow-x: auto; }
-.truyen-list-hot .comic-card { flex: 0 0 190px; width: 190px; }
-.comic-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: linear-gradient(180deg,#222630,#191c23); box-shadow: 0 8px 22px rgba(0,0,0,.18); transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
-.comic-card:hover { transform: translateY(-5px); border-color: rgba(232,170,69,.55); box-shadow: 0 16px 32px rgba(0,0,0,.32); }
-.comic-cover-link { position: relative; display: block; overflow: hidden; aspect-ratio: 2 / 3; background: #292d37; }
-.comic-cover { display: block; width: 100%; height: 100% !important; object-fit: cover; border: 0 !important; transition: transform .35s ease; }
-.comic-card:hover .comic-cover { transform: scale(1.045); }
-.comic-badge { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); padding: 5px 8px; overflow: hidden; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(17,19,24,.76); color: #f7d294; font-size: .58rem; font-weight: 800; letter-spacing: .07em; text-overflow: ellipsis; white-space: nowrap; backdrop-filter: blur(8px); }
-.comic-card-info { position: relative; min-height: 83px; padding: 11px 13px 13px; }
-.comic-title { display: -webkit-box; min-height: 2.6em; overflow: hidden; color: #f3f4f6; font-size: .9rem; font-weight: 700; line-height: 1.3; text-decoration: none; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.comic-title:hover { color: var(--accent); }
-.comic-meta { display: block; margin-top: 7px; color: #9298a5; font-size: .7rem; }
-.comic-card .favorite-btn { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; background: #2a2e38; color: #f1f2f5; font-size: 1.2rem; line-height: 1; }
-.comic-card .favorite-btn:hover, .comic-card .favorite-btn.is-favorite { border-color: #e68181; background: #47292f; color: #ff888f; }
-.truyen-list-hot .comic-card-info { padding-right: 48px; }
-.truyen-list-hot .comic-card .favorite-btn { right: 9px; bottom: 17px; }
-
-@media (max-width: 1100px) {
-    .truyen-list, .truyen-list-new, .search-results { grid-template-columns: repeat(4,minmax(0,1fr)); }
-}
 @media (max-width: 768px) {
-    .truyen-list, .truyen-list-new, .search-results { grid-template-columns: repeat(3,minmax(0,1fr)); }
-    .navbar-collapse { padding: 12px 4px 16px; }
-    .search-container { width: 100%; }
-    #search-input { min-width: 0; }
-    .carousel-inner, .carousel-item { min-height: 230px; }
-    .card img { height: 205px; }
-    .hot-slide { min-height: 250px; gap: 20px; padding: 12px 42px; }
-    .hot-cover { flex: 0 0 155px; width: 155px; height: 225px; max-width: 32vw; }
-    .truyen-list-hot .comic-card { flex-basis: 170px; width: 170px; }
+    body {
+        margin-top: 72px;
+    }
+    .carousel-item {
+        padding: 1.5rem 1.25rem;
+    }
+    .hot-slide {
+        flex-direction: column;
+        text-align: center;
+        gap: 18px;
+    }
+    .hot-cover {
+        flex: 0 0 150px;
+        width: 150px;
+        height: 210px;
+    }
+    .hot-copy {
+        align-items: center;
+    }
+    .hot-copy .btn-primary {
+        align-self: center;
+    }
+    .truyen-list-hot .comic-card {
+        flex: 0 0 155px;
+        width: 155px;
+    }
 }
-@media (max-width: 520px) {
-    .truyen-list, .truyen-list-new, .search-results { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-    .card img { height: 190px; }
-    .truyen-section { margin: 26px 0 32px; }
-    .carousel-item { padding: 12px; }
-    .hot-slide { min-height: 225px; gap: 14px; padding: 12px 34px; }
-    .hot-cover { flex: 0 0 105px; width: 105px; height: 165px; max-width: 30vw; }
-    .hot-copy .text-title { margin: 7px 0; font-size: 1.2rem; }
-    .hot-copy .text-content { margin-bottom: 12px; font-size: .78rem; line-height: 1.4; -webkit-line-clamp: 2; }
-    .eyebrow { font-size: .54rem; letter-spacing: .08em; }
-    .hot-copy .btn { padding: 7px 11px; font-size: .82rem; }
-}
-@media (max-width: 360px) {
-    .card img { height: 155px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+
+@media (max-width: 576px) {
+    .truyen-list,
+    .truyen-list-new {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+    }
+    .text-title {
+        font-size: 1.25rem;
+    }
+    .text-content {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 2;
+    }
 }

@@ -3,14 +3,14 @@
    =================================================== */
 
 :root {
-    --genre-bg: #0f1015;
-    --genre-card-bg: #181920;
-    --genre-card-hover: #22232d;
-    --genre-border: #2a2b36;
-    --genre-accent: #3b82f6;
-    --genre-accent-hover: #2563eb;
-    --genre-text-primary: #f3f4f6;
-    --genre-text-secondary: #9ca3af;
+    --genre-bg: #0b0f19;
+    --genre-card-bg: #131b2e;
+    --genre-card-hover: #1c263d;
+    --genre-border: rgba(255, 255, 255, 0.08);
+    --genre-accent: #06b6d4;
+    --genre-accent-hover: #22d3ee;
+    --genre-text-primary: #f1f5f9;
+    --genre-text-secondary: #94a3b8;
     --genre-badge-bg: rgba(0, 0, 0, 0.7);
 }
 
@@ -23,7 +23,7 @@ body.genre-page {
 
 /* Header Section */
 .genre-header {
-    background: linear-gradient(180deg, rgba(59, 130, 246, 0.12) 0%, rgba(15, 16, 21, 0) 100%);
+    background: linear-gradient(180deg, rgba(6, 182, 212, 0.14) 0%, rgba(11, 15, 25, 0) 100%);
     padding: 2.5rem 0 1.5rem;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--genre-border);
@@ -40,12 +40,12 @@ body.genre-page {
 }
 
 .genre-title span.highlight {
-    color: #60a5fa;
-    text-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    color: #22d3ee;
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.45);
 }
 
 .genre-desc-card {
-    background: rgba(24, 25, 32, 0.75);
+    background: rgba(19, 27, 46, 0.75);
     backdrop-filter: blur(8px);
     border: 1px solid var(--genre-border);
     border-radius: 12px;
@@ -102,8 +102,8 @@ body.genre-page {
     display: inline-flex;
     align-items: center;
     padding: 0.45rem 0.9rem;
-    background: #22232c;
-    color: #d1d5db;
+    background: #111827;
+    color: #cbd5e1;
     border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 20px;
     font-size: 0.85rem;
@@ -115,18 +115,18 @@ body.genre-page {
 }
 
 .genre-chip:hover {
-    background: #2d2e3a;
+    background: #1e293b;
     color: #ffffff;
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color: rgba(6, 182, 212, 0.4);
     transform: translateY(-1px);
 }
 
 .genre-chip.active {
-    background: #2563eb;
-    color: #ffffff;
-    border-color: #3b82f6;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-    font-weight: 600;
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    color: #0b0f19 !important;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);
+    font-weight: 700;
 }
 
 /* Filter Toolbar */
@@ -151,8 +151,8 @@ body.genre-page {
 }
 
 .genre-select-custom {
-    background-color: #121319;
-    color: #e5e7eb;
+    background-color: #0b0f19;
+    color: #e2e8f0;
     border: 1px solid var(--genre-border);
     border-radius: 8px;
     padding: 0.45rem 2rem 0.45rem 0.85rem;
@@ -160,7 +160,7 @@ body.genre-page {
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.2s ease;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2306b6d4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 14px 10px;
@@ -170,7 +170,7 @@ body.genre-page {
 .genre-select-custom:focus {
     outline: none;
     border-color: var(--genre-accent);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
 }
 
 .genre-count-badge {
@@ -181,7 +181,7 @@ body.genre-page {
 /* Comic Grid & Cards */
 .comic-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1.25rem;
     margin-bottom: 2.5rem;
 }
@@ -189,7 +189,7 @@ body.genre-page {
 .comic-poster-card {
     background: var(--genre-card-bg);
     border: 1px solid var(--genre-border);
-    border-radius: 10px;
+    border-radius: 14px;
     overflow: hidden;
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     display: flex;
@@ -199,8 +199,8 @@ body.genre-page {
 
 .comic-poster-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
-    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(6, 182, 212, 0.2);
+    border-color: rgba(6, 182, 212, 0.45);
 }
 
 .comic-thumb-wrapper {
@@ -208,7 +208,7 @@ body.genre-page {
     width: 100%;
     aspect-ratio: 2 / 3;
     overflow: hidden;
-    background: #1e1f29;
+    background: #0f172a;
 }
 
 .comic-thumb {
@@ -226,14 +226,14 @@ body.genre-page {
     position: absolute;
     top: 8px;
     left: 8px;
-    background: rgba(220, 38, 38, 0.9);
-    color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    color: #0b0f19;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
     border-radius: 6px;
     backdrop-filter: blur(4px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
 .comic-badge-bottom {
@@ -242,15 +242,21 @@ body.genre-page {
     left: 0;
     right: 0;
     padding: 20px 8px 6px;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(0deg, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0) 100%);
     display: flex;
     justify-content: space-between;
     font-size: 0.75rem;
-    color: #e5e7eb;
+    color: #cbd5e1;
+}
+
+.comic-badge-bottom span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .comic-card-info {
-    padding: 0.75rem;
+    padding: 0.85rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -258,24 +264,24 @@ body.genre-page {
 
 .comic-card-title {
     font-size: 0.925rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #ffffff;
-    text-decoration: none;
     line-height: 1.35;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    text-decoration: none;
     transition: color 0.2s ease;
 }
 
-.comic-card-title:hover {
-    color: #60a5fa;
+.comic-poster-card:hover .comic-card-title {
+    color: var(--genre-accent);
 }
 
 .comic-card-desc {
-    font-size: 0.8rem;
+    font-size: 0.775rem;
     color: var(--genre-text-secondary);
     line-height: 1.4;
     display: -webkit-box;
@@ -285,64 +291,97 @@ body.genre-page {
     margin-top: auto;
 }
 
+/* Empty State */
+.genre-empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: var(--genre-card-bg);
+    border: 1px dashed var(--genre-border);
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+}
+
+.genre-empty-icon {
+    font-size: 3.5rem;
+    color: var(--genre-accent);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.genre-empty-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.genre-empty-desc {
+    color: var(--genre-text-secondary);
+    font-size: 0.95rem;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
 /* Pagination */
 .genre-pagination {
     display: flex;
     justify-content: center;
-    gap: 0.4rem;
-    margin: 2.5rem 0 4rem;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 3.5rem;
+    flex-wrap: wrap;
 }
 
-.genre-page-btn {
-    min-width: 40px;
-    height: 40px;
-    padding: 0 0.75rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.genre-pagination .page-btn {
     background: var(--genre-card-bg);
     color: var(--genre-text-primary);
     border: 1px solid var(--genre-border);
     border-radius: 8px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.875rem;
     font-weight: 600;
-    text-decoration: none;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.genre-page-btn:hover {
-    background: #282936;
-    color: #ffffff;
-    border-color: #3b82f6;
+.genre-pagination .page-btn:hover:not(:disabled) {
+    background: var(--genre-card-hover);
+    color: var(--genre-accent);
+    border-color: var(--genre-accent);
 }
 
-.genre-page-btn.active {
-    background: #2563eb;
-    color: #ffffff;
-    border-color: #3b82f6;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+.genre-pagination .page-btn.active {
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    color: #0b0f19;
+    border-color: transparent;
+    font-weight: 800;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
 }
 
-.genre-page-btn.disabled {
-    opacity: 0.4;
-    pointer-events: none;
+.genre-pagination .page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
     .comic-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 0.85rem;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
     }
     .genre-title {
-        font-size: 1.4rem;
+        font-size: 1.45rem;
     }
-    .genre-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .genre-toolbar-left {
-        flex-direction: column;
-        align-items: stretch;
+}
+
+@media (max-width: 520px) {
+    .comic-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
     }
 }

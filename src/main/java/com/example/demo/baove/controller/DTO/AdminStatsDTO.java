@@ -16,4 +16,5 @@ public class AdminStatsDTO {
     private long totalComments;
     private long totalViews;
     private long totalReports;
+    private long totalAuthors;
 }

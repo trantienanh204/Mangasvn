@@ -11,7 +11,7 @@ function escapeHistoryHtml(value) {
         loadHistory();
         console.log("Đăng xuất thành công, localHistory:", localStorage.getItem('localHistory'));
         Toastify({ text: "Đã đăng xuất!", duration: 3000, gravity: "top", position: "right", style: { background: "#28a745" } }).showToast();
-        window.location.href = "/view/trangchu.html";
+        window.location.href = "/";
     }
 
 
@@ -113,7 +113,7 @@ function escapeHistoryHtml(value) {
                     if (xhr.status === 401 || xhr.status === 403) {
                         Toastify({ text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!", duration: 3000, gravity: "top", position: "right", style: { background: "#ff4444" } }).showToast();
                         localStorage.removeItem("token");
-                        window.location.href = "/api/auth/login";
+                        window.location.href = "/login";
                     }
                 }
             });

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ComicTacGiaRepository extends JpaRepository<ComicTacGia,Integer>
-{
+public interface ComicTacGiaRepository extends JpaRepository<ComicTacGia, Integer> {
     List<ComicTacGia> findByComicsId(int comicId);
+    boolean existsByTacGiaId(int tacGiaId);
+    long countByTacGiaId(int tacGiaId);
+    void deleteByTacGiaId(int tacGiaId);
 }

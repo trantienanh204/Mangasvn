@@ -91,7 +91,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
             setTimeout(() => {
                 errorElement.style.display = "none";
                 errorElement.innerText = "";
-                window.location.href = "/api/auth/login";
+                window.location.href = "/login";
             }, 3000);
         } else {
             errorElement.innerText = data.message || "Đăng ký thất bại, vui lòng thử lại!";

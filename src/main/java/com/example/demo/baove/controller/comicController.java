@@ -104,18 +104,34 @@ public class comicController {
                 .build();
     }
 
-    @PostMapping
+        @PostMapping
     @Transactional
     public ResponseEntity<?> createTruyen(
             HttpServletRequest request,
-            @RequestParam(value = "title") String title,
-            @RequestParam(value = "description") String description,
-            @RequestParam(value = "note") String note,
-            @RequestParam(value = "cover") MultipartFile cover,
+            @RequestParam(value = "title", required = false) String titleParam,
+            @RequestParam(value = "tenTruyen", required = false) String tenTruyenParam,
+            @RequestParam(value = "description", required = false) String descParam,
+            @RequestParam(value = "moTa", required = false) String moTaParam,
+            @RequestParam(value = "note", required = false) String noteParam,
+            @RequestParam(value = "ghiChu", required = false) String ghiChuParam,
+            @RequestParam(value = "cover", required = false) MultipartFile coverParam,
+            @RequestParam(value = "image", required = false) MultipartFile imageParam,
             @RequestParam(value = "chapterZip", required = false) List<MultipartFile> chapterZips,
             @RequestParam(value = "chapterName", required = false) List<String> chapterNames,
             @RequestParam(value = "authorIds") List<Integer> authorIds,
             @RequestParam(value = "categoryIds") List<Integer> categoryIds) {
+
+        String title = (titleParam != null && !titleParam.trim().isEmpty()) ? titleParam.trim() : (tenTruyenParam != null ? tenTruyenParam.trim() : "");
+        String description = (descParam != null) ? descParam : (moTaParam != null ? moTaParam : "");
+        String note = (noteParam != null) ? noteParam : (ghiChuParam != null ? ghiChuParam : "");
+        MultipartFile cover = (coverParam != null && !coverParam.isEmpty()) ? coverParam : imageParam;
+
+        if (title.isEmpty()) {
+            return ResponseEntity.badRequest().body("Tiêu đề truyện không được để trống!");
+        }
+        if (cover == null || cover.isEmpty()) {
+            return ResponseEntity.badRequest().body("Ảnh bìa truyện không được để trống!");
+        }
 
         logger.info("Bắt đầu tạo truyện mới với tiêu đề: {}", title);
 
@@ -680,13 +696,15 @@ public class comicController {
                 return ResponseEntity.status(404).body(false);
             }
 
-            Comic truyen = comicRepository.findById(truyenId)
-                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
+            Comic truyen = comicRepository.findById(truyenId).orElse(null);
+            if (truyen == null) {
+                return ResponseEntity.status(404).body(false);
+            }
             boolean isFavorited = wishlistRepository.existsByUsersAndComics(user, truyen);
             return ResponseEntity.ok(isFavorited);
         } catch (Exception e) {
             logger.error("Lỗi khi kiểm tra trạng thái yêu thích cho truyện ID {}: {}", truyenId, e.getMessage(), e);
-            return ResponseEntity.status(401).body(false);
+            return ResponseEntity.status(500).body(false);
         }
     }
 
@@ -709,12 +727,14 @@ public class comicController {
                 return ResponseEntity.status(404).body("Người dùng không tồn tại!");
             }
 
-            Comic truyen = comicRepository.findById(truyenId)
-                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
+            Comic truyen = comicRepository.findById(truyenId).orElse(null);
+            if (truyen == null) {
+                return ResponseEntity.status(404).body("Truyện không tồn tại!");
+            }
 
             if (wishlistRepository.existsByUsersAndComics(user, truyen)) {
                 logger.info("Truyện ID {} đã có trong danh sách yêu thích của người dùng {}", truyenId, username);
-                return ResponseEntity.status(200).body("Truyện đã có trong danh sách yêu thích!");
+                return ResponseEntity.ok("Truyện đã có trong danh sách yêu thích!");
             }
 
             Wishlist favorite = new Wishlist();
@@ -731,7 +751,7 @@ public class comicController {
             return ResponseEntity.ok("Thêm vào yêu thích thành công");
         } catch (Exception e) {
             logger.error("Lỗi khi thêm truyện ID {} vào danh sách yêu thích: {}", truyenId, e.getMessage(), e);
-            return ResponseEntity.status(401).body("Token không hợp lệ hoặc lỗi: " + e.getMessage());
+            return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
         }
     }
 
@@ -754,23 +774,24 @@ public class comicController {
                 return ResponseEntity.status(404).body("Người dùng không tồn tại!");
             }
 
-            Comic truyen = comicRepository.findById(truyenId)
-                    .orElseThrow(() -> new RuntimeException("Truyện không tồn tại"));
+            Comic truyen = comicRepository.findById(truyenId).orElse(null);
+            if (truyen == null) {
+                return ResponseEntity.status(404).body("Truyện không tồn tại!");
+            }
 
-            Wishlist favorite = wishlistRepository.findByUsersAndComics(user, truyen)
-                    .orElseThrow(() -> new RuntimeException("Truyện không có trong danh sách yêu thích!"));
-
-            // Giảm luotThich  khi xóa
-            truyen.setLuotThich(truyen.getLuotThich() > 0 ? truyen.getLuotThich() - 1 : 0);
-            comicRepository.save(truyen);
-
-            wishlistRepository.delete(favorite);
+            Wishlist favorite = wishlistRepository.findByUsersAndComics(user, truyen).orElse(null);
+            if (favorite != null) {
+                // Giảm luotThich khi xóa
+                truyen.setLuotThich(truyen.getLuotThich() > 0 ? truyen.getLuotThich() - 1 : 0);
+                comicRepository.save(truyen);
+                wishlistRepository.delete(favorite);
+            }
 
             logger.info("Xóa truyện ID {} khỏi danh sách yêu thích của người dùng {} thành công", truyenId, username);
             return ResponseEntity.ok("Đã xóa khỏi danh sách yêu thích!");
         } catch (Exception e) {
             logger.error("Lỗi khi xóa truyện ID {} khỏi danh sách yêu thích: {}", truyenId, e.getMessage(), e);
-            return ResponseEntity.status(401).body("Token không hợp lệ hoặc lỗi: " + e.getMessage());
+            return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
         }
     }
 
@@ -908,12 +929,38 @@ public class comicController {
         long totalUncompressedBytes = 0;
         final long maxUncompressedBytes = 100L * 1024 * 1024;
 
-        try (ZipInputStream zis = new ZipInputStream(zipFile.getInputStream())) {
+                try (ZipInputStream zis = new ZipInputStream(zipFile.getInputStream())) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                if (!entry.isDirectory() && entry.getName().matches("^\\d+\\.(jpg|png|jpeg)$")) {
+                String entryName = entry.getName();
+                if (entry.isDirectory() || entryName == null) {
+                    zis.closeEntry();
+                    continue;
+                }
+
+                // Loại bỏ thư mục rác và file metadata hệ thống
+                if (entryName.contains("__MACOSX") || entryName.endsWith(".DS_Store") || entryName.endsWith("Thumbs.db")) {
+                    zis.closeEntry();
+                    continue;
+                }
+
+                // Trích xuất tên file thuần túy (loại bỏ mọi tầng thư mục lồng nhau '/' hoặc '\')
+                String fileName = entryName;
+                int lastSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+                if (lastSlash >= 0) {
+                    fileName = fileName.substring(lastSlash + 1);
+                }
+
+                if (fileName.startsWith("._") || fileName.trim().isEmpty()) {
+                    zis.closeEntry();
+                    continue;
+                }
+
+                // Kiểm tra định dạng ảnh hợp lệ (jpg, jpeg, png, webp, gif)
+                String lower = fileName.toLowerCase();
+                if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp") || lower.endsWith(".gif")) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[8192];
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
                         totalUncompressedBytes += len;
@@ -922,17 +969,30 @@ public class comicController {
                         }
                         baos.write(buffer, 0, len);
                     }
-                    fileDataMap.put(entry.getName(), baos.toByteArray());
+                    fileDataMap.put(fileName, baos.toByteArray());
                 }
                 zis.closeEntry();
             }
         }
 
+        if (fileDataMap.isEmpty()) {
+            throw new IOException("File ZIP không chứa bất kỳ hình ảnh hợp lệ nào (.jpg, .jpeg, .png, .webp, .gif)!");
+        }
+
         List<String> fileNames = new ArrayList<>(fileDataMap.keySet());
         fileNames.sort((a, b) -> {
-            int numA = Integer.parseInt(a.replaceAll("[^0-9]", ""));
-            int numB = Integer.parseInt(b.replaceAll("[^0-9]", ""));
-            return Integer.compare(numA, numB);
+            String digitsA = a.replaceAll("[^0-9]", "");
+            String digitsB = b.replaceAll("[^0-9]", "");
+            if (!digitsA.isEmpty() && !digitsB.isEmpty()) {
+                try {
+                    long numA = Long.parseLong(digitsA);
+                    long numB = Long.parseLong(digitsB);
+                    if (numA != numB) {
+                        return Long.compare(numA, numB);
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+            return a.compareToIgnoreCase(b);
         });
 
         logger.info("Danh sách file sau khi sắp xếp: {}", fileNames);

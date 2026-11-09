@@ -1,41 +1,49 @@
-
 $(document).ready(function() {
-    const token = localStorage.getItem("token");
     const serverHost = window.location.origin;
 
+    function updateFavoriteUI(truyenId, isFavorited) {
+        // 1. Update round heart buttons on cards (homepage, category, search, etc.)
+        $(`.favorite-btn[data-truyen-id="${truyenId}"]`).each(function() {
+            const $btn = $(this);
+            if (!$btn.hasClass('btn')) {
+                $btn.toggleClass('is-favorite', Boolean(isFavorited));
+                $btn.attr('aria-label', isFavorited ? 'Đã thêm vào yêu thích' : 'Thêm truyện vào yêu thích');
+            }
+        });
+
+        // 2. Update detail page action button if present
+        const $detailContainer = $("#favorite-button-container");
+        if ($detailContainer.length > 0) {
+            const detailHtml = isFavorited
+                ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}"><i class="fa-solid fa-heart me-1"></i> Xóa khỏi yêu thích</button>`
+                : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}"><i class="fa-regular fa-heart me-1"></i> Thêm vào yêu thích</button>`;
+            $detailContainer.html(detailHtml);
+        }
+    }
+
     function toggleFavorite(truyenId, isAdding) {
+        const token = localStorage.getItem("token");
         if (!token) {
             Toastify({
                 text: "Vui lòng đăng nhập để quản lý danh sách yêu thích!",
-                duration: 3000,
+                duration: 2500,
                 gravity: "top",
                 position: "right",
-                backgroundColor: "#ff4444"
+                style: { background: "#ef4444" }
             }).showToast();
-            window.location.href = "/login";
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1200);
             return;
         }
 
         const url = `${serverHost}/api/truyen/favorite/${truyenId}`;
         const method = isAdding ? "POST" : "DELETE";
         const cardId = `favourite-truyen-${truyenId}`;
-        const isFavouritePage = window.location.pathname.includes('/view/favourite');
+        const isFavouritePage = window.location.pathname.includes('/view/favourite') || window.location.pathname.includes('/wishlist');
 
-        if (isAdding || !isFavouritePage) {
-
-            $(`[id$="truyen-${truyenId}"]`).each(function() {
-                const newButtonHtml = isAdding
-                    ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
-                    : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
-                $(this).find(".favorite-btn").replaceWith(newButtonHtml);
-            });
-
-            const favoriteButtonContainer = $("#favorite-button-container");
-            const newButtonHtml = isAdding
-                ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`
-                : `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`;
-            favoriteButtonContainer.html(newButtonHtml);
-        }
+        // Optimistically update UI
+        updateFavoriteUI(truyenId, isAdding);
 
         $.ajax({
             url: url,
@@ -46,64 +54,76 @@ $(document).ready(function() {
             success: function(response) {
                 Toastify({
                     text: isAdding ? "Đã thêm vào danh sách yêu thích!" : "Đã xóa khỏi danh sách yêu thích!",
-                    duration: 3000,
+                    duration: 2500,
                     gravity: "top",
                     position: "right",
-                    backgroundColor: isAdding ? "#00b09b" : "#ff4444"
+                    style: { background: isAdding ? "#06b6d4" : "#ef4444" }
                 }).showToast();
 
                 if (!isAdding && isFavouritePage) {
-                    $(`#${cardId}`).remove();
-                    if ($('#favourite-list .custom-card').length === 0) {
-                        $('#favourite-list').html('<p style="color: #ff4444; padding: 10px;">Bạn chưa có truyện yêu thích nào.</p>');
-                    }
+                    $(`#${cardId}`).fadeOut(250, function() {
+                        $(this).remove();
+                        if ($('#favourite-list .library-item').length === 0) {
+                            $('#favourite-list').html('<p style="color: #94a3b8; padding: 20px; text-align: center;">Bạn chưa có truyện yêu thích nào.</p>');
+                        }
+                    });
                 }
             },
             error: function(xhr) {
-                if (isAdding || !isFavouritePage) {
-                    $(`[id$="truyen-${truyenId}"]`).each(function() {
-                        const revertButtonHtml = isAdding
-                            ? `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`
-                            : `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`;
-                        $(this).find(".favorite-btn").replaceWith(revertButtonHtml);
-                    });
+                // Revert UI on failure
+                updateFavoriteUI(truyenId, !isAdding);
 
-                    const revertButtonHtml = isAdding
-                        ? `<button class="btn btn-sm btn-outline-primary favorite-btn" data-truyen-id="${truyenId}">Thêm vào yêu thích</button>`
-                        : `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyenId}">Xóa khỏi yêu thích</button>`;
-                    $("#favorite-button-container").html(revertButtonHtml);
-                }
-
-                if (xhr.status === 401 || xhr.status === 403) {
+                if (xhr.status === 401) {
                     Toastify({
                         text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!",
-                        duration: 3000,
+                        duration: 2500,
                         gravity: "top",
                         position: "right",
-                        backgroundColor: "#ff4444"
+                        style: { background: "#ef4444" }
                     }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/login";
+                    setTimeout(() => {
+                        window.location.href = "/login";
+                    }, 1200);
                 } else {
+                    const errorMsg = xhr.responseText || (isAdding ? "Lỗi khi thêm vào danh sách yêu thích!" : "Lỗi khi xóa khỏi danh sách yêu thích!");
                     Toastify({
-                        text: isAdding ? "Lỗi khi thêm vào danh sách yêu thích!" : "Lỗi khi xóa khỏi danh sách yêu thích!",
+                        text: errorMsg,
                         duration: 3000,
                         gravity: "top",
                         position: "right",
-                        backgroundColor: "#ff4444"
+                        style: { background: "#ef4444" }
                     }).showToast();
                 }
             }
         });
     }
 
-    $(document).on('click', '.favorite-btn', function() {
-        const truyenId = $(this).data('truyen-id');
-        const isAdding = $(this).hasClass('btn-outline-primary');
+    // Expose toggleFavorite globally for inline onclick handlers
+    window.toggleFavorite = toggleFavorite;
+
+    $(document).on('click', '.favorite-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $btn = $(this);
+        const truyenId = $btn.data('truyen-id');
+        if (!truyenId) return;
+
+        let isAdding;
+        if ($btn.hasClass('btn-outline-primary')) {
+            isAdding = true;
+        } else if ($btn.hasClass('btn-outline-danger')) {
+            isAdding = false;
+        } else {
+            // Heart button on comic card: if currently favorite, clicking will remove; else add
+            isAdding = !$btn.hasClass('is-favorite');
+        }
+
         toggleFavorite(truyenId, isAdding);
     });
 
-    function truncateText(text, maxLength = 20) {
+    function truncateText(text, maxLength = 26) {
+        if (!text) return "Không có tiêu đề";
         if (text.length > maxLength) {
             return text.substring(0, maxLength) + "...";
         }
@@ -114,15 +134,16 @@ $(document).ready(function() {
         e.preventDefault();
         const query = $("#search-input").val().trim();
         if (query) {
-            window.location.href = `/view/search.html?query=${encodeURIComponent(query)}`;
+            const firstItem = $("#search-suggestions .suggestion-item[data-truyen-id]").first();
+            if (firstItem.length && firstItem.data("truyen-id")) {
+                window.location.href = `/truyen/${firstItem.data("truyen-id")}`;
+            }
         }
     });
 
     $("#search-input").on("input", function() {
         const query = $(this).val().trim();
         const suggestions = $("#search-suggestions");
-
-        console.log("Searching with query:", query);
 
         if (query.length < 2) {
             suggestions.hide().empty();
@@ -133,24 +154,26 @@ $(document).ready(function() {
             url: `${serverHost}/api/truyen/search?query=${encodeURIComponent(query)}`,
             method: "GET",
             success: function(data) {
-                console.log("API response:", data);
                 suggestions.empty();
                 if (Array.isArray(data) && data.length > 0) {
-                    data.slice(0, 5).forEach(truyen => {
+                    data.slice(0, 6).forEach(truyen => {
                         suggestions.append(`
-                            <div class="suggestion-item" data-truyen-id="${truyen.id}" style="display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
+                            <div class="suggestion-item d-flex align-items-center gap-3 p-2" data-truyen-id="${truyen.id}" style="cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.15s ease;">
                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}" 
                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}" 
-                                     style="width: 40px; height: 60px; object-fit: cover; margin-right: 10px;">
-                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    ${truncateText(truyen.tenTruyen || 'Không có tiêu đề')}
-                                </span>
+                                     style="width: 42px; height: 58px; object-fit: cover; border-radius: 6px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">
+                                <div style="min-width: 0; flex: 1;">
+                                    <div class="fw-bold text-truncate text-light" style="font-size: 0.875rem;">
+                                        ${truncateText(truyen.tenTruyen || 'Không có tiêu đề', 36)}
+                                    </div>
+                                    <div class="small text-muted text-truncate" style="font-size: 0.75rem;">MangaSVN · Đọc ngay</div>
+                                </div>
                             </div>
                         `);
                     });
                     suggestions.show();
                 } else {
-                    suggestions.append('<div class="suggestion-item" style="padding: 8px; color: #ff4444;">Không tìm thấy kết quả nào.</div>');
+                    suggestions.append('<div class="suggestion-item p-3 text-center text-muted small"><i class="fa-solid fa-circle-exclamation me-1 text-warning"></i> Không tìm thấy kết quả nào.</div>');
                     suggestions.show();
                 }
             },
@@ -173,81 +196,4 @@ $(document).ready(function() {
             $("#search-suggestions").hide();
         }
     });
-
-    // window.displayTruyen = function(container, truyen, token, isScrollable = false, prefix = '') {
-    //     const timeAgo = Math.floor(Math.random() * 10) + 1 + " Phút Trước";
-    //     const isHot = Math.random() > 0.5 ? "Hot" : "";
-    //     const cardId = `${prefix}truyen-${truyen.id || truyen.comicId}`;
-    //
-    //     console.log(`Displaying truyen: ID=${truyen.id || truyen.comicId}, TenTruyen=${truyen.tenTruyen}, Prefix=${prefix}`);
-    //
-    //     if (token) {
-    //         $.ajax({
-    //             url: `${serverHost}/api/truyen/favorite/status/${truyen.id || truyen.comicId}`,
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": "Bearer " + token
-    //             },
-    //             success: function(isFavorited) {
-    //                 const buttonHtml = isFavorited
-    //                     ? `<button class="btn btn-sm btn-outline-danger favorite-btn" data-truyen-id="${truyen.id || truyen.comicId}">Xóa khỏi yêu thích</button>`
-    //                     : '';
-    //                 container.append(`
-    //                 <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
-    //                     <div class="card-content">
-    //                         <div class="image-title-container">
-    //                             <a href="/truyen/${truyen.id || truyen.comicId}">
-    //                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
-    //                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
-    //                                      class="card-img">
-    //                             </a>
-    //                             <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
-    //                         </div>
-    //                         ${buttonHtml ? `<div class="card-actions">${buttonHtml}</div>` : ''} <!-- Tách nút ra -->
-    //                     </div>
-    //                     ${isHot ? '<span class="hot-label">Hot</span>' : ''}
-    //                     <span class="time-label">${timeAgo}</span>
-    //                 </div>
-    //             `);
-    //             },
-    //             error: function(xhr, status, error) {
-    //                 console.log(`Lỗi khi kiểm tra trạng thái yêu thích cho truyen ${truyen.id || truyen.comicId}: ${status} - ${error}`);
-    //                 container.append(`
-    //                 <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
-    //                     <div class="card-content">
-    //                         <div class="image-title-container">
-    //                             <a href="/truyen/${truyen.id || truyen.comicId}">
-    //                                 <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
-    //                                      alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
-    //                                      class="card-img">
-    //                             </a>
-    //                             <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
-    //                         </div>
-    //                     </div>
-    //                     ${isHot ? '<span class="hot-label">Hot</span>' : ''}
-    //                     <span class="time-label">${timeAgo}</span>
-    //                 </div>
-    //             `);
-    //             }
-    //         });
-    //     } else {
-    //         container.append(`
-    //         <div class="card custom-card" id="${cardId}" style="${isScrollable ? 'display: inline-block; vertical-align: top; margin: 10px;' : 'margin-bottom: 15px;'}">
-    //             <div class="card-content">
-    //                 <div class="image-title-container">
-    //                     <a href="/truyen/${truyen.id || truyen.comicId}">
-    //                         <img src="${truyen.imageComic || 'https://i.postimg.cc/zBZ7k81R/cass.jpg'}"
-    //                              alt="${truyen.tenTruyen || 'Không có tiêu đề'}"
-    //                              class="card-img">
-    //                     </a>
-    //                     <h5 class="card-title">${truyen.tenTruyen || 'Không có tiêu đề'}</h5> <!-- Tăng kích thước h5 -->
-    //                 </div>
-    //             </div>
-    //             ${isHot ? '<span class="hot-label">Hot</span>' : ''}
-    //             <span class="time-label">${timeAgo}</span>
-    //         </div>
-    //     `);
-    //     }
-    // };
-
 });

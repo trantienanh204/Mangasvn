@@ -45,9 +45,7 @@ $(document).ready(function() {
         const title = escapeHtml(truyen.tenTruyen || "Chưa có tên truyện");
         const cover = escapeHtml(truyen.imageComic || "https://i.postimg.cc/zBZ7k81R/cass.jpg");
         const badge = isScrollable ? '<span class="comic-badge">ĐANG ĐƯỢC QUAN TÂM</span>' : '';
-        const favoriteButton = token
-            ? `<button class="favorite-btn" type="button" data-truyen-id="${Number(truyen.id)}" aria-label="Thêm truyện vào yêu thích">♡</button>`
-            : '';
+        const favoriteButton = `<button class="favorite-btn" type="button" data-truyen-id="${Number(truyen.id)}" aria-label="Thêm truyện vào yêu thích">♡</button>`;
 
         container.append(`
             <article class="comic-card ${isScrollable ? 'comic-card-featured' : ''}" id="${cardId}">
@@ -310,7 +308,7 @@ $(document).ready(function() {
 
     window.logout = function() {
         localStorage.removeItem("token");
-        window.location.href = "/view/trangchu.html";
+        window.location.href = "/";
     };
 });
 document.addEventListener("DOMContentLoaded", checkAdminAccess);

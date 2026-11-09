@@ -1,18 +1,23 @@
+/* ===================================================
+   MANGASVN - GENRES MEGA DROPDOWN (DARK NEON STYLE)
+   =================================================== */
+
 .genres-menu {
     position: fixed !important;
-    top: 65px !important;
+    top: 62px !important;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     transform: none !important;
-    background-color: rgba(18, 20, 26, 0.96) !important;
-    backdrop-filter: blur(14px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 2px solid #3b82f6;
+    background-color: rgba(11, 15, 25, 0.96) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 2px solid var(--accent-primary, #06b6d4);
     border-radius: 0 !important;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
     padding: 24px 8% !important;
     max-height: 75vh !important;
     overflow-y: auto !important;
@@ -23,7 +28,7 @@
 
 .genres-menu.show {
     display: block !important;
-    animation: slideDown 0.22s ease-out;
+    animation: slideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .genres-list {
@@ -38,25 +43,25 @@
 .genres-list a {
     text-decoration: none !important;
     color: #e2e8f0 !important;
-    background-color: #242731;
-    padding: 8px 12px;
+    background-color: #131b2e;
+    padding: 9px 12px;
     display: block;
     text-align: center;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 13.5px;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .genres-list a:hover {
     text-decoration: none !important;
-    background-color: #3b82f6 !important;
-    color: #ffffff !important;
-    border-color: #60a5fa !important;
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%) !important;
+    color: #0b0f19 !important;
+    border-color: #22d3ee !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35);
-    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(6, 182, 212, 0.4);
+    font-weight: 700;
 }
 
 @keyframes slideDown {
@@ -70,14 +75,14 @@
         gap: 8px;
     }
     .genres-menu {
-        top: 60px !important;
+        top: 58px !important;
         padding: 16px 4% !important;
     }
 }
 
 @media (max-width: 576px) {
     .genres-list {
-        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
         gap: 6px;
     }
     .genres-menu {

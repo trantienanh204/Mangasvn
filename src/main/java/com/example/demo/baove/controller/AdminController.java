@@ -6,6 +6,7 @@ import com.example.demo.baove.controller.error.messageSuccess;
 import com.example.demo.baove.entity.Comic;
 import com.example.demo.baove.entity.DanhMuc;
 import com.example.demo.baove.entity.Role;
+import com.example.demo.baove.entity.TacGia;
 import com.example.demo.baove.repository.RoleRepository;
 import com.example.demo.baove.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -284,6 +285,60 @@ public class AdminController {
         try {
             adminService.deleteCategory(id);
             return ResponseEntity.ok(new messageSuccess("Đã xóa thể loại ID " + id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // QUẢN LÝ TÁC GIẢ (AUTHORS)
+    // ==========================================
+
+    @GetMapping("/authors")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CHUTUT')")
+    public ResponseEntity<List<TacGia>> getAuthors(@RequestParam(required = false) String keyword) {
+        return ResponseEntity.ok(adminService.getAllAuthorsForAdmin(keyword));
+    }
+
+    @PostMapping("/authors")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CHUTUT')")
+    public ResponseEntity<?> createAuthor(@RequestBody AuthorRequestDTO request) {
+        try {
+            TacGia created = adminService.createAuthor(request);
+            return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/authors/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateAuthor(@PathVariable int id, @RequestBody AuthorRequestDTO request) {
+        try {
+            TacGia updated = adminService.updateAuthor(id, request);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/authors/{id}/toggle-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> toggleAuthorStatus(@PathVariable int id) {
+        try {
+            TacGia updated = adminService.toggleAuthorStatus(id);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/authors/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteAuthor(@PathVariable int id) {
+        try {
+            adminService.deleteAuthor(id);
+            return ResponseEntity.ok(new messageSuccess("Đã xóa tác giả ID " + id));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new messageError(e.getMessage()));
         }

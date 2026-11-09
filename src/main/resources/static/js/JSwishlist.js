@@ -103,22 +103,23 @@ $(document).ready(function() {
                     }).showToast();
                     localStorage.removeItem("token");
                     setTimeout(() => {
-                        window.location.href = "/api/auth/login";
+                        window.location.href = "/login";
                     }, 3000);
                 }
             }
         });
     }
     window.toggleFavorite = function (truyenId, isAdding) {
-        if (!token) {
+        const currentToken = localStorage.getItem("token");
+        if (!currentToken) {
             Toastify({
                 text: "Vui lòng đăng nhập để quản lý danh sách yêu thích!",
-                duration: 3000,
+                duration: 2500,
                 gravity: "top",
                 position: "right",
                 backgroundColor: "#ff4444"
             }).showToast();
-            window.location.href = "/api/auth/login";
+            setTimeout(() => { window.location.href = "/login"; }, 1200);
             return;
         }
 
@@ -131,7 +132,7 @@ $(document).ready(function() {
             url: url,
             method: method,
             headers: {
-                "Authorization": "Bearer " + token
+                "Authorization": "Bearer " + currentToken
             },
             success: function(response) {
                 Toastify({
@@ -159,7 +160,7 @@ $(document).ready(function() {
                         backgroundColor: "#ff4444"
                     }).showToast();
                     localStorage.removeItem("token");
-                    window.location.href = "/api/auth/login";
+                    window.location.href = "/login";
                 } else {
                     Toastify({
                         text: isAdding ? "Lỗi khi thêm vào danh sách yêu thích!" : "Lỗi khi xóa khỏi danh sách yêu thích!",
@@ -175,6 +176,6 @@ $(document).ready(function() {
 
     window.logout = function() {
         localStorage.removeItem("token");
-        window.location.href = "/view/trangchu.html";
+        window.location.href = "/";
     };
 });

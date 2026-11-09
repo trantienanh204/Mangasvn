@@ -1,6 +1,7 @@
 package com.example.demo.baove.service;
 
 import com.example.demo.baove.controller.DTO.AdminStatsDTO;
+import com.example.demo.baove.controller.DTO.AuthorRequestDTO;
 import com.example.demo.baove.controller.DTO.ComicAdminDTO;
 import com.example.demo.baove.controller.DTO.ReportDTO;
 import com.example.demo.baove.controller.DTO.UserAdminDTO;
@@ -55,6 +56,12 @@ public class AdminService {
     @Autowired
     private ComicDanhMucRepository comicDanhMucRepository;
 
+    @Autowired
+    private TacGiaRepository tacGiaRepository;
+
+    @Autowired
+    private ComicTacGiaRepository comicTacGiaRepository;
+
     /**
      * Thống kê tổng quan hệ thống cho Admin Dashboard
      */
@@ -66,8 +73,9 @@ public class AdminService {
         long totalComments = commentRepository.count();
         long totalViews = comicRepository.sumTotalViews();
         long totalReports = reportRepo.count();
+        long totalAuthors = tacGiaRepository.count();
 
-        return new AdminStatsDTO(totalComics, totalChapters, totalUsers, totalComments, totalViews, totalReports);
+        return new AdminStatsDTO(totalComics, totalChapters, totalUsers, totalComments, totalViews, totalReports, totalAuthors);
     }
 
     /**
@@ -460,5 +468,77 @@ public class AdminService {
         dto.setTrangThai(report.getTrangThai());
         dto.setNgayTao(report.getNgayTao());
         return dto;
+    }
+
+    // ==========================================
+    // QUẢN LÝ TÁC GIẢ (AUTHORS)
+    // ==========================================
+
+    @Transactional(readOnly = true)
+    public List<TacGia> getAllAuthorsForAdmin(String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return tacGiaRepository.findByTenTacGiaContainingIgnoreCase(keyword.trim());
+        }
+        return tacGiaRepository.findAll();
+    }
+
+    @Transactional
+    public TacGia createAuthor(AuthorRequestDTO request) {
+        if (request.getTenTacGia() == null || request.getTenTacGia().trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên tác giả không được để trống");
+        }
+        String ten = request.getTenTacGia().trim();
+        if (tacGiaRepository.existsByTenTacGiaIgnoreCase(ten)) {
+            throw new IllegalArgumentException("Tác giả '" + ten + "' đã tồn tại trong hệ thống");
+        }
+        TacGia author = new TacGia();
+        author.setTenTacGia(ten);
+        author.setTrangThai(request.getTrangThai() != null ? request.getTrangThai() : true);
+        author.setNgayTao(LocalDate.now());
+        author.setNgaySua(LocalDate.now());
+        return tacGiaRepository.save(author);
+    }
+
+    @Transactional
+    public TacGia updateAuthor(int id, AuthorRequestDTO request) {
+        TacGia author = tacGiaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tác giả với ID " + id));
+
+        if (request.getTenTacGia() != null && !request.getTenTacGia().trim().isEmpty()) {
+            String newName = request.getTenTacGia().trim();
+            if (!newName.equalsIgnoreCase(author.getTenTacGia()) && tacGiaRepository.existsByTenTacGiaIgnoreCase(newName)) {
+                throw new IllegalArgumentException("Tên tác giả '" + newName + "' đã được sử dụng");
+            }
+            author.setTenTacGia(newName);
+        }
+        if (request.getTrangThai() != null) {
+            author.setTrangThai(request.getTrangThai());
+        }
+        author.setNgaySua(LocalDate.now());
+        return tacGiaRepository.save(author);
+    }
+
+    @Transactional
+    public TacGia toggleAuthorStatus(int id) {
+        TacGia author = tacGiaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tác giả với ID " + id));
+        author.setTrangThai(!author.isTrangThai());
+        author.setNgaySua(LocalDate.now());
+        return tacGiaRepository.save(author);
+    }
+
+    @Transactional
+    public void deleteAuthor(int id) {
+        TacGia author = tacGiaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tác giả với ID " + id));
+
+        long comicCount = comicTacGiaRepository.countByTacGiaId(id);
+        if (comicCount > 0) {
+            author.setTrangThai(false);
+            author.setNgaySua(LocalDate.now());
+            tacGiaRepository.save(author);
+            throw new IllegalArgumentException("Tác giả đang gắn liền với " + comicCount + " bộ truyện. Hệ thống đã tự động chuyển sang trạng thái 'Ngừng hoạt động' thay vì xóa cứng.");
+        }
+        tacGiaRepository.delete(author);
     }
 }
